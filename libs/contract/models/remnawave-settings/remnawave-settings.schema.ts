@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { CloudflareAccessSettingsSchema } from './cloudflare-access-settings.schema';
 import { PasswordAuthSettingsSchema } from './password-auth-settings.schema';
 import { BrandingSettingsSchema } from './branding-settings.schema';
 import { PasskeySettingsSchema } from './passkey-settings.schema';
@@ -9,6 +10,7 @@ export const RemnawaveSettingsSchema = z.object({
     passkeySettings: z.nullable(PasskeySettingsSchema),
     oauth2Settings: z.nullable(Oauth2SettingsSchema),
     passwordSettings: z.nullable(PasswordAuthSettingsSchema),
+    cloudflareAccessSettings: z.nullable(CloudflareAccessSettingsSchema),
     brandingSettings: z.nullable(BrandingSettingsSchema),
 });
 

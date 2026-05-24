@@ -2,9 +2,11 @@ import { PrismaClient, RemnawaveSettings } from '@prisma/client';
 import consola from 'consola';
 
 import {
+    CloudflareAccessSettingsSchema,
     Oauth2SettingsSchema,
     PasskeySettingsSchema,
     TBrandingSettings,
+    TCloudflareAccessSettings,
     TOauth2Settings,
     TPasswordAuthSettings,
     TRemnawavePasskeySettings,
@@ -71,10 +73,20 @@ export async function seedRemnawaveSettings(prisma: PrismaClient) {
         enabled: true,
     };
 
+    const DEFAULT_CLOUDFLARE_ACCESS_SETTINGS: TCloudflareAccessSettings = {
+        enabled: false,
+        teamDomain: null,
+        audience: null,
+        emailAllowlistEnabled: true,
+        allowedEmails: [],
+        allowedDomains: [],
+    };
+
     const settingsMapping = {
         passkeySettings: DEFAULT_PASSKEY_SETTINGS,
         oauth2Settings: DEFAULT_OAUTH2_SETTINGS,
         passwordSettings: DEFAULT_PASSWORD_AUTH_SETTINGS,
+        cloudflareAccessSettings: DEFAULT_CLOUDFLARE_ACCESS_SETTINGS,
     };
 
     const DEFAULT_BRANDING_SETTINGS: TBrandingSettings = {
@@ -120,6 +132,22 @@ export async function seedRemnawaveSettings(prisma: PrismaClient) {
                         continue;
                     }
                 }
+
+                if (key === 'cloudflareAccessSettings') {
+                    if (
+                        !CloudflareAccessSettingsSchema.safeParse(
+                            existingConfig.cloudflareAccessSettings,
+                        ).success
+                    ) {
+                        consola.warn(`${key} is not valid! Falling back to default...`);
+                        await prisma.remnawaveSettings.update({
+                            where: { id: existingConfig.id },
+                            data: { [key]: DEFAULT_CLOUDFLARE_ACCESS_SETTINGS },
+                        });
+                        consola.success(`${key} updated to default`);
+                        continue;
+                    }
+                }
             }
         }
     }
@@ -129,6 +157,7 @@ export async function seedRemnawaveSettings(prisma: PrismaClient) {
             passkeySettings: DEFAULT_PASSKEY_SETTINGS,
             oauth2Settings: DEFAULT_OAUTH2_SETTINGS,
             passwordSettings: DEFAULT_PASSWORD_AUTH_SETTINGS,
+            cloudflareAccessSettings: DEFAULT_CLOUDFLARE_ACCESS_SETTINGS,
             brandingSettings: DEFAULT_BRANDING_SETTINGS,
         });
 

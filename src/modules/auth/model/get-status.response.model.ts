@@ -10,6 +10,9 @@ interface IAuthentication {
     password: {
         enabled: boolean;
     };
+    cloudflareAccess: {
+        enabled: boolean;
+    };
 }
 
 export class GetStatusResponseModel {

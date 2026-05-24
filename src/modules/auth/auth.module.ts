@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { getJWTConfig } from '@common/config/jwt/jwt.config';
 
 import { InjectRemnawaveSettingsMiddleware } from './middlewares/inject-remnawave-settings';
+import { CloudflareAccessService } from './services/cloudflare-access.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies';
@@ -14,7 +15,7 @@ import { COMMANDS } from './commands';
 @Module({
     imports: [CqrsModule, JwtModule.registerAsync(getJWTConfig()), HttpModule],
     controllers: [AuthController],
-    providers: [JwtStrategy, AuthService, ...COMMANDS],
+    providers: [JwtStrategy, CloudflareAccessService, AuthService, ...COMMANDS],
 })
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

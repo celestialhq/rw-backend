@@ -37,9 +37,11 @@ model RemnawaveSettings {
   /// [Oauth2Settings]
   oauth2Settings   Json? @map("oauth2_settings")
   /// [PasswordAuthSettings]
-  passwordSettings Json? @map("password_settings")
+  passwordSettings          Json? @map("password_settings")
+  /// [CloudflareAccessSettings]
+  cloudflareAccessSettings Json? @map("cloudflare_access_settings")
   /// [BrandingSettings]
-  brandingSettings Json? @map("branding_settings")
+  brandingSettings          Json? @map("branding_settings")
 
   @@map("remnawave_settings")
 }
