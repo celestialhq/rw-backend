@@ -321,7 +321,7 @@ export class ResolveProxyConfigService {
             transport: 'kcp',
             transportOptions: {
                 clientMtu: settings?.clientMtu || settings?.mtu || 1350,
-                tti: settings?.tti || 50,
+                clientTti: settings?.clientTti || settings?.tti || 50,
                 congestion: settings?.congestion || false,
             },
         };

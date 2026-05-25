@@ -77,7 +77,7 @@ export const GrpcTransportOptionsSchema = z.object({
 
 export const KcpTransportOptionsSchema = z.object({
     clientMtu: z.number().int(),
-    tti: z.number().int(),
+    clientTti: z.number().int(),
     congestion: z.boolean(),
 });
 

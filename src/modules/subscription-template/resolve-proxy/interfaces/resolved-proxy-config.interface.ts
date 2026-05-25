@@ -59,7 +59,7 @@ export interface IGrpcTransportOptions {
 
 export interface IKcpTransportOptions {
     clientMtu: number;
-    tti: number;
+    clientTti: number;
     congestion: boolean;
 }
 
