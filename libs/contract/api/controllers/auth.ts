@@ -4,6 +4,7 @@ export const AUTH_ROUTES = {
     LOGIN: 'login',
     REGISTER: 'register',
     GET_STATUS: 'status',
+    CLOUDFLARE_ACCESS: 'cloudflare-access',
 
     OAUTH2: {
         TELEGRAM_CALLBACK: 'oauth2/tg/callback',

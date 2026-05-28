@@ -28,6 +28,9 @@ export namespace GetStatusCommand {
                     password: z.object({
                         enabled: z.boolean(),
                     }),
+                    cloudflareAccess: z.object({
+                        enabled: z.boolean(),
+                    }),
                 }),
             ),
             branding: z.object({

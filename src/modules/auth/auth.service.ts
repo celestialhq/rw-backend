@@ -47,6 +47,7 @@ import {
     OAuth2CallbackResponseModel,
     GetStatusResponseModel,
 } from './model';
+import { CloudflareAccessService } from './services/cloudflare-access.service';
 import { VerifyPasskeyAuthenticationRequestDto } from './dtos';
 import { ILogin, IRegister } from './interfaces';
 
@@ -68,6 +69,7 @@ export class AuthService {
         private readonly commandBus: CommandBus,
         private readonly eventEmitter: EventEmitter2,
         private readonly httpService: HttpService,
+        private readonly cloudflareAccessService: CloudflareAccessService,
     ) {
         this.jwtSecret = this.configService.getOrThrow<string>('JWT_AUTH_SECRET');
         this.jwtLifetime = this.configService.getOrThrow<number>('JWT_AUTH_LIFETIME');
@@ -305,6 +307,9 @@ export class AuthService {
                         password: {
                             enabled: remnawaveSettings.passwordSettings.enabled,
                         },
+                        cloudflareAccess: {
+                            enabled: remnawaveSettings.cloudflareAccessSettings?.enabled ?? false,
+                        },
                     },
                     branding: remnawaveSettings.brandingSettings,
                 }),
@@ -534,6 +539,94 @@ export class AuthService {
             return ok(new OAuth2CallbackResponseModel({ accessToken: jwtToken }));
         } catch (error) {
             this.logger.error(`OAuth2 callback error (${provider}):`, error);
+            return fail(ERRORS.LOGIN_ERROR);
+        }
+    }
+
+    public async cloudflareAccessLogin(
+        assertion: string | undefined,
+        ip: string,
+        userAgent: string,
+    ): Promise<TResult<{ accessToken: string }>> {
+        try {
+            const statusResponse = await this.getStatus();
+
+            if (!statusResponse.isOk) {
+                return fail(ERRORS.GET_AUTH_STATUS_ERROR);
+            }
+
+            if (
+                !statusResponse.response.isLoginAllowed ||
+                !statusResponse.response.authentication?.cloudflareAccess.enabled
+            ) {
+                await this.emitFailedLoginAttempt(
+                    'Unknown',
+                    'Cloudflare Access assertion',
+                    ip,
+                    userAgent,
+                    'Cloudflare Access authentication is disabled or login is not allowed.',
+                );
+                return fail(ERRORS.FORBIDDEN);
+            }
+
+            const firstAdmin = await this.getFirstAdmin();
+            if (!firstAdmin.isOk) {
+                await this.emitFailedLoginAttempt(
+                    'Unknown',
+                    'Cloudflare Access assertion',
+                    ip,
+                    userAgent,
+                    'Superadmin not found.',
+                );
+                return fail(ERRORS.FORBIDDEN);
+            }
+
+            const remnawaveSettings = await this.queryBus.execute(
+                new GetCachedRemnawaveSettingsQuery(),
+            );
+
+            const assertionValidationResult = await this.cloudflareAccessService.validateAssertion(
+                assertion,
+                remnawaveSettings.cloudflareAccessSettings ?? {
+                    allowedDomains: [],
+                    allowedEmails: [],
+                    audience: null,
+                    emailAllowlistEnabled: true,
+                    enabled: false,
+                    teamDomain: null,
+                },
+            );
+
+            if (!assertionValidationResult.isOk) {
+                await this.emitFailedLoginAttempt(
+                    'Unknown',
+                    'Cloudflare Access assertion',
+                    ip,
+                    userAgent,
+                    'Cloudflare Access assertion validation failed.',
+                );
+                return fail(ERRORS.FORBIDDEN);
+            }
+
+            const accessToken = this.jwtService.sign(
+                {
+                    username: firstAdmin.response.username,
+                    uuid: firstAdmin.response.uuid,
+                    role: ROLE.ADMIN,
+                },
+                { expiresIn: `${this.jwtLifetime}h` },
+            );
+
+            await this.emitLoginSuccess(
+                assertionValidationResult.response.email,
+                ip,
+                userAgent,
+                'Logged via Cloudflare Access.',
+            );
+
+            return ok({ accessToken });
+        } catch (error) {
+            this.logger.error(`Cloudflare Access login error: ${error}`);
             return fail(ERRORS.LOGIN_ERROR);
         }
     }

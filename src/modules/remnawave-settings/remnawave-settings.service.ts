@@ -1,4 +1,5 @@
 import isEmail from 'validator/lib/isEmail';
+import isFQDN from 'validator/lib/isFQDN';
 
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -89,6 +90,7 @@ export class RemnawaveSettingsService {
                 !settings.oauth2Settings.yandex.enabled &&
                 !settings.oauth2Settings.keycloak.enabled &&
                 !settings.oauth2Settings.telegram.enabled &&
+                !settings.cloudflareAccessSettings?.enabled &&
                 !settings.passwordSettings.enabled &&
                 !settings.oauth2Settings.generic.enabled
             ) {
@@ -221,6 +223,59 @@ export class RemnawaveSettingsService {
                         valid: false,
                         error: `[Telegram OAuth2] At least one admin ID must be set in order to use Telegram OAuth2 authentication.`,
                     };
+                }
+            }
+
+            if (settings.cloudflareAccessSettings?.enabled) {
+                if (
+                    !settings.cloudflareAccessSettings.teamDomain ||
+                    !settings.cloudflareAccessSettings.audience
+                ) {
+                    return {
+                        valid: false,
+                        error: '[Cloudflare Access] Team domain and audience must be set in order to use Cloudflare Access authentication.',
+                    };
+                }
+
+                const normalizedTeamDomain = settings.cloudflareAccessSettings.teamDomain
+                    .trim()
+                    .replace(/^https?:\/\//, '')
+                    .replace(/\/.*$/, '');
+
+                if (!isFQDN(normalizedTeamDomain)) {
+                    return {
+                        valid: false,
+                        error: '[Cloudflare Access] Team domain must be a valid fully qualified domain name.',
+                    };
+                }
+
+                if (settings.cloudflareAccessSettings.emailAllowlistEnabled) {
+                    const { allowedEmails, allowedDomains } = settings.cloudflareAccessSettings;
+
+                    if (allowedEmails.length === 0 && allowedDomains.length === 0) {
+                        return {
+                            valid: false,
+                            error: '[Cloudflare Access] At least one allowed email or domain must be set when email allowlist is enabled.',
+                        };
+                    }
+
+                    for (const email of allowedEmails) {
+                        if (!isEmail(email)) {
+                            return {
+                                valid: false,
+                                error: `[Cloudflare Access] Email ${email} is not a valid email address.`,
+                            };
+                        }
+                    }
+
+                    for (const domain of allowedDomains) {
+                        if (!isFQDN(domain)) {
+                            return {
+                                valid: false,
+                                error: `[Cloudflare Access] Domain ${domain} is not a valid fully qualified domain name.`,
+                            };
+                        }
+                    }
                 }
             }
 

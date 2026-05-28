@@ -15,6 +15,7 @@ export class RemnawaveSettingsRepository {
             data: {
                 id: entity.id,
                 passkeySettings: entity.passkeySettings,
+                cloudflareAccessSettings: entity.cloudflareAccessSettings,
             },
         });
 

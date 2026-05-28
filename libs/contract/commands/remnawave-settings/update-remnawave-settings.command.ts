@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import {
     BrandingSettingsSchema,
+    CloudflareAccessSettingsSchema,
     Oauth2SettingsSchema,
     PasskeySettingsSchema,
     PasswordAuthSettingsSchema,
@@ -24,6 +25,7 @@ export namespace UpdateRemnawaveSettingsCommand {
         passkeySettings: PasskeySettingsSchema.optional(),
         oauth2Settings: Oauth2SettingsSchema.optional(),
         passwordSettings: PasswordAuthSettingsSchema.optional(),
+        cloudflareAccessSettings: CloudflareAccessSettingsSchema.optional(),
         brandingSettings: BrandingSettingsSchema.optional(),
     });
 

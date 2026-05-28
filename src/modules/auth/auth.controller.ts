@@ -4,7 +4,7 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Body, Controller, HttpStatus, UseFilters } from '@nestjs/common';
+import { Body, Controller, Headers, HttpStatus, UseFilters } from '@nestjs/common';
 
 import { GetRemnawaveSettings } from '@common/decorators/get-remnawave-settings';
 import { HttpExceptionFilter } from '@common/exception/http-exception.filter';
@@ -18,6 +18,7 @@ import {
     RegisterCommand,
     OAuth2AuthorizeCommand,
     OAuth2CallbackCommand,
+    CloudflareAccessCommand,
     GetPasskeyAuthenticationOptionsCommand,
     VerifyPasskeyAuthenticationCommand,
 } from '@libs/contracts/commands';
@@ -32,6 +33,7 @@ import {
     LoginResponseDto,
     RegisterRequestDto,
     RegisterResponseDto,
+    CloudflareAccessResponseDto,
     OAuth2AuthorizeResponseDto,
     OAuth2CallbackResponseDto,
     OAuth2CallbackRequestDto,
@@ -117,6 +119,30 @@ export class AuthController {
         const data = errorHandler(result);
         return {
             response: data,
+        };
+    }
+
+    @ApiResponse({
+        type: CloudflareAccessResponseDto,
+        description: 'JWT access token after successful Cloudflare Access authentication',
+    })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid Cloudflare Access assertion',
+    })
+    @Endpoint({
+        command: CloudflareAccessCommand,
+        httpCode: HttpStatus.OK,
+    })
+    async cloudflareAccessLogin(
+        @Headers('cf-access-jwt-assertion') assertion: string | undefined,
+        @IpAddress() ip: string,
+        @UserAgent() userAgent: string,
+    ): Promise<CloudflareAccessResponseDto> {
+        const result = await this.authService.cloudflareAccessLogin(assertion, ip, userAgent);
+
+        const data = errorHandler(result);
+        return {
+            response: new AuthResponseModel(data),
         };
     }
 
