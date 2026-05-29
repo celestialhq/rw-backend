@@ -2,6 +2,8 @@ name: Build&Push Release Docker Image
 
 on:
   push:
+    branches:
+      - main
     tags:
       - '*'
 
@@ -47,10 +49,15 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          else
+            echo "Skipping Docker Hub login because credentials are not configured."
+          fi
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -61,16 +68,51 @@ jobs:
 
       - name: Prepare build metadata
         id: meta
+        env:
+          DOCKERHUB_BACKEND_IMAGE: ${{ vars.DOCKERHUB_BACKEND_IMAGE }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          FRONTEND_REPOSITORY: ${{ vars.FRONTEND_REPOSITORY }}
         run: |
+          FRONTEND_REPOSITORY="${FRONTEND_REPOSITORY:-${GITHUB_REPOSITORY_OWNER}/rw-frontend}"
+          GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            TAGS="${GHCR_IMAGE}:${GITHUB_REF_NAME}"$'\n'"${GHCR_IMAGE}:latest"
+            if [[ "$GITHUB_REF_NAME" == 2.* ]]; then
+              TAGS="${TAGS}"$'\n'"${GHCR_IMAGE}:2"
+            fi
+            FRONTEND_URL="https://github.com/${FRONTEND_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/remnawave-frontend.zip"
+          else
+            TAGS="${GHCR_IMAGE}:main"
+            FRONTEND_URL="https://github.com/${FRONTEND_REPOSITORY}/releases/latest/download/remnawave-frontend.zip"
+          fi
+
+          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+              TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:${GITHUB_REF_NAME}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:latest"
+              if [[ "$GITHUB_REF_NAME" == 2.* ]]; then
+                TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:2"
+              fi
+            else
+              TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:main"
+            fi
+          fi
+
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "frontend_url=${FRONTEND_URL}" >> $GITHUB_OUTPUT
           echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
           echo "build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-          echo "frontend_commit=$(curl -s https://api.github.com/repos/remnawave/frontend/commits/${{ github.ref_name }} | jq -r '.sha')" >> $GITHUB_OUTPUT
+          echo "frontend_commit=$(curl -s https://api.github.com/repos/${FRONTEND_REPOSITORY}/commits/${{ github.ref_name }} | jq -r '.sha // \"unknown\"')" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           build-args: |
-            __RW_METADATA_GIT_BRANCH=main
+            FRONTEND_URL=${{ steps.meta.outputs.frontend_url }}
+            __RW_METADATA_GIT_BRANCH=${{ github.ref_name }}
             __RW_METADATA_BUILD_TIME=${{ steps.meta.outputs.build_time }}
             __RW_METADATA_BUILD_NUMBER=${{ github.run_number }}
             __RW_METADATA_VERSION=${{ steps.meta.outputs.version }}
@@ -79,16 +121,11 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            remnawave/backend:latest
-            remnawave/backend:${{github.ref_name}}
-            remnawave/backend:2
-            ghcr.io/remnawave/backend:latest
-            ghcr.io/remnawave/backend:${{github.ref_name}}
-            ghcr.io/remnawave/backend:2
+          tags: ${{ steps.meta.outputs.tags }}
 
   create-release:
     needs: [build-docker-image]
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -137,16 +174,14 @@ jobs:
             ${{ env.CHANGELOG }}
 
             Latest Docker image:
-            - `remnawave/backend:latest`
-            - `ghcr.io/remnawave/backend:latest`
+            - `ghcr.io/${{ github.repository }}:latest`
 
             Docker images:
-            - `remnawave/backend:${{github.ref_name}}`
-            - `ghcr.io/remnawave/backend:${{github.ref_name}}`
+            - `ghcr.io/${{ github.repository }}:${{github.ref_name}}`
 
   send-finish-tg-msg:
     name: Send TG message
-    needs: [build-docker-image, create-release]
+    needs: [build-docker-image]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
