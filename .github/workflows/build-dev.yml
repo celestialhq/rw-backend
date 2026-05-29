@@ -7,6 +7,10 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   send-tg-msg:
     name: Send TG message
@@ -45,7 +49,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.TOKEN_GH_DEPLOY }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare build metadata
         id: meta
