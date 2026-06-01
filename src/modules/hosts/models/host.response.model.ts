@@ -22,6 +22,7 @@ export class HostResponseModel {
     public finalMask: null | object;
     public serverDescription: null | string;
     public pinnedPeerCertSha256: string | null;
+    public verifyPeerCertByName: string | null;
 
     public shuffleHost: boolean;
     public mihomoX25519: boolean;
@@ -66,6 +67,7 @@ export class HostResponseModel {
         this.finalMask = data.finalMask;
         this.serverDescription = data.serverDescription;
         this.pinnedPeerCertSha256 = data.pinnedPeerCertSha256;
+        this.verifyPeerCertByName = data.verifyPeerCertByName;
         this.shuffleHost = data.shuffleHost;
         this.mihomoX25519 = data.mihomoX25519;
 

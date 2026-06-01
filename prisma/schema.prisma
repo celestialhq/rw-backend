@@ -276,6 +276,7 @@ model Hosts {
   serverDescription            String?  @map("server_description") @db.VarChar(30)
   vlessRouteId                 Int?     @map("vless_route_id")
   pinnedPeerCertSha256         String?  @map("pinned_peer_cert_sha256")
+  verifyPeerCertByName         String?  @map("verify_peer_cert_by_name")
   shuffleHost                  Boolean  @default(false) @map("shuffle_host")
   mihomoX25519                 Boolean  @default(false) @map("mihomo_x25519")
   xrayJsonTemplateUuid         String?  @map("xray_json_template_uuid") @db.Uuid

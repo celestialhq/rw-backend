@@ -72,6 +72,7 @@ export interface IHysteriaTransportOptions {
 
 export interface ITlsSecurityOptions {
     pinnedPeerCertSha256: string | null;
+    verifyPeerCertByName: string | null;
     alpn: string | null;
     enableSessionResumption: boolean;
     fingerprint: string | null;
