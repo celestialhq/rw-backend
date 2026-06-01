@@ -76,7 +76,7 @@ const XHTTP_FIELD_MAP: [string, string, boolean?][] = [
     ['xPaddingHeader', 'x-padding-header'],
     ['xPaddingPlacement', 'x-padding-placement'],
     ['xPaddingMethod', 'x-padding-method'],
-    ['uplinkHttpMethod', 'uplink-http-method'],
+    ['uplinkHTTPMethod', 'uplink-http-method'],
     ['sessionPlacement', 'session-placement'],
     ['sessionKey', 'session-key'],
     ['seqPlacement', 'seq-placement'],
@@ -233,7 +233,8 @@ export class MihomoGeneratorService {
                     node.alpn = opts.alpn.split(',');
                 }
 
-                if (opts.allowInsecure && node.type !== 'ss') {
+                // allowInsecure
+                if (opts.pinnedPeerCertSha256 && node.type !== 'ss') {
                     node['skip-cert-verify'] = true;
                 }
                 break;
@@ -647,11 +648,11 @@ export class MihomoGeneratorService {
 
     private buildHysteria2TlsFields(host: ResolvedProxyConfig): Record<string, unknown> {
         if (host.security !== 'tls') return {};
-        const { serverName, allowInsecure, fingerprint, alpn } = host.securityOptions;
+        const { serverName, pinnedPeerCertSha256, fingerprint, alpn } = host.securityOptions;
 
         return {
             ...(serverName && { sni: serverName }),
-            ...(allowInsecure && { 'skip-cert-verify': true }),
+            ...(pinnedPeerCertSha256 && { 'skip-cert-verify': true }),
             ...(fingerprint && { 'client-fingerprint': fingerprint }),
             ...(alpn && { alpn: alpn.split(',') }),
         };

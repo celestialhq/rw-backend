@@ -24,7 +24,8 @@ export class HostsEntity implements Hosts {
     finalMask: null | object;
     isDisabled: boolean;
     serverDescription: null | string;
-    allowInsecure: boolean;
+    pinnedPeerCertSha256: string | null;
+    verifyPeerCertByName: string | null;
 
     tag: null | string;
     isHidden: boolean;
