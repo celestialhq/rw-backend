@@ -453,7 +453,7 @@ export class HostsService {
 
     public async getAllHostTags(): Promise<TResult<string[]>> {
         try {
-            const result = await this.hostsRepository.getAllHostTags();
+            const result = await this.hostsRepository.findAllTags();
 
             return ok(result);
         } catch (error) {

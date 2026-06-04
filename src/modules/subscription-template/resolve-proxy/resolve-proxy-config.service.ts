@@ -566,7 +566,7 @@ export class ResolveProxyConfigService {
             },
             metadata: {
                 uuid: inputHost.uuid,
-                tag: inputHost.tag,
+                tags: inputHost.tags,
                 excludeFromSubscriptionTypes: inputHost.excludeFromSubscriptionTypes,
                 inboundTag: inputHost.inboundTag,
                 configProfileUuid: inputHost.configProfileUuid,
@@ -679,7 +679,7 @@ export class ResolveProxyConfigService {
                     },
                     metadata: {
                         uuid: '00000000-0000-0000-0000-000000000000',
-                        tag: null,
+                        tags: [],
                         excludeFromSubscriptionTypes: [],
                         inboundTag: '',
                         configProfileUuid: null,

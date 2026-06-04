@@ -35,7 +35,7 @@ const entityToModel = (entity: HostsEntity): Hosts => {
         shuffleHost: entity.shuffleHost,
         mihomoX25519: entity.mihomoX25519,
         mihomoIpVersion: entity.mihomoIpVersion,
-        tag: entity.tag,
+        tags: entity.tags,
         isHidden: entity.isHidden,
 
         overrideSniFromAddress: entity.overrideSniFromAddress,

@@ -204,7 +204,7 @@ export const SecurityVariantSchema = z.discriminatedUnion('security', [
 
 export const ProxyEntryMetadataSchema = z.object({
     uuid: z.string().uuid(),
-    tag: z.string().nullable(),
+    tags: z.array(z.string()),
     excludeFromSubscriptionTypes: z.array(z.nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE)),
     inboundTag: z.string(),
     configProfileUuid: z.string().uuid().nullable(),

@@ -28,7 +28,7 @@ export class HostsEntity implements Hosts {
     pinnedPeerCertSha256: string | null;
     verifyPeerCertByName: string | null;
     mihomoIpVersion: TMihomoIpVersion | null;
-    tag: null | string;
+    tags: string[];
     isHidden: boolean;
 
     overrideSniFromAddress: boolean;

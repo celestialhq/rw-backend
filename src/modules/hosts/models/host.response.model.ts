@@ -31,7 +31,7 @@ export class HostResponseModel {
     public shuffleHost: boolean;
     public mihomoX25519: boolean;
     public mihomoIpVersion: TMihomoIpVersion | null;
-    public tag: null | string;
+    public tags: string[];
     public isHidden: boolean;
 
     public overrideSniFromAddress: boolean;
@@ -76,7 +76,7 @@ export class HostResponseModel {
         this.mihomoX25519 = data.mihomoX25519;
         this.mihomoIpVersion = data.mihomoIpVersion;
 
-        this.tag = data.tag;
+        this.tags = data.tags;
         this.isHidden = data.isHidden;
 
         this.overrideSniFromAddress = data.overrideSniFromAddress;

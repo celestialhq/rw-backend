@@ -95,6 +95,7 @@ export class HostsRepository implements ICrud<HostsEntity> {
             | 'excludedInternalSquads'
             | 'excludeFromSubscriptionTypes'
             | 'finalMask'
+            | 'tags'
         >,
     ): Promise<HostsEntity[]> {
         const list = await this.prisma.tx.hosts.findMany({
@@ -254,15 +255,16 @@ export class HostsRepository implements ICrud<HostsEntity> {
         return true;
     }
 
-    public async getAllHostTags(): Promise<string[]> {
-        const result = await this.prisma.tx.hosts.findMany({
-            select: {
-                tag: true,
-            },
-            distinct: ['tag'],
-        });
+    public async findAllTags(): Promise<string[]> {
+        const result = await this.qb.kysely
+            .selectFrom('hosts')
+            .select(sql<string>`unnest(tags)`.as('tag'))
+            .distinct()
+            .where('tags', 'is not', null)
+            .orderBy('tag')
+            .execute();
 
-        return result.map((host) => host.tag).filter((tag) => tag !== null);
+        return result.map((value) => value.tag);
     }
 
     public async addNodesToHost(hostUuid: string, nodes: string[]): Promise<boolean> {
