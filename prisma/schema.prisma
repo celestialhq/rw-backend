@@ -177,6 +177,7 @@ model Nodes {
 
   lastStatusChange  DateTime? @map("last_status_change")
   lastStatusMessage String?   @map("last_status_message")
+  note              String?   @map("note") @db.VarChar(255)
 
   consumptionMultiplier BigInt @default(1000000000) @map("consumption_multiplier")
 

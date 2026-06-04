@@ -22,7 +22,7 @@ export class NodeResponseModel {
     public trafficLimitBytes: null | number;
     public trafficUsedBytes: null | number;
     public notifyPercent: null | number;
-
+    public note: null | string;
     public viewPosition: number;
     public countryCode: string;
     public tags: string[];
@@ -57,7 +57,7 @@ export class NodeResponseModel {
         this.trafficLimitBytes = Number(data.trafficLimitBytes);
         this.trafficUsedBytes = Number(data.trafficUsedBytes);
         this.notifyPercent = data.notifyPercent;
-
+        this.note = data.note;
         this.consumptionMultiplier = fromNanoToNumber(data.consumptionMultiplier);
 
         this.tags = data.tags;

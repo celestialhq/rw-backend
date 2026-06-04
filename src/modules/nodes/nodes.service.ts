@@ -580,6 +580,7 @@ export class NodesService {
                 providerUuid: fields.providerUuid,
                 tags: fields.tags,
                 activePluginUuid: fields.activePluginUuid,
+                note: fields.note,
             };
 
             await this.nodesRepository.updateMany(uuids, fieldsToUpdate);

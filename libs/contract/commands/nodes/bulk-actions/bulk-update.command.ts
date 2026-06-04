@@ -41,6 +41,9 @@ export namespace BulkNodesUpdateCommand {
                     .max(10, 'Maximum 10 tags'),
             ),
             activePluginUuid: z.optional(z.nullable(z.string().uuid())),
+            note: z.optional(
+                z.string().max(255, 'Note must be less than 255 characters').nullable(),
+            ),
         }),
     });
 

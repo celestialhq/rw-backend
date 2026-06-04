@@ -37,6 +37,7 @@ export class NodesEntity implements Nodes {
     public providerUuid: string | null;
     public provider: InfraProviderEntity | null;
     public activePluginUuid: string | null;
+    public note: string | null;
 
     constructor(node: Partial<INodesWithResolvedInbounds & Nodes>) {
         Object.assign(this, node);
