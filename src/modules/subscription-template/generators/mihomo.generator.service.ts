@@ -3,6 +3,8 @@ import _ from 'lodash';
 
 import { Injectable, Logger } from '@nestjs/common';
 
+import { FINGERPRINTS } from '@libs/contracts/constants';
+
 import { SubscriptionTemplateService } from '@modules/subscription-template/subscription-template.service';
 
 import { ResolvedProxyConfig } from '../resolve-proxy/interfaces';
@@ -271,14 +273,12 @@ export class MihomoGeneratorService {
     }
 
     private resolveFingerprint(host: ResolvedProxyConfig): string {
-        switch (host.security) {
-            case 'tls':
-                return host.securityOptions.fingerprint ?? 'chrome';
-            case 'reality':
-                return host.securityOptions.fingerprint ?? 'chrome';
-            case 'none':
-                return 'chrome';
+        const raw = host.securityOptions?.fingerprint?.toLowerCase();
+        if (!raw) {
+            return 'chrome';
         }
+
+        return FINGERPRINTS.find((fp) => raw.includes(fp)) ?? 'chrome';
     }
 
     private resolveClashNetwork(host: ResolvedProxyConfig): string {

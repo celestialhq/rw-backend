@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import {
     getEndpointDetails,
-    FINGERPRINTS,
     SECURITY_LAYERS,
     ALPN,
     SUBSCRIPTION_TEMPLATE_TYPE,
@@ -53,7 +52,7 @@ export namespace UpdateHostCommand {
         sni: z.optional(z.string()),
         host: z.optional(z.string()),
         alpn: z.optional(z.nativeEnum(ALPN).nullable()),
-        fingerprint: z.optional(z.nativeEnum(FINGERPRINTS).nullable()),
+        fingerprint: z.optional(z.string().nullable()),
         isDisabled: z.optional(z.boolean()),
         securityLayer: z.optional(z.nativeEnum(SECURITY_LAYERS)),
         xHttpExtraParams: z.optional(z.nullable(z.unknown())),
