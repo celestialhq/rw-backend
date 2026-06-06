@@ -7,6 +7,7 @@ import { Injectable } from '@nestjs/common';
 
 import { getKyselyUuid } from '@common/helpers/kysely/get-kysely-uuid';
 import { values } from '@common/helpers/kysely/values';
+import { INodeConnectionOpts } from '@common/axios';
 import { TxKyselyService } from '@common/database';
 import { ICrud } from '@common/types/crud-port';
 
@@ -73,39 +74,56 @@ export class NodesRepository implements ICrud<NodesEntity> {
     public async findConnectedNodesPartial(): Promise<IGetOnlineNodesPartialResponse[]> {
         const nodesList = await this.qb.kysely
             .selectFrom('nodes')
-            .select(['uuid', 'address', 'port', 'consumptionMultiplier', 'id'])
+            .select(['uuid', 'consumptionMultiplier', 'id', 'address', 'port', 'proxyUrl'])
             .where('isConnected', '=', true)
             .where('isDisabled', '=', false)
             .where('isConnecting', '=', false)
             .where('activeConfigProfileUuid', 'is not', null)
             .execute();
 
-        return nodesList;
+        return nodesList.map((value) => ({
+            uuid: value.uuid,
+            consumptionMultiplier: value.consumptionMultiplier,
+            id: value.id,
+            connectionOpts: {
+                address: value.address,
+                port: value.port,
+                proxyUrl: value.proxyUrl,
+            },
+        }));
     }
 
     public async findEnabledNodesPartial(): Promise<IGetEnabledNodesPartialResponse[]> {
         const nodesList = await this.qb.kysely
             .selectFrom('nodes')
-            .select(['uuid', 'address', 'port', 'isConnected'])
+            .select(['uuid', 'isConnected', 'address', 'port', 'proxyUrl'])
             .where('isDisabled', '=', false)
             .where('isConnecting', '=', false)
             .execute();
 
-        return nodesList;
+        return nodesList.map((value) => ({
+            uuid: value.uuid,
+            isConnected: value.isConnected,
+            connectionOpts: {
+                address: value.address,
+                port: value.port,
+                proxyUrl: value.proxyUrl,
+            },
+        }));
     }
 
     public async findConnectedNodesWithoutInbounds(): Promise<
         {
             uuid: string;
-            address: string;
-            port: number | null;
+            connectionOpts: INodeConnectionOpts;
         }[]
     > {
-        return await this.prisma.tx.nodes.findMany({
+        const result = await this.prisma.tx.nodes.findMany({
             select: {
                 uuid: true,
                 address: true,
                 port: true,
+                proxyUrl: true,
             },
             where: {
                 isConnected: true,
@@ -115,6 +133,15 @@ export class NodesRepository implements ICrud<NodesEntity> {
                 },
             },
         });
+
+        return result.map((value) => ({
+            uuid: value.uuid,
+            connectionOpts: {
+                address: value.address,
+                port: value.port,
+                proxyUrl: value.proxyUrl,
+            },
+        }));
     }
 
     public async findAllNodes(): Promise<NodesEntity[]> {

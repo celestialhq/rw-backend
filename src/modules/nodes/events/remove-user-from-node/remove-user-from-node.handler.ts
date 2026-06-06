@@ -34,10 +34,7 @@ export class RemoveUserFromNodeHandler implements IEventHandler<RemoveUserFromNo
             await this.nodesQueuesService.removeUserFromNodeBulk(
                 nodes.map((node) => ({
                     data: userData,
-                    node: {
-                        address: node.address,
-                        port: node.port,
-                    },
+                    node: node.connectionOpts,
                 })),
             );
 

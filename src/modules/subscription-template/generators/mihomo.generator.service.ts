@@ -3,6 +3,8 @@ import _ from 'lodash';
 
 import { Injectable, Logger } from '@nestjs/common';
 
+import { FINGERPRINTS } from '@libs/contracts/constants';
+
 import { SubscriptionTemplateService } from '@modules/subscription-template/subscription-template.service';
 
 import { ResolvedProxyConfig } from '../resolve-proxy/interfaces';
@@ -57,6 +59,7 @@ interface ProxyNode {
     servername?: string;
     'skip-cert-verify'?: boolean;
     'packet-encoding'?: string;
+    'ip-version'?: string;
     sni?: string;
     tls?: boolean;
     type: string;
@@ -161,6 +164,7 @@ export class MihomoGeneratorService {
             port: host.port,
             network: this.resolveClashNetwork(host),
             udp: true,
+            'ip-version': host.clientOverrides.mihomoIpVersion ?? undefined,
         };
 
         if (!this.applyProtocolFields(node, host)) {
@@ -269,14 +273,12 @@ export class MihomoGeneratorService {
     }
 
     private resolveFingerprint(host: ResolvedProxyConfig): string {
-        switch (host.security) {
-            case 'tls':
-                return host.securityOptions.fingerprint ?? 'chrome';
-            case 'reality':
-                return host.securityOptions.fingerprint ?? 'chrome';
-            case 'none':
-                return 'chrome';
+        const raw = host.securityOptions?.fingerprint?.toLowerCase();
+        if (!raw) {
+            return 'chrome';
         }
+
+        return FINGERPRINTS.find((fp) => raw.includes(fp)) ?? 'chrome';
     }
 
     private resolveClashNetwork(host: ResolvedProxyConfig): string {

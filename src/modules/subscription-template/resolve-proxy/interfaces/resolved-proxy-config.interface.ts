@@ -1,6 +1,6 @@
 import { SplitHTTPMode, TCPHeaderHTTP, TCPHeaderNone, VLessFlow } from 'xray-typed';
 
-import { TSubscriptionTemplateType } from '@libs/contracts/constants';
+import { TMihomoIpVersion, TSubscriptionTemplateType } from '@libs/contracts/constants';
 
 // ─── Protocol Options ────────────────────────────────────
 
@@ -187,7 +187,7 @@ export type SecurityVariant = TlsSecurity | RealitySecurity | NoneSecurity;
 
 export interface IProxyEntryMetadata {
     uuid: string;
-    tag: string | null;
+    tags: string[];
     excludeFromSubscriptionTypes: TSubscriptionTemplateType[];
     inboundTag: string;
     configProfileUuid: string | null;
@@ -217,6 +217,7 @@ export type ResolvedProxyConfig = {
     clientOverrides: {
         shuffleHost: boolean;
         mihomoX25519: boolean;
+        mihomoIpVersion: TMihomoIpVersion | null;
         serverDescription: string | null;
         xrayJsonTemplate: object | null;
     };

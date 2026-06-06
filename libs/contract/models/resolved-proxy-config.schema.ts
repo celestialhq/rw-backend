@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { SUBSCRIPTION_TEMPLATE_TYPE } from '../constants';
+import { MIHOMO_IP_VERSION, SUBSCRIPTION_TEMPLATE_TYPE } from '../constants';
 
 export const VlessProtocolOptionsSchema = z.object({
     encryption: z.string(),
@@ -204,7 +204,7 @@ export const SecurityVariantSchema = z.discriminatedUnion('security', [
 
 export const ProxyEntryMetadataSchema = z.object({
     uuid: z.string().uuid(),
-    tag: z.string().nullable(),
+    tags: z.array(z.string()),
     excludeFromSubscriptionTypes: z.array(z.nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE)),
     inboundTag: z.string(),
     configProfileUuid: z.string().uuid().nullable(),
@@ -254,6 +254,7 @@ export const ResolvedProxyConfigSchema = z.object({
     clientOverrides: z.object({
         shuffleHost: z.boolean(),
         mihomoX25519: z.boolean(),
+        mihomoIpVersion: z.nativeEnum(MIHOMO_IP_VERSION).nullable(),
         serverDescription: z.string().nullable(),
         xrayJsonTemplate: z.nullable(z.unknown()),
     }),

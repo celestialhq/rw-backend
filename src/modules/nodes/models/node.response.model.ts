@@ -11,6 +11,7 @@ export class NodeResponseModel {
     public name: string;
     public address: string;
     public port: null | number;
+    public proxyUrl: string | null;
     public isConnected: boolean;
     public isConnecting: boolean;
     public isDisabled: boolean;
@@ -22,7 +23,7 @@ export class NodeResponseModel {
     public trafficLimitBytes: null | number;
     public trafficUsedBytes: null | number;
     public notifyPercent: null | number;
-
+    public note: null | string;
     public viewPosition: number;
     public countryCode: string;
     public tags: string[];
@@ -47,6 +48,7 @@ export class NodeResponseModel {
         this.name = data.name;
         this.address = data.address;
         this.port = data.port;
+        this.proxyUrl = data.proxyUrl;
         this.isConnected = data.isConnected;
         this.isConnecting = data.isConnecting;
         this.isDisabled = data.isDisabled;
@@ -57,7 +59,7 @@ export class NodeResponseModel {
         this.trafficLimitBytes = Number(data.trafficLimitBytes);
         this.trafficUsedBytes = Number(data.trafficUsedBytes);
         this.notifyPercent = data.notifyPercent;
-
+        this.note = data.note;
         this.consumptionMultiplier = fromNanoToNumber(data.consumptionMultiplier);
 
         this.tags = data.tags;

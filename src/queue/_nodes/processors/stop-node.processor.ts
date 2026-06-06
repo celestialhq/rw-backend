@@ -44,7 +44,11 @@ export class StopNodeProcessor extends WorkerHost {
                 return true;
             }
 
-            await this.axios.stopXray(result.response.address, result.response.port);
+            await this.axios.stopXray({
+                address: result.response.address,
+                port: result.response.port,
+                proxyUrl: result.response.proxyUrl,
+            });
 
             // TODO: disable plugins?
 

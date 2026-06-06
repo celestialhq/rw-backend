@@ -116,6 +116,7 @@ export class IpControlService {
                             node: {
                                 address: node.address,
                                 port: node.port,
+                                proxyUrl: node.proxyUrl,
                             },
                         });
                     }
@@ -130,6 +131,7 @@ export class IpControlService {
                             node: {
                                 address: node.address,
                                 port: node.port,
+                                proxyUrl: node.proxyUrl,
                             },
                         });
                     }

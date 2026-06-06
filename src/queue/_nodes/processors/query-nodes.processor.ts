@@ -83,8 +83,11 @@ export class QueryNodesQueueProcessor extends WorkerHost {
                 try {
                     const ipsListResponse = await this.axios.getIpsList(
                         { userId: job.data.userId },
-                        node.address,
-                        node.port,
+                        {
+                            address: node.address,
+                            port: node.port,
+                            proxyUrl: node.proxyUrl,
+                        },
                     );
 
                     if (!ipsListResponse.isOk || !ipsListResponse.response.response.ips.length) {
@@ -168,10 +171,11 @@ export class QueryNodesQueueProcessor extends WorkerHost {
                 };
             }
 
-            const result = await this.axios.getUsersIpsList(
-                nodeResult.response.address,
-                nodeResult.response.port,
-            );
+            const result = await this.axios.getUsersIpsList({
+                address: nodeResult.response.address,
+                port: nodeResult.response.port,
+                proxyUrl: nodeResult.response.proxyUrl,
+            });
 
             if (!result.isOk) {
                 return {

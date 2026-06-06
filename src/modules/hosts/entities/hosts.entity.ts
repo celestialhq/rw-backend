@@ -2,6 +2,7 @@ import { Hosts } from '@prisma/client';
 
 import {
     SUBSCRIPTION_TEMPLATE_TYPE_VALUES,
+    TMihomoIpVersion,
     TSecurityLayers,
     TSubscriptionTemplateType,
 } from '@contract/constants';
@@ -26,8 +27,8 @@ export class HostsEntity implements Hosts {
     serverDescription: null | string;
     pinnedPeerCertSha256: string | null;
     verifyPeerCertByName: string | null;
-
-    tag: null | string;
+    mihomoIpVersion: TMihomoIpVersion | null;
+    tags: string[];
     isHidden: boolean;
 
     overrideSniFromAddress: boolean;

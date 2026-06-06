@@ -34,8 +34,8 @@ const entityToModel = (entity: HostsEntity): Hosts => {
         verifyPeerCertByName: entity.verifyPeerCertByName,
         shuffleHost: entity.shuffleHost,
         mihomoX25519: entity.mihomoX25519,
-
-        tag: entity.tag,
+        mihomoIpVersion: entity.mihomoIpVersion,
+        tags: entity.tags,
         isHidden: entity.isHidden,
 
         overrideSniFromAddress: entity.overrideSniFromAddress,

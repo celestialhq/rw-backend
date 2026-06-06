@@ -177,7 +177,11 @@ export class StartAllNodesByProfileQueueProcessor extends WorkerHost {
                 }
 
                 let pluginsSupported = true;
-                const xrayStatusResponse = await this.axios.getNodeHealth(node.address, node.port);
+                const xrayStatusResponse = await this.axios.getNodeHealth({
+                    address: node.address,
+                    port: node.port,
+                    proxyUrl: node.proxyUrl,
+                });
 
                 if (!xrayStatusResponse.isOk) {
                     await this.commandBus.execute(
@@ -250,8 +254,11 @@ export class StartAllNodesByProfileQueueProcessor extends WorkerHost {
                         {
                             plugin,
                         },
-                        node.address,
-                        node.port,
+                        {
+                            address: node.address,
+                            port: node.port,
+                            proxyUrl: node.proxyUrl,
+                        },
                     );
 
                     if (!syncNodePluginsResponse.isOk) {
@@ -294,8 +301,11 @@ export class StartAllNodesByProfileQueueProcessor extends WorkerHost {
                             forceRestart: payload.force ?? false,
                         },
                     },
-                    node.address,
-                    node.port,
+                    {
+                        address: node.address,
+                        port: node.port,
+                        proxyUrl: node.proxyUrl,
+                    },
                 );
 
                 switch (startXrayResponse.isOk) {

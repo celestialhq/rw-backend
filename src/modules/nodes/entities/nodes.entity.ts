@@ -11,6 +11,7 @@ export class NodesEntity implements Nodes {
     public name: string;
     public address: string;
     public port: null | number;
+    public proxyUrl: string | null;
     public isConnected: boolean;
     public isConnecting: boolean;
     public isDisabled: boolean;
@@ -37,6 +38,7 @@ export class NodesEntity implements Nodes {
     public providerUuid: string | null;
     public provider: InfraProviderEntity | null;
     public activePluginUuid: string | null;
+    public note: string | null;
 
     constructor(node: Partial<INodesWithResolvedInbounds & Nodes>) {
         Object.assign(this, node);

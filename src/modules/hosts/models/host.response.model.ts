@@ -1,4 +1,9 @@
-import { TSecurityLayers, TSubscriptionTemplateType } from '@libs/contracts/constants';
+import {
+    TAlpnValues,
+    TMihomoIpVersion,
+    TSecurityLayers,
+    TSubscriptionTemplateType,
+} from '@libs/contracts/constants';
 
 import { HostsEntity } from '../entities/hosts.entity';
 
@@ -12,7 +17,7 @@ export class HostResponseModel {
     public path: null | string;
     public sni: null | string;
     public host: null | string;
-    public alpn: null | string;
+    public alpn: null | TAlpnValues;
     public fingerprint: null | string;
     public isDisabled: boolean;
     public securityLayer: TSecurityLayers;
@@ -26,8 +31,8 @@ export class HostResponseModel {
 
     public shuffleHost: boolean;
     public mihomoX25519: boolean;
-
-    public tag: null | string;
+    public mihomoIpVersion: TMihomoIpVersion | null;
+    public tags: string[];
     public isHidden: boolean;
 
     public overrideSniFromAddress: boolean;
@@ -56,7 +61,7 @@ export class HostResponseModel {
         this.path = data.path;
         this.sni = data.sni;
         this.host = data.host;
-        this.alpn = data.alpn;
+        this.alpn = data.alpn as TAlpnValues | null;
         this.fingerprint = data.fingerprint;
 
         this.isDisabled = data.isDisabled;
@@ -70,8 +75,9 @@ export class HostResponseModel {
         this.verifyPeerCertByName = data.verifyPeerCertByName;
         this.shuffleHost = data.shuffleHost;
         this.mihomoX25519 = data.mihomoX25519;
+        this.mihomoIpVersion = data.mihomoIpVersion;
 
-        this.tag = data.tag;
+        this.tags = data.tags;
         this.isHidden = data.isHidden;
 
         this.overrideSniFromAddress = data.overrideSniFromAddress;

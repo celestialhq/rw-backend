@@ -37,19 +37,18 @@ export class RecordNodeUsageQueueProcessor extends WorkerHost {
 
     async process(job: Job<IRecordNodeUsagePayload>) {
         try {
-            const { nodeUuid, nodeAddress, nodePort } = job.data;
+            const { nodeUuid, connectionOpts } = job.data;
 
             const combinedStats = await this.axios.getCombinedStats(
                 {
                     reset: true,
                 },
-                nodeAddress,
-                nodePort,
+                connectionOpts,
             );
 
             if (!combinedStats.isOk) {
                 this.logger.warn(
-                    `Node ${nodeUuid}, ${nodeAddress}:${nodePort} – stats are not available, skipping`,
+                    `Node ${nodeUuid}, ${connectionOpts.address}:${connectionOpts.port} – stats are not available, skipping`,
                 );
                 return;
             }
@@ -97,7 +96,6 @@ export class RecordNodeUsageQueueProcessor extends WorkerHost {
         }
 
         const totalBytes = totalDownlink + totalUplink;
-
         await this.commandBus.execute(
             new UpsertHistoryEntryCommand(
                 new NodesUsageHistoryEntity({

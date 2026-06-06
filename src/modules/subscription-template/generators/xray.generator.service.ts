@@ -388,13 +388,13 @@ export class XrayGeneratorService {
     // ── Query String Builder ─────────────────────────
 
     private buildQueryString(params: Record<string, unknown>): string {
-        const stringParams: Record<string, string> = {};
+        const parts: string[] = [];
 
         for (const [key, value] of Object.entries(params)) {
             if (value === undefined || value === null) continue;
-            stringParams[key] = String(value);
+            parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
         }
 
-        return new URLSearchParams(stringParams).toString();
+        return parts.join('&');
     }
 }

@@ -164,11 +164,12 @@ model Keygen {
 }
 
 model Nodes {
-  id      BigInt @unique @default(autoincrement()) @map("id")
-  uuid    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name    String @unique @map("name")
-  address String @unique @map("address")
-  port    Int?   @map("port")
+  id       BigInt  @unique @default(autoincrement()) @map("id")
+  uuid     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String  @unique @map("name")
+  address  String  @unique @map("address")
+  port     Int?    @map("port")
+  proxyUrl String? @map("proxy_url")
 
   activeConfigProfileUuid String? @map("active_config_profile_uuid") @db.Uuid
   activePluginUuid        String? @map("active_plugin_uuid") @db.Uuid
@@ -179,6 +180,7 @@ model Nodes {
 
   lastStatusChange  DateTime? @map("last_status_change")
   lastStatusMessage String?   @map("last_status_message")
+  note              String?   @map("note") @db.VarChar(255)
 
   consumptionMultiplier BigInt @default(1000000000) @map("consumption_multiplier")
 
@@ -281,12 +283,13 @@ model Hosts {
   verifyPeerCertByName         String?  @map("verify_peer_cert_by_name")
   shuffleHost                  Boolean  @default(false) @map("shuffle_host")
   mihomoX25519                 Boolean  @default(false) @map("mihomo_x25519")
+  mihomoIpVersion              String?  @map("mihomo_ip_version") // ENUM: dual, ipv4, ipv6, ipv4-prefer, ipv6-prefer
   xrayJsonTemplateUuid         String?  @map("xray_json_template_uuid") @db.Uuid
   keepSniBlank                 Boolean  @default(false) @map("keep_sni_blank")
   excludeFromSubscriptionTypes String[] @default([]) @map("exclude_from_subscription_types")
 
-  tag      String? @map("tag")
-  isHidden Boolean @default(false) @map("is_hidden")
+  tags     String[] @default([]) @map("tags")
+  isHidden Boolean  @default(false) @map("is_hidden")
 
   overrideSniFromAddress Boolean @default(false) @map("override_sni_from_address")
 

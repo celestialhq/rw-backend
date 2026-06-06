@@ -50,14 +50,17 @@ export class RecordUserUsageQueueProcessor extends WorkerHost {
 
     async process(job: Job<IRecordUserUsagePayload>) {
         try {
-            const { nodeUuid, nodeAddress, nodePort, consumptionMultiplier, nodeId } = job.data;
+            const { nodeUuid, connectionOpts, consumptionMultiplier, nodeId } = job.data;
 
             const response = await this.axios.getUsersStats(
                 {
                     reset: true,
                 },
-                nodeAddress,
-                nodePort,
+                {
+                    address: connectionOpts.address,
+                    port: connectionOpts.port,
+                    proxyUrl: connectionOpts.proxyUrl,
+                },
             );
 
             switch (response.isOk) {
@@ -76,7 +79,7 @@ export class RecordUserUsageQueueProcessor extends WorkerHost {
                     );
 
                     this.logger.error(
-                        `Failed to get users stats, node: ${nodeUuid} – ${nodeAddress}:${nodePort}, error: ${JSON.stringify(
+                        `Failed to get users stats, node: ${nodeUuid} – ${connectionOpts.address}:${connectionOpts.port}, error: ${JSON.stringify(
                             response,
                         )}`,
                     );
