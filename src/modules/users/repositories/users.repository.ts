@@ -215,6 +215,19 @@ export class UsersRepository {
 
         if (sorting?.length) {
             for (const sort of sorting) {
+                if (sort.id === 'usedTrafficPercentage') {
+                    qb = qb.orderBy(
+                        (eb) =>
+                            eb(
+                                eb.cast<number>('userTraffic.usedTrafficBytes', 'numeric'),
+                                '/',
+                                eb.fn<number>('nullif', ['users.trafficLimitBytes', sql.lit(0)]),
+                            ),
+                        (ob) => (sort.desc ? ob.desc() : ob.asc()).nullsLast(),
+                    );
+                    continue;
+                }
+
                 const sortId = sort.id === 'id' ? 'users.tId' : sort.id;
                 qb = qb.orderBy(sql.ref(sortId), (ob) =>
                     (sort.desc ? ob.desc() : ob.asc()).nullsLast(),
