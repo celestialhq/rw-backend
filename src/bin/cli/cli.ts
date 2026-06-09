@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { Prisma, PrismaClient } from '@prisma/client';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { PrismaClient } from '@prisma/client';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import consola from 'consola';
@@ -42,12 +42,12 @@ const redis = new Redis({
 const enum CLI_ACTIONS {
     ENABLE_PASSWORD_AUTH = 'enable-password-auth',
     EXIT = 'exit',
-    FIX_POSTGRES_COLLATION = 'fix-postgres-collation',
     GET_SECRET_KEY_FOR_NODE = 'get-secret-key-for-node',
     RESET_CERTS = 'reset-certs',
     RESET_SUPERADMIN = 'reset-superadmin',
     TRUNCATE_HWID_USER_DEVICES = 'truncate-hwid-user-devices',
     TRUNCATE_SRH_TABLE = 'truncate-srh-table',
+    TRUNCATE_USERS_USAGE_TABLE = 'truncate-users-usage-table',
 }
 
 async function checkDatabaseConnection() {
@@ -99,7 +99,9 @@ async function resetSuperadmin() {
 
         await redis.del(CACHE_KEYS.REMNAWAVE_SETTINGS);
 
-        consola.success(`✅ Superadmin ${superadmin.username} was reset successfully. Please open the login page and set a new one.`);
+        consola.success(
+            `✅ Superadmin ${superadmin.username} was reset successfully. Please open the login page and set a new one.`,
+        );
     } catch (error) {
         consola.error('❌ Failed to reset superadmin:', error);
         process.exit(1);
@@ -177,36 +179,6 @@ async function getSecretKeyForNode() {
         process.exit(0);
     } catch (error) {
         consola.error('❌ Failed to get SECRET_KEY for node:', error);
-        process.exit(1);
-    }
-}
-
-async function fixPostgresCollation() {
-    consola.start('🔄 Fixing Collation...');
-
-    const answer = await consola.prompt('Are you sure you want to fix Collation?', {
-        type: 'confirm',
-        required: true,
-    });
-
-    if (!answer) {
-        consola.error('❌ Aborted.');
-        process.exit(1);
-    }
-
-    try {
-        const result = await prisma.$queryRaw<
-            { dbname: string }[]
-        >`SELECT current_database() as dbname;`;
-        const dbName = result[0].dbname;
-
-        consola.info(`🔄 Refreshing Collation for database: ${dbName}`);
-
-        await prisma.$executeRaw`ALTER DATABASE ${Prisma.raw(dbName)} REFRESH COLLATION VERSION;`;
-        consola.success('✅ Collation fixed successfully.');
-        process.exit(0);
-    } catch (error) {
-        consola.error('❌ Failed to fix Collation:', error);
         process.exit(1);
     }
 }
@@ -293,6 +265,31 @@ async function truncateSrhTable() {
     }
 }
 
+async function truncateUsersUsageTable() {
+    consola.start('🔄 Cleaning up Users Usage Table...');
+
+    const answer = await consola.prompt('Are you sure you want to clean up Users Usage Table?', {
+        type: 'confirm',
+        required: true,
+    });
+
+    if (!answer) {
+        consola.error('❌ Aborted.');
+        process.exit(1);
+    }
+
+    try {
+        await prisma.$executeRaw`TRUNCATE nodes_user_usage_history RESTART IDENTITY;`;
+        await prisma.$executeRaw`VACUUM nodes_user_usage_history;`;
+        await prisma.$executeRaw`REINDEX TABLE nodes_user_usage_history;`;
+        consola.success('✅ Users Usage Table cleaned up successfully.');
+        process.exit(0);
+    } catch (error) {
+        consola.error('❌ Failed to clean up Users Usage Table:', error);
+        process.exit(1);
+    }
+}
+
 async function main() {
     consola.box('Remnawave Rescue CLI v0.4');
 
@@ -337,11 +334,6 @@ async function main() {
                 hint: 'Get SECRET_KEY in cases, where you can not get from Panel',
             },
             {
-                value: CLI_ACTIONS.FIX_POSTGRES_COLLATION,
-                label: 'Fix Collation',
-                hint: 'Fix Collation issues for current database',
-            },
-            {
                 value: CLI_ACTIONS.TRUNCATE_HWID_USER_DEVICES,
                 label: 'Clean up HWID Devices',
                 hint: 'Remove all HWID Devices from the database',
@@ -350,6 +342,11 @@ async function main() {
                 value: CLI_ACTIONS.TRUNCATE_SRH_TABLE,
                 label: 'Clean up SRH Table',
                 hint: 'Remove all SRH data from the database',
+            },
+            {
+                value: CLI_ACTIONS.TRUNCATE_USERS_USAGE_TABLE,
+                label: 'Clean up Users Usage Table',
+                hint: 'Remove all users traffic statistics data from the database',
             },
             {
                 value: CLI_ACTIONS.EXIT,
@@ -369,9 +366,6 @@ async function main() {
         case CLI_ACTIONS.GET_SECRET_KEY_FOR_NODE:
             await getSecretKeyForNode();
             break;
-        case CLI_ACTIONS.FIX_POSTGRES_COLLATION:
-            await fixPostgresCollation();
-            break;
         case CLI_ACTIONS.ENABLE_PASSWORD_AUTH:
             await enablePasswordAuth();
             break;
@@ -380,6 +374,9 @@ async function main() {
             break;
         case CLI_ACTIONS.TRUNCATE_SRH_TABLE:
             await truncateSrhTable();
+            break;
+        case CLI_ACTIONS.TRUNCATE_USERS_USAGE_TABLE:
+            await truncateUsersUsageTable();
             break;
         case CLI_ACTIONS.EXIT:
             consola.info('👋 Exiting...');
