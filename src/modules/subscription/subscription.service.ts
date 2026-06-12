@@ -146,7 +146,7 @@ export class SubscriptionService {
 
             const subscriptionSettings = srrContext.subscriptionSettings;
 
-            if (subscriptionSettings.hwidSettings.enabled) {
+            if (subscriptionSettings.hwidSettings.enabled && !srrContext.disableHwidCheck) {
                 const isAllowed = await this.checkHwidDeviceLimit(
                     user.response,
                     hwidHeaders,
