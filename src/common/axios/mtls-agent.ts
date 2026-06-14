@@ -20,6 +20,7 @@ export class MtlsSocksProxyAgent extends SocksProxyAgent {
             ...opts,
             ...this.mtls,
             checkServerIdentity: () => undefined,
+            minVersion: 'TLSv1.3',
             rejectUnauthorized: true,
         } as SocksConnectOpts);
     }

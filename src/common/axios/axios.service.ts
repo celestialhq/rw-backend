@@ -81,6 +81,7 @@ export class AxiosService {
                 checkServerIdentity: () => undefined,
                 rejectUnauthorized: true,
                 keepAlive: true,
+                minVersion: 'TLSv1.3',
             });
 
             this.axiosInstance.defaults.httpsAgent = httpsAgent;
