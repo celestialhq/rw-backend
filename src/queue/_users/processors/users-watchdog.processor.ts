@@ -217,7 +217,7 @@ export class UsersWatchdogQueueProcessor extends WorkerHost {
                 const { response: users } = getNotConnectedUsersResult;
 
                 this.logger.log(
-                    `Job ${job.name} has found ${users.length} users for not connected interval ${interval} users notification.`,
+                    `Job ${job.name} has found ${users.length} users for not connected interval ${interval} hours notification.`,
                 );
 
                 let skipTelegramNotification = false;
