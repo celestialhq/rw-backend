@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import 'reflect-metadata';
 import {
     generateHybridIdentity,
     generateX25519Identity,

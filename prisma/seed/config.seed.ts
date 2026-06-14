@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { PrismaClient } from '@prisma/client';
 import timezone from 'dayjs/plugin/timezone';
