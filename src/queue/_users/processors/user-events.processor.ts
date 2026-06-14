@@ -110,10 +110,18 @@ export class UserEventsQueueProcessor extends WorkerHost {
                     );
 
                     break;
-                case EVENTS.USER.EXPIRE_NOTIFY_EXPIRES_IN_72_HOURS:
-                case EVENTS.USER.EXPIRE_NOTIFY_EXPIRES_IN_48_HOURS:
-                case EVENTS.USER.EXPIRE_NOTIFY_EXPIRES_IN_24_HOURS:
-                case EVENTS.USER.EXPIRE_NOTIFY_EXPIRED_24_HOURS_AGO:
+                case EVENTS.USER.EXPIRATION:
+                    this.eventEmitter.emit(
+                        userEvent as string,
+                        new UserEvent({
+                            user,
+                            event: userEvent,
+                            meta,
+                            skipTelegramNotification,
+                        }),
+                    );
+
+                    break;
                 case EVENTS.USER.FIRST_CONNECTED:
                     this.eventEmitter.emit(
                         userEvent as string,

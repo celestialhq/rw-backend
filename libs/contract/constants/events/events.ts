@@ -9,12 +9,6 @@ export const EVENTS = {
         LIMITED: 'user.limited',
         EXPIRED: 'user.expired',
         TRAFFIC_RESET: 'user.traffic_reset',
-
-        EXPIRE_NOTIFY_EXPIRES_IN_72_HOURS: 'user.expires_in_72_hours',
-        EXPIRE_NOTIFY_EXPIRES_IN_48_HOURS: 'user.expires_in_48_hours',
-        EXPIRE_NOTIFY_EXPIRES_IN_24_HOURS: 'user.expires_in_24_hours',
-        EXPIRE_NOTIFY_EXPIRED_24_HOURS_AGO: 'user.expired_24_hours_ago',
-
         FIRST_CONNECTED: 'user.first_connected',
         BANDWIDTH_USAGE_THRESHOLD_REACHED: 'user.bandwidth_usage_threshold_reached',
         /**
@@ -24,6 +18,12 @@ export const EVENTS = {
          * Includes additional meta object with notConnectedAfterHours field.
          */
         NOT_CONNECTED: 'user.not_connected',
+        /**
+         * Emitted when a user is not connected to the panel for a certain amount of time.
+         * Active only when EXPIRATION_NOTIFICATIONS_ENABLED is true in .env.
+         * Includes additional meta object with expiration field.
+         */
+        EXPIRATION: 'user.expiration',
     },
     /**
      * HWID events are emitted only when HWID Device Limit feature is enabled.
