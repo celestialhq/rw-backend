@@ -84,6 +84,7 @@ model Users {
 
   externalSquad ExternalSquads? @relation(fields: [externalSquadUuid], references: [uuid], onDelete: SetNull)
 
+  @@index([expireAt])
   @@map("users")
 }
 

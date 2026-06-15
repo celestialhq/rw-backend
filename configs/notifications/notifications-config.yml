@@ -86,23 +86,9 @@ events:
   # User Expiration Notifications
   # ────────────────────────────────────────────────────────────────────────────
 
-  # Triggered 72 hours before subscription expires
-  user.expires_in_72_hours:
-    telegram: true
-    webhook: true
-
-  # Triggered 48 hours before subscription expires
-  user.expires_in_48_hours:
-    telegram: true
-    webhook: true
-
-  # Triggered 24 hours before subscription expires
-  user.expires_in_24_hours:
-    telegram: true
-    webhook: true
-
-  # Triggered 24 hours after subscription expired
-  user.expired_24_hours_ago:
+  # Triggered when user hasn't connected for a configured period
+  # Note: Requires EXPIRATION_NOTIFICATIONS_ENABLED=true in .env
+  user.expiration:
     telegram: true
     webhook: true
 

@@ -176,6 +176,23 @@ export const configSchema = z
             .default('0')
             .transform((bytes) => BigInt(bytes))
             .pipe(z.bigint().max(1_048_576n).default(0n)),
+        EXPIRATION_NOTIFICATIONS_ENABLED: z
+            .string()
+            .default('false')
+            .transform((val) => (val === '' ? 'false' : val))
+            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        EXPIRATION_NOTIFICATIONS: z
+            .string()
+            .optional()
+            .transform((val) => {
+                if (!val || val === '') return undefined;
+                try {
+                    return JSON.parse(val);
+                } catch {
+                    throw new Error('EXPIRATION_NOTIFICATIONS must be a valid JSON array');
+                }
+            })
+            .pipe(z.array(z.number()).optional()),
     })
     .superRefine((data, ctx) => {
         if (!data.REDIS_SOCKET && (!data.REDIS_HOST || !data.REDIS_PORT)) {
@@ -264,40 +281,6 @@ export const configSchema = z
                 });
             }
         }
-
-        // if (data.COOKIE_AUTH_ENABLED) {
-        //     if (!data.COOKIE_AUTH_NONCE) {
-        //         ctx.addIssue({
-        //             code: z.ZodIssueCode.custom,
-        //             message: 'COOKIE_AUTH_NONCE is required when COOKIE_AUTH_ENABLED is true',
-        //             path: ['COOKIE_AUTH_NONCE'],
-        //         });
-        //     } else if (!data.COOKIE_AUTH_NONCE) {
-        //         if (!/^[a-zA-Z0-9]+$/.test(data.COOKIE_AUTH_NONCE)) {
-        //             ctx.addIssue({
-        //                 code: z.ZodIssueCode.custom,
-        //                 message: 'COOKIE_AUTH_NONCE can only contain letters and numbers',
-        //                 path: ['COOKIE_AUTH_NONCE'],
-        //             });
-        //         }
-
-        //         if (data.COOKIE_AUTH_NONCE.length > 64) {
-        //             ctx.addIssue({
-        //                 code: z.ZodIssueCode.custom,
-        //                 message: 'COOKIE_AUTH_NONCE must be less than 64 characters',
-        //                 path: ['COOKIE_AUTH_NONCE'],
-        //             });
-        //         }
-
-        //         if (data.COOKIE_AUTH_NONCE.length < 6) {
-        //             ctx.addIssue({
-        //                 code: z.ZodIssueCode.custom,
-        //                 message: 'COOKIE_AUTH_NONCE must be at least 6 characters',
-        //                 path: ['COOKIE_AUTH_NONCE'],
-        //             });
-        //         }
-        //     }
-        // }
 
         if (data.BANDWIDTH_USAGE_NOTIFICATIONS_ENABLED === 'true') {
             if (!data.BANDWIDTH_USAGE_NOTIFICATIONS_THRESHOLD) {
@@ -394,6 +377,78 @@ export const configSchema = z
                         code: z.ZodIssueCode.custom,
                         message: 'Hours values must be in strictly ascending order',
                         path: ['NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS'],
+                    });
+                }
+            }
+        }
+
+        if (data.EXPIRATION_NOTIFICATIONS_ENABLED === 'true') {
+            if (!data.EXPIRATION_NOTIFICATIONS) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message:
+                        'EXPIRATION_NOTIFICATIONS is required when EXPIRATION_NOTIFICATIONS_ENABLED is true',
+                    path: ['EXPIRATION_NOTIFICATIONS'],
+                });
+            } else if (data.EXPIRATION_NOTIFICATIONS.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: 'EXPIRATION_NOTIFICATIONS must not be empty',
+                    path: ['EXPIRATION_NOTIFICATIONS'],
+                });
+            } else {
+                if (
+                    data.EXPIRATION_NOTIFICATIONS.some(
+                        (t) => isNaN(t) || !Number.isInteger(t) || t === 0 || t < -168 || t > 168,
+                    )
+                ) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message:
+                            'All expiration values must be non-zero integers between -168 and 168',
+                        path: ['EXPIRATION_NOTIFICATIONS'],
+                    });
+                }
+
+                if (data.EXPIRATION_NOTIFICATIONS.filter((t) => t < 0).length > 5) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message:
+                            'EXPIRATION_NOTIFICATIONS must contain at most 5 negative values (before expiration)',
+                        path: ['EXPIRATION_NOTIFICATIONS'],
+                    });
+                }
+
+                if (data.EXPIRATION_NOTIFICATIONS.filter((t) => t > 0).length > 5) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message:
+                            'EXPIRATION_NOTIFICATIONS must contain at most 5 positive values (after expiration)',
+                        path: ['EXPIRATION_NOTIFICATIONS'],
+                    });
+                }
+
+                if (
+                    new Set(data.EXPIRATION_NOTIFICATIONS).size !==
+                    data.EXPIRATION_NOTIFICATIONS.length
+                ) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'EXPIRATION_NOTIFICATIONS must not contain duplicate values',
+                        path: ['EXPIRATION_NOTIFICATIONS'],
+                    });
+                }
+
+                if (
+                    !data.EXPIRATION_NOTIFICATIONS.every(
+                        (value, index, array) => index === 0 || value > array[index - 1],
+                    )
+                ) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message:
+                            'EXPIRATION_NOTIFICATIONS values must be in strictly ascending order',
+                        path: ['EXPIRATION_NOTIFICATIONS'],
                     });
                 }
             }

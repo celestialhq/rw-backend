@@ -18,13 +18,20 @@ export class FindUsersForExpireNotificationsTask implements OnApplicationBootstr
     ) {}
 
     public async onApplicationBootstrap() {
+        const isJobEnabled = this.configService.getOrThrow<string>(
+            'EXPIRATION_NOTIFICATIONS_ENABLED',
+        );
+
         const isTelegramLoggerEnabled = this.configService.getOrThrow<string>(
             'IS_TELEGRAM_NOTIFICATIONS_ENABLED',
         );
 
         const isWebhookLoggerEnabled = this.configService.getOrThrow<string>('WEBHOOK_ENABLED');
 
-        if (isTelegramLoggerEnabled === 'true' || isWebhookLoggerEnabled === 'true') {
+        if (
+            isJobEnabled === 'true' &&
+            (isTelegramLoggerEnabled === 'true' || isWebhookLoggerEnabled === 'true')
+        ) {
             const job = this.schedulerRegistry.getCronJob(
                 FindUsersForExpireNotificationsTask.CRON_NAME,
             );

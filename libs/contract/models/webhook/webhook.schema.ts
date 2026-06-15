@@ -15,7 +15,8 @@ export const RemnawaveWebhookUserEvents = z.object({
     data: ExtendedUsersSchema,
     meta: z
         .object({
-            notConnectedAfterHours: z.number().int().nullable().optional(),
+            notConnectedAfterHours: z.number().nullish(),
+            expiration: z.number().nullish(),
         })
         .nullable(),
 });
