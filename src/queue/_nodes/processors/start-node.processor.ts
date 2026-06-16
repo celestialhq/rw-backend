@@ -40,9 +40,9 @@ export class StartNodeProcessor extends WorkerHost {
         super();
     }
 
-    async process(job: Job<{ nodeUuid: string }>) {
+    async process(job: Job<{ nodeUuid: string; force?: boolean }>) {
         try {
-            const { nodeUuid } = job.data;
+            const { nodeUuid, force } = job.data;
 
             const nodeCheckup = await this.queryBus.execute(new GetNodeByUuidQuery(nodeUuid));
 
@@ -207,7 +207,10 @@ export class StartNodeProcessor extends WorkerHost {
             const startNodeResult = await this.axios.startXray(
                 {
                     xrayConfig: config.response.config as unknown as Record<string, unknown>,
-                    internals: { hashes: config.response.hashesPayload, forceRestart: false },
+                    internals: {
+                        hashes: config.response.hashesPayload,
+                        forceRestart: force ?? false,
+                    },
                 },
                 {
                     address: node.address,

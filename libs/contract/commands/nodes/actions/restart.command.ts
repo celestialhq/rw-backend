@@ -19,6 +19,16 @@ export namespace RestartNodeCommand {
 
     export type Request = z.infer<typeof RequestSchema>;
 
+    export const RequestQuerySchema = z.object({
+        force: z
+            .string()
+            .transform((str) => str === 'true')
+            .optional()
+            .default('true'),
+    });
+
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
+
     export const ResponseSchema = z.object({
         response: z.object({
             eventSent: z.boolean(),
