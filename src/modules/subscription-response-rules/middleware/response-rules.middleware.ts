@@ -55,9 +55,6 @@ export class ResponseRulesMiddleware implements NestMiddleware {
 
             if (req.params.clientType) {
                 overrideClientType = req.params.clientType as unknown as TRequestTemplateTypeKeys;
-                if (overrideClientType) {
-                    headersToAppend['x-remnawave-injected-client-type'] = overrideClientType;
-                }
             }
 
             const result = this.matcher.matchRules(
