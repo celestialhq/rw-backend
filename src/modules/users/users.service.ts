@@ -6,9 +6,9 @@ import dayjs from 'dayjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
 
 import { mapDefined, wrapBigInt, wrapBigIntNullable } from '@common/utils';
+import { TypedConfigService } from '@common/config/app-config';
 import { fail, ok, TResult } from '@common/types';
 import { ERRORS, USERS_STATUS, EVENTS } from '@libs/contracts/constants';
 import { GetAllUsersCommand } from '@libs/contracts/commands';
@@ -21,7 +21,6 @@ import { RemoveUserFromNodeEvent } from '@modules/nodes/events/remove-user-from-
 import { AddUsersToNodeEvent } from '@modules/nodes/events/add-users-to-node';
 import { AddUserToNodeEvent } from '@modules/nodes/events/add-user-to-node';
 
-import { NodesQueuesService } from '@queue/_nodes';
 import { UsersQueuesService } from '@queue/_users';
 
 import {
@@ -56,11 +55,10 @@ export class UsersService {
         private readonly eventBus: EventBus,
         private readonly eventEmitter: EventEmitter2,
         private readonly queryBus: QueryBus,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly usersQueuesService: UsersQueuesService,
-        private readonly nodesQueuesService: NodesQueuesService,
     ) {
-        this.shortUuidLength = this.configService.getOrThrow<number>('SHORT_UUID_LENGTH');
+        this.shortUuidLength = this.configService.getOrThrow('SHORT_UUID_LENGTH');
     }
 
     public async createUser(dto: CreateUserRequestDto): Promise<TResult<UserEntity>> {

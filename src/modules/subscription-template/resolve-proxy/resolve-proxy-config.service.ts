@@ -12,7 +12,6 @@ import {
 import { filter, shuffle } from 'lodash';
 import { customAlphabet } from 'nanoid';
 
-import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 
 import {
@@ -23,6 +22,7 @@ import {
 import { getSsPassword, isSS2022MethodFromMethod } from '@common/helpers/xray-config/ss-cipher';
 import { TemplateEngine } from '@common/utils/templates/replace-templates-values';
 import { setVlessRouteForUuid } from '@common/utils/vless-route';
+import { TypedConfigService } from '@common/config/app-config';
 import { getVlessFlow } from '@common/utils/flow';
 import { SECURITY_LAYERS, USERS_STATUS } from '@libs/contracts/constants';
 
@@ -64,7 +64,7 @@ export class ResolveProxyConfigService {
     private readonly domainRegex =
         /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
-    constructor(private readonly configService: ConfigService) {
+    constructor(private readonly configService: TypedConfigService) {
         this.nanoid = customAlphabet('0123456789abcdefghjkmnopqrstuvwxyz', 10);
         this.subPublicDomain = this.configService.getOrThrow('SUB_PUBLIC_DOMAIN');
     }

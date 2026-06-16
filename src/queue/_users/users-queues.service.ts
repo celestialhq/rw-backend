@@ -2,10 +2,9 @@ import { Queue } from 'bullmq';
 import { chunk } from 'lodash';
 
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectQueue } from '@nestjs/bullmq';
 
-import { ConfigSchema } from '@common/config/app-config';
+import { TypedConfigService } from '@common/config/app-config';
 import { md5 } from '@common/utils';
 import { TUsersStatus } from '@libs/contracts/constants';
 
@@ -27,7 +26,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
     protected readonly logger: Logger = new Logger(UsersQueuesService.name);
     private readonly disableSrhRecords: boolean;
     constructor(
-        private readonly configService: ConfigService<ConfigSchema>,
+        private readonly configService: TypedConfigService,
         @InjectQueue(QUEUES_NAMES.USERS.MODIFY_MANY) private readonly modifyManyUsersQueue: Queue,
         @InjectQueue(QUEUES_NAMES.USERS.SERIAL_OPERATIONS)
         private readonly serialUsersOperationsQueue: Queue,
@@ -42,9 +41,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
         @InjectQueue(QUEUES_NAMES.USERS.UPDATE_USERS_USAGE)
         private readonly updateUsersUsageQueue: Queue,
     ) {
-        this.disableSrhRecords = this.configService.getOrThrow<boolean>(
-            'SERVICE_DISABLE_SRH_RECORDS',
-        );
+        this.disableSrhRecords = this.configService.getOrThrow('SERVICE_DISABLE_SRH_RECORDS');
     }
 
     get queues() {

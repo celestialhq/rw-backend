@@ -20,11 +20,11 @@ import dayjs from 'dayjs';
 import { ROOT } from '@contract/api';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { getDocs, isDevelopment, isDevOrDebugLogsEnabled } from '@common/utils/startup-app';
 import { proxyCheckMiddleware, getRealIp, noRobotsMiddleware } from '@common/middlewares';
+import { TypedConfigService } from '@common/config/app-config/typed-config.service';
 import { getStartMessage } from '@common/utils/startup-app/get-start-message';
 import { customLogFilter } from '@common/utils/filter-logs';
 import { AxiosService } from '@common/axios';
@@ -79,7 +79,7 @@ async function bootstrap(): Promise<void> {
 
     app.use(json({ limit: '100mb' }));
 
-    const config = app.get(ConfigService);
+    const config = app.get(TypedConfigService);
 
     app.use(
         helmet({
@@ -107,7 +107,7 @@ async function bootstrap(): Promise<void> {
 
     app.use(getRealIp);
 
-    if (config.getOrThrow<string>('IS_HTTP_LOGGING_ENABLED') === 'true') {
+    if (config.getOrThrow('IS_HTTP_LOGGING_ENABLED')) {
         app.use(
             morgan(
                 ':remote-addr - ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"',
@@ -138,7 +138,7 @@ async function bootstrap(): Promise<void> {
     await getDocs(app, config);
 
     app.enableCors({
-        origin: isDevelopment() ? '*' : config.getOrThrow<string>('FRONT_END_DOMAIN'),
+        origin: isDevelopment() ? '*' : config.getOrThrow('FRONT_END_DOMAIN'),
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: false,
     });
@@ -149,7 +149,7 @@ async function bootstrap(): Promise<void> {
 
     app.enableShutdownHooks();
 
-    await app.listen(Number(config.getOrThrow<string>('APP_PORT')));
+    await app.listen(Number(config.getOrThrow('APP_PORT')));
 
     const axiosService = app.get(AxiosService);
     await axiosService.setJwt();

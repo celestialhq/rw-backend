@@ -81,7 +81,7 @@ export class NodesQueuesService implements OnApplicationBootstrap {
         await this.startAllNodesQueue.setGlobalConcurrency(1);
     }
 
-    public async startNode(payload: { nodeUuid: string }) {
+    public async startNode(payload: { nodeUuid: string; force?: boolean }) {
         return this.startNodeQueue.add(NODES_JOB_NAMES.START_NODE, payload, {
             jobId: `${NODES_JOB_NAMES.START_NODE}-${payload.nodeUuid}`,
             removeOnComplete: true,

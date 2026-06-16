@@ -3,9 +3,9 @@ import dayjs from 'dayjs';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
+import { TypedConfigService } from '@common/config/app-config';
 import { TResult } from '@common/types';
 import { EVENTS } from '@libs/contracts/constants/events/events';
 
@@ -30,7 +30,7 @@ export class UsersWatchdogQueueProcessor extends WorkerHost {
         private readonly queryBus: QueryBus,
         private readonly commandBus: CommandBus,
         private readonly nodesQueuesService: NodesQueuesService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly usersQueuesService: UsersQueuesService,
     ) {
         super();
@@ -135,9 +135,11 @@ export class UsersWatchdogQueueProcessor extends WorkerHost {
     }
 
     private async handleFindUsersForThresholdNotification(job: Job) {
-        const percentages = this.configService.getOrThrow<number[]>(
-            'BANDWIDTH_USAGE_NOTIFICATIONS_THRESHOLD',
-        );
+        const percentages = this.configService.get('BANDWIDTH_USAGE_NOTIFICATIONS_THRESHOLD');
+
+        if (!percentages) {
+            return;
+        }
 
         // Loop reason: SQL query is strictly limited by 5000 users
         while (true) {
@@ -191,9 +193,12 @@ export class UsersWatchdogQueueProcessor extends WorkerHost {
     }
 
     private async handleFindNotConnectedUsersNotification(job: Job) {
-        const intervals = this.configService.getOrThrow<number[]>(
-            'NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS',
-        );
+        const intervals = this.configService.get('NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS');
+
+        if (!intervals) {
+            return;
+        }
+
         const now = dayjs().utc();
 
         try {

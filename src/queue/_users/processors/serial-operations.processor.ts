@@ -3,11 +3,10 @@ import dayjs from 'dayjs';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
+import { TypedConfigService } from '@common/config/app-config';
 import { wrapBigInt, wrapBigIntNullable } from '@common/utils';
-import { ConfigSchema } from '@common/config/app-config';
 import { ok, TResult } from '@common/types';
 import { EVENTS, TUsersStatus, USERS_STATUS } from '@libs/contracts/constants';
 
@@ -34,7 +33,7 @@ export class SerialUsersOperationsQueueProcessor extends WorkerHost {
         private readonly queryBus: QueryBus,
         private readonly nodesQueuesService: NodesQueuesService,
         private readonly commandBus: CommandBus,
-        private readonly configService: ConfigService<ConfigSchema>,
+        private readonly configService: TypedConfigService,
         private readonly usersQueuesService: UsersQueuesService,
     ) {
         super();
@@ -57,7 +56,12 @@ export class SerialUsersOperationsQueueProcessor extends WorkerHost {
     }
 
     private async handleExpireUserNotifications() {
-        const intervals = this.configService.getOrThrow<number[]>('EXPIRATION_NOTIFICATIONS');
+        const intervals = this.configService.get('EXPIRATION_NOTIFICATIONS');
+
+        if (!intervals) {
+            return;
+        }
+
         const now = dayjs().utc();
 
         try {

@@ -152,7 +152,10 @@ export class NodesService {
         }
     }
 
-    public async restartNode(uuid: string): Promise<TResult<RestartNodeResponseModel>> {
+    public async restartNode(
+        uuid: string,
+        force: boolean,
+    ): Promise<TResult<RestartNodeResponseModel>> {
         try {
             const node = await this.nodesRepository.findByUUID(uuid);
             if (!node) {
@@ -165,6 +168,7 @@ export class NodesService {
 
             await this.nodesQueuesService.startNode({
                 nodeUuid: node.uuid,
+                force,
             });
 
             return ok(new RestartNodeResponseModel(true));
@@ -204,7 +208,7 @@ export class NodesService {
     }
 
     public async restartAllNodes(
-        forceRestart?: boolean,
+        forceRestart: boolean,
     ): Promise<TResult<RestartNodeResponseModel>> {
         try {
             const nodes = await this.nodesRepository.findByCriteria({
@@ -216,7 +220,7 @@ export class NodesService {
 
             await this.nodesQueuesService.startAllNodes({
                 emitter: NodesService.name,
-                force: forceRestart ?? false,
+                force: forceRestart,
             });
 
             return ok(new RestartNodeResponseModel(true));
@@ -549,7 +553,7 @@ export class NodesService {
             const actionMap: Record<string, (uuid: string) => Promise<unknown>> = {
                 [NODES_BULK_ACTIONS.ENABLE]: (uuid) => this.enableNode(uuid),
                 [NODES_BULK_ACTIONS.DISABLE]: (uuid) => this.disableNode(uuid),
-                [NODES_BULK_ACTIONS.RESTART]: (uuid) => this.restartNode(uuid),
+                [NODES_BULK_ACTIONS.RESTART]: (uuid) => this.restartNode(uuid, true),
                 [NODES_BULK_ACTIONS.RESET_TRAFFIC]: (uuid) => this.resetNodeTraffic(uuid),
             };
 

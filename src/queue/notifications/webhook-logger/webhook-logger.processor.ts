@@ -6,9 +6,10 @@ import { catchError } from 'rxjs';
 import { Job } from 'bullmq';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
+
+import { TypedConfigService } from '@common/config/app-config';
 
 import { IBaseWebhookLogger } from './interfaces';
 import { WebhookLoggerJobNames } from './enums';
@@ -24,10 +25,10 @@ export class WebhookLoggerQueueProcessor extends WorkerHost {
 
     constructor(
         private readonly httpService: HttpService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
     ) {
         super();
-        this.webhookSecret = this.configService.get<string>('WEBHOOK_SECRET_HEADER');
+        this.webhookSecret = this.configService.get('WEBHOOK_SECRET_HEADER');
     }
 
     async process(job: Job) {
@@ -83,7 +84,7 @@ export class WebhookLoggerQueueProcessor extends WorkerHost {
                 `Error handling "${WebhookLoggerJobNames.sendWebhook}" job: ${error}`,
             );
 
-            return { isOk: false };
+            throw new Error(error instanceof Error ? error.message : 'Unknown error');
         }
     }
 }

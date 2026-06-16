@@ -2,9 +2,9 @@ import { Prisma } from '@prisma/client';
 import { randomUUID } from 'crypto';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 
+import { TypedConfigService } from '@common/config/app-config/typed-config.service';
 import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
 import { ERRORS } from '@libs/contracts/constants';
@@ -23,7 +23,7 @@ export class ApiTokensService {
 
         private readonly apiTokensRepository: ApiTokensRepository,
         private readonly commandBus: CommandBus,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
     ) {}
 
     public async create(body: ICreateApiTokenRequest): Promise<TResult<ApiTokenEntity>> {
@@ -78,19 +78,13 @@ export class ApiTokensService {
         try {
             const result = await this.apiTokensRepository.findByCriteria({});
 
-            const isDocsEnabled = this.configService.getOrThrow<string>('IS_DOCS_ENABLED');
-            const scalarPath = this.configService.get<string>('SCALAR_PATH') ?? null;
-            const swaggerPath = this.configService.get<string>('SWAGGER_PATH') ?? null;
-
-            const docs = {
-                isDocsEnabled: isDocsEnabled === 'true',
-                scalarPath: scalarPath,
-                swaggerPath: swaggerPath,
-            };
-
             return ok({
                 apiKeys: result.map((item) => item),
-                docs,
+                docs: {
+                    isDocsEnabled: this.configService.getOrThrow('IS_DOCS_ENABLED'),
+                    scalarPath: this.configService.get('SCALAR_PATH'),
+                    swaggerPath: this.configService.get('SWAGGER_PATH'),
+                },
             });
         } catch (error) {
             this.logger.error(error);

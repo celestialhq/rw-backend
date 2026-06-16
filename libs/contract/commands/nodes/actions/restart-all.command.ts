@@ -13,12 +13,9 @@ export namespace RestartAllNodesCommand {
         'Restart all nodes',
     );
 
-    export const RequestBodySchema = z.preprocess(
-        (val) => val || {},
-        z.object({
-            forceRestart: z.boolean().optional(),
-        }),
-    );
+    export const RequestBodySchema = z.object({
+        forceRestart: z.boolean(),
+    });
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;
 

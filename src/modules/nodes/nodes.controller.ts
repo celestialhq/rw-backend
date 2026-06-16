@@ -59,6 +59,7 @@ import {
     RestartAllNodesRequestBodyDto,
     RestartAllNodesResponseDto,
     RestartNodeRequestDto,
+    RestartNodeRequestBodyDto,
     RestartNodeResponseDto,
     UpdateNodeRequestDto,
     UpdateNodeResponseDto,
@@ -220,8 +221,11 @@ export class NodesController {
         command: RestartNodeCommand,
         httpCode: HttpStatus.OK,
     })
-    async restartNode(@Param() uuid: RestartNodeRequestDto): Promise<RestartNodeResponseDto> {
-        const res = await this.nodesService.restartNode(uuid.uuid);
+    async restartNode(
+        @Param() uuid: RestartNodeRequestDto,
+        @Body() body: RestartNodeRequestBodyDto,
+    ): Promise<RestartNodeResponseDto> {
+        const res = await this.nodesService.restartNode(uuid.uuid, body.forceRestart);
         const data = errorHandler(res);
         return {
             response: data,

@@ -13,10 +13,10 @@ import * as arctic from 'arctic';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
 
+import { TypedConfigService } from '@common/config/app-config';
 import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
 import {
@@ -64,15 +64,15 @@ export class AuthService {
     constructor(
         private readonly rawCacheService: RawCacheService,
         private readonly jwtService: JwtService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly queryBus: QueryBus,
         private readonly commandBus: CommandBus,
         private readonly eventEmitter: EventEmitter2,
         private readonly httpService: HttpService,
         private readonly cloudflareAccessService: CloudflareAccessService,
     ) {
-        this.jwtSecret = this.configService.getOrThrow<string>('JWT_AUTH_SECRET');
-        this.jwtLifetime = this.configService.getOrThrow<number>('JWT_AUTH_LIFETIME');
+        this.jwtSecret = this.configService.getOrThrow('JWT_AUTH_SECRET');
+        this.jwtLifetime = this.configService.getOrThrow('JWT_AUTH_LIFETIME');
     }
 
     public async login(

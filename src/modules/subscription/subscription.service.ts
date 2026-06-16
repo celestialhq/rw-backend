@@ -5,11 +5,11 @@ import _ from 'lodash';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
 
 import { TemplateEngine } from '@common/utils/templates/replace-templates-values';
 import { prettyBytesUtil } from '@common/utils/bytes/pretty-bytes.util';
 import { HwidHeaders } from '@common/utils/extract-hwid-headers';
+import { TypedConfigService } from '@common/config/app-config';
 import { hasContent } from '@common/utils/convert-type';
 import { fail, ok, TResult } from '@common/types';
 import { ERRORS, EVENTS, TSubscriptionTemplateType, USERS_STATUS } from '@libs/contracts/constants';
@@ -60,7 +60,7 @@ export class SubscriptionService {
 
     constructor(
         private readonly queryBus: QueryBus,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly commandBus: CommandBus,
         private readonly eventEmitter: EventEmitter2,
         private readonly renderTemplatesService: RenderTemplatesService,
@@ -69,7 +69,7 @@ export class SubscriptionService {
         private readonly usersQueuesService: UsersQueuesService,
         private readonly srrMatcher: ResponseRulesMatcherService,
     ) {
-        this.subPublicDomain = this.configService.getOrThrow<string>('SUB_PUBLIC_DOMAIN');
+        this.subPublicDomain = this.configService.getOrThrow('SUB_PUBLIC_DOMAIN');
     }
 
     public async getSubscriptionByShortUuid(

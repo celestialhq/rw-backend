@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ConfigService } from '@nestjs/config';
 
 import { NotificationsConfigService } from '@common/config/common-config';
+import { TypedConfigService } from '@common/config/app-config';
 import { TCRMEvents } from '@libs/contracts/constants';
 
 import { CrmEvent } from '@integration-modules/notifications/interfaces';
@@ -21,9 +21,9 @@ export class CrmEvents implements OnApplicationBootstrap {
         private readonly eventEmitter: EventEmitter2,
         private readonly notificationsConfig: NotificationsConfigService,
         private readonly telegramQueue: TelegramBotLoggerQueueService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
     ) {
-        const chatId = this.configService.get<string>('TELEGRAM_NOTIFY_CRM');
+        const chatId = this.configService.get('TELEGRAM_NOTIFY_CRM');
         if (chatId) {
             [this.chatId, this.threadId] = chatId.split(':');
         }

@@ -4,9 +4,9 @@ import dayjs from 'dayjs';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ConfigService } from '@nestjs/config';
 
 import { NotificationsConfigService } from '@common/config/common-config';
+import { TypedConfigService } from '@common/config/app-config';
 import { RawCacheService } from '@common/raw-cache';
 import { CACHE_KEYS, EVENTS, EVENTS_SCOPES } from '@libs/contracts/constants';
 
@@ -34,15 +34,18 @@ export class WebhookEvents {
 
     constructor(
         private readonly webhookLoggerQueueService: WebhookLoggerQueueService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly notificationsConfig: NotificationsConfigService,
         private readonly rawCacheService: RawCacheService,
     ) {
-        this.subPublicDomain = this.configService.getOrThrow<string>('SUB_PUBLIC_DOMAIN');
-        this.webhookUrls = this.configService
-            .getOrThrow<string>('WEBHOOK_URL')
-            .split(',')
-            .map((url) => url.trim());
+        this.subPublicDomain = this.configService.getOrThrow('SUB_PUBLIC_DOMAIN');
+
+        const webhookUrls = this.configService.get('WEBHOOK_URL');
+        if (webhookUrls) {
+            this.webhookUrls = webhookUrls.split(',').map((url) => url.trim());
+        } else {
+            this.webhookUrls = [];
+        }
     }
 
     @OnEvent(EVENTS.CATCH_ALL_USER_EVENTS)

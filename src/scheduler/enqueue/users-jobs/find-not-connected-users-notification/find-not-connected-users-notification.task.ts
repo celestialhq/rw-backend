@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
-import { ConfigService } from '@nestjs/config';
+
+import { TypedConfigService } from '@common/config/app-config';
 
 import { UsersQueuesService } from '@queue/_users';
 
@@ -13,23 +14,20 @@ export class FindNotConnectedUsersNotificationTask implements OnApplicationBoots
 
     constructor(
         private readonly usersQueuesService: UsersQueuesService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private schedulerRegistry: SchedulerRegistry,
     ) {}
 
     public async onApplicationBootstrap() {
-        const isJobEnabled = this.configService.getOrThrow<string>(
+        const isJobEnabled = this.configService.getOrThrow(
             'NOT_CONNECTED_USERS_NOTIFICATIONS_ENABLED',
         );
-        const isTelegramLoggerEnabled = this.configService.getOrThrow<string>(
+        const isTelegramLoggerEnabled = this.configService.getOrThrow(
             'IS_TELEGRAM_NOTIFICATIONS_ENABLED',
         );
-        const isWebhookLoggerEnabled = this.configService.getOrThrow<string>('WEBHOOK_ENABLED');
+        const isWebhookLoggerEnabled = this.configService.getOrThrow('WEBHOOK_ENABLED');
 
-        if (
-            isJobEnabled === 'true' &&
-            (isTelegramLoggerEnabled === 'true' || isWebhookLoggerEnabled === 'true')
-        ) {
+        if (isJobEnabled && (isTelegramLoggerEnabled || isWebhookLoggerEnabled)) {
             const job = this.schedulerRegistry.getCronJob(
                 FindNotConnectedUsersNotificationTask.CRON_NAME,
             );

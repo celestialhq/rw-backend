@@ -1,10 +1,10 @@
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { HttpExceptionFilter } from '@common/exception/http-exception.filter';
 import { JwtDefaultGuard } from '@common/guards/jwt-guards/def-jwt-guard';
 import { errorHandler } from '@common/helpers/error-handler.helper';
+import { TypedConfigService } from '@common/config/app-config';
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
 import { RolesGuard } from '@common/guards/roles';
@@ -56,9 +56,9 @@ export class UsersBulkActionsController {
     public readonly subPublicDomain: string;
     constructor(
         private readonly usersService: UsersService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
     ) {
-        this.subPublicDomain = this.configService.getOrThrow<string>('SUB_PUBLIC_DOMAIN');
+        this.subPublicDomain = this.configService.getOrThrow('SUB_PUBLIC_DOMAIN');
     }
 
     @ApiOkResponse({

@@ -12,7 +12,6 @@ import os from 'node:os';
 import { ERRORS, INTERNAL_CACHE_KEYS } from '@contract/constants';
 
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { QueryBus } from '@nestjs/cqrs';
 
 import {
@@ -25,6 +24,7 @@ import {
 import { resolveCountryEmoji } from '@common/utils/resolve-country-emoji';
 import { RuntimeMetric } from '@common/runtime-metrics/interfaces';
 import { calcDiff } from '@common/utils/calc-percent-diff.util';
+import { TypedConfigService } from '@common/config/app-config';
 import { prettyBytesUtil } from '@common/utils/bytes';
 import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
@@ -71,7 +71,7 @@ export class SystemService implements OnApplicationBootstrap {
 
     constructor(
         private readonly queryBus: QueryBus,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly srrParser: ResponseRulesParserService,
         private readonly srrMatcher: ResponseRulesMatcherService,
         private readonly rawCacheService: RawCacheService,
@@ -79,7 +79,7 @@ export class SystemService implements OnApplicationBootstrap {
 
     public async onApplicationBootstrap(): Promise<void> {
         const { version } = await readPackageJSON();
-        this.rwVersion = version || this.configService.getOrThrow<string>('__RW_METADATA_VERSION');
+        this.rwVersion = version || this.configService.getOrThrow('__RW_METADATA_VERSION');
     }
 
     public async getMetadata(): Promise<TResult<GetMetadataResponseModel>> {
@@ -87,17 +87,15 @@ export class SystemService implements OnApplicationBootstrap {
             return ok(
                 new GetMetadataResponseModel({
                     version: this.rwVersion,
-                    backendCommitSha: this.configService.getOrThrow<string>(
+                    backendCommitSha: this.configService.getOrThrow(
                         '__RW_METADATA_GIT_BACKEND_COMMIT',
                     ),
-                    frontendCommitSha: this.configService.getOrThrow<string>(
+                    frontendCommitSha: this.configService.getOrThrow(
                         '__RW_METADATA_GIT_FRONTEND_COMMIT',
                     ),
-                    branch: this.configService.getOrThrow<string>('__RW_METADATA_GIT_BRANCH'),
-                    buildTime: this.configService.getOrThrow<string>('__RW_METADATA_BUILD_TIME'),
-                    buildNumber: this.configService.getOrThrow<string>(
-                        '__RW_METADATA_BUILD_NUMBER',
-                    ),
+                    branch: this.configService.getOrThrow('__RW_METADATA_GIT_BRANCH'),
+                    buildTime: this.configService.getOrThrow('__RW_METADATA_BUILD_TIME'),
+                    buildNumber: this.configService.getOrThrow('__RW_METADATA_BUILD_NUMBER'),
                 }),
             );
         } catch (error) {
@@ -220,9 +218,9 @@ export class SystemService implements OnApplicationBootstrap {
 
     public async getNodesMetrics(): Promise<TResult<GetNodesStatsResponseModel>> {
         try {
-            const metricPort = this.configService.getOrThrow<string>('METRICS_PORT');
-            const username = this.configService.getOrThrow<string>('METRICS_USER');
-            const password = this.configService.getOrThrow<string>('METRICS_PASS');
+            const metricPort = this.configService.getOrThrow('METRICS_PORT');
+            const username = this.configService.getOrThrow('METRICS_USER');
+            const password = this.configService.getOrThrow('METRICS_PASS');
             const metricsText = await axios.get(`http://127.0.0.1:${metricPort}/metrics`, {
                 auth: {
                     username,

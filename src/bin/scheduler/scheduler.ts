@@ -16,7 +16,6 @@ import helmet from 'helmet';
 import dayjs from 'dayjs';
 
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { NotFoundExceptionFilter } from '@common/exception/not-found-exception.filter';
@@ -24,6 +23,7 @@ import { getRedisConnectionOptions } from '@common/utils/get-redis-connection-op
 import { WorkerRoutesGuard } from '@common/guards/worker-routes/worker-routes.guard';
 import { customLogFilter } from '@common/utils/filter-logs/filter-logs';
 import { isDevOrDebugLogsEnabled } from '@common/utils/startup-app';
+import { TypedConfigService } from '@common/config/app-config';
 import { AxiosService } from '@common/axios';
 import { BULLBOARD_ROOT, HEALTH_ROOT, METRICS_ROOT } from '@libs/contracts/api';
 
@@ -73,7 +73,7 @@ async function bootstrap(): Promise<void> {
 
     app.use(json({ limit: '100mb' }));
 
-    const config = app.get(ConfigService);
+    const config = app.get(TypedConfigService);
 
     app.use(
         helmet({
@@ -101,13 +101,13 @@ async function bootstrap(): Promise<void> {
         transport: Transport.REDIS,
         options: {
             ...getRedisConnectionOptions(
-                config.get<string>('REDIS_SOCKET'),
-                config.get<string>('REDIS_HOST'),
-                config.get<number>('REDIS_PORT'),
+                config.get('REDIS_SOCKET'),
+                config.get('REDIS_HOST'),
+                config.get('REDIS_PORT'),
                 'ioredis',
             ),
-            db: config.getOrThrow<number>('REDIS_DB'),
-            password: config.get<string | undefined>('REDIS_PASSWORD'),
+            db: config.getOrThrow('REDIS_DB'),
+            password: config.get('REDIS_PASSWORD'),
             keyPrefix: 'nmicro:',
         },
     });
@@ -116,7 +116,7 @@ async function bootstrap(): Promise<void> {
 
     app.enableShutdownHooks();
 
-    await app.listen(Number(config.getOrThrow<string>('METRICS_PORT')));
+    await app.listen(config.getOrThrow('METRICS_PORT'));
 
     const axiosService = app.get(AxiosService);
     await axiosService.setJwt();

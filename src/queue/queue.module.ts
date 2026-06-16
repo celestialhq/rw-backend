@@ -2,10 +2,10 @@ import { ExpressAdapter } from '@bull-board/express';
 import { BullBoardModule } from '@bull-board/nestjs';
 
 import { Module, Global } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 
+import { TypedConfigService } from '@common/config/app-config';
 import { getRedisConnectionOptions } from '@common/utils';
 import { BasicAuthMiddleware } from '@common/middlewares';
 import { useBullBoard } from '@common/utils/startup-app';
@@ -73,17 +73,17 @@ const bullBoard = [
     imports: [
         BullModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => {
+            useFactory: (configService: TypedConfigService) => {
                 return {
                     connection: {
                         ...getRedisConnectionOptions(
-                            configService.get<string>('REDIS_SOCKET'),
-                            configService.get<string>('REDIS_HOST'),
-                            configService.get<number>('REDIS_PORT'),
+                            configService.get('REDIS_SOCKET'),
+                            configService.get('REDIS_HOST'),
+                            configService.get('REDIS_PORT'),
                             'ioredis',
                         ),
-                        db: configService.getOrThrow<number>('REDIS_DB'),
-                        password: configService.get<string | undefined>('REDIS_PASSWORD'),
+                        db: configService.getOrThrow('REDIS_DB'),
+                        password: configService.get('REDIS_PASSWORD'),
                     },
                     defaultJobOptions: {
                         removeOnComplete: 500,
@@ -91,7 +91,7 @@ const bullBoard = [
                     },
                 };
             },
-            inject: [ConfigService],
+            inject: [TypedConfigService],
         }),
 
         ...(useBullBoard() ? bullBoard : []),

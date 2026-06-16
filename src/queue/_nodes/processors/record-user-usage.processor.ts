@@ -3,12 +3,12 @@ import { Job } from 'bullmq';
 import { t } from 'try';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 
 import { GetUsersStatsCommand } from '@remnawave/node-contract';
 
+import { TypedConfigService } from '@common/config/app-config';
 import { multiplyConsumption } from '@common/utils/nano';
 import { RawCacheService } from '@common/raw-cache';
 import { AxiosService } from '@common/axios';
@@ -36,16 +36,14 @@ export class RecordUserUsageQueueProcessor extends WorkerHost {
     constructor(
         private readonly commandBus: CommandBus,
         private readonly axios: AxiosService,
-        private readonly configService: ConfigService,
+        private readonly configService: TypedConfigService,
         private readonly usersQueuesService: UsersQueuesService,
         private readonly pushFromRedisQueueService: PushFromRedisQueueService,
         private readonly rawCacheService: RawCacheService,
     ) {
         super();
 
-        this.ignoreBelowBytes = this.configService.getOrThrow<bigint>(
-            'USER_USAGE_IGNORE_BELOW_BYTES',
-        );
+        this.ignoreBelowBytes = this.configService.getOrThrow('USER_USAGE_IGNORE_BELOW_BYTES');
     }
 
     async process(job: Job<IRecordUserUsagePayload>) {

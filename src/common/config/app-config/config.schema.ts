@@ -1,6 +1,15 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+const booleanString = (def: 'true' | 'false' = 'false') =>
+    z
+        .string()
+        .default(def)
+        .transform((val) => (val === '' ? def : val))
+        .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".')
+        .transform((val) => val === 'true')
+        .pipe(z.boolean());
+
 export const configSchema = z
     .object({
         __RW_METADATA_VERSION: z.string().default('1.1.1'),
@@ -37,11 +46,7 @@ export const configSchema = z
                 'JWT_API_TOKENS_SECRET cannot be set to "change_me"',
             ),
 
-        IS_TELEGRAM_NOTIFICATIONS_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        IS_TELEGRAM_NOTIFICATIONS_ENABLED: booleanString('false'),
         TELEGRAM_BOT_TOKEN: z.string().optional(),
         TELEGRAM_BOT_API_ROOT: z.string().default('https://api.telegram.org'),
         TELEGRAM_BOT_PROXY: z
@@ -59,21 +64,13 @@ export const configSchema = z
 
         FRONT_END_DOMAIN: z.string(),
         PANEL_DOMAIN: z.string().optional(),
-        IS_DOCS_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        IS_DOCS_ENABLED: booleanString('false'),
         SCALAR_PATH: z.string().default('/scalar'),
         SWAGGER_PATH: z.string().default('/docs'),
         METRICS_USER: z.string().min(1, { message: 'METRICS_USER cannot be empty' }),
         METRICS_PASS: z.string().min(1, { message: 'METRICS_PASS cannot be empty' }),
         SUB_PUBLIC_DOMAIN: z.string(),
-        WEBHOOK_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        WEBHOOK_ENABLED: booleanString('false'),
         WEBHOOK_URL: z.string().optional(),
         WEBHOOK_SECRET_HEADER: z.string().optional(),
         REDIS_HOST: z.string().optional(),
@@ -97,16 +94,8 @@ export const configSchema = z
             .default('16')
             .transform((val) => parseInt(val, 10))
             .refine((val) => val >= 16 && val <= 64, 'SHORT_UUID_LENGTH must be between 16 and 64'),
-        IS_HTTP_LOGGING_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
-        ENABLE_DEBUG_LOGS: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        IS_HTTP_LOGGING_ENABLED: booleanString('false'),
+        ENABLE_DEBUG_LOGS: booleanString('false'),
         REMNAWAVE_BRANCH: z.string().default('dev'),
 
         // COOKIE_AUTH_ENABLED: z
@@ -115,28 +104,10 @@ export const configSchema = z
         //     .transform((val) => val === 'true'),
         // COOKIE_AUTH_NONCE: z.optional(z.string()),
 
-        SERVICE_CLEAN_USAGE_HISTORY: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
-
-        SERVICE_DISABLE_USER_USAGE_RECORDS: z
-            .string()
-            .default('false')
-            .transform((val) => val === 'true' || val === '1')
-            .pipe(z.boolean()),
-        SERVICE_DISABLE_SRH_RECORDS: z
-            .string()
-            .default('false')
-            .transform((val) => val === 'true' || val === '1')
-            .pipe(z.boolean()),
-
-        BANDWIDTH_USAGE_NOTIFICATIONS_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        SERVICE_CLEAN_USAGE_HISTORY: booleanString('false'),
+        SERVICE_DISABLE_USER_USAGE_RECORDS: booleanString('false'),
+        SERVICE_DISABLE_SRH_RECORDS: booleanString('false'),
+        BANDWIDTH_USAGE_NOTIFICATIONS_ENABLED: booleanString('false'),
         BANDWIDTH_USAGE_NOTIFICATIONS_THRESHOLD: z
             .string()
             .optional()
@@ -152,11 +123,7 @@ export const configSchema = z
             })
             .pipe(z.array(z.number()).optional()),
 
-        NOT_CONNECTED_USERS_NOTIFICATIONS_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        NOT_CONNECTED_USERS_NOTIFICATIONS_ENABLED: booleanString('false'),
         NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS: z
             .string()
             .optional()
@@ -176,11 +143,7 @@ export const configSchema = z
             .default('0')
             .transform((bytes) => BigInt(bytes))
             .pipe(z.bigint().max(1_048_576n).default(0n)),
-        EXPIRATION_NOTIFICATIONS_ENABLED: z
-            .string()
-            .default('false')
-            .transform((val) => (val === '' ? 'false' : val))
-            .refine((val) => val === 'true' || val === 'false', 'Must be "true" or "false".'),
+        EXPIRATION_NOTIFICATIONS_ENABLED: booleanString('false'),
         EXPIRATION_NOTIFICATIONS: z
             .string()
             .optional()
@@ -211,7 +174,7 @@ export const configSchema = z
             });
         }
 
-        if (data.WEBHOOK_ENABLED === 'true') {
+        if (data.WEBHOOK_ENABLED) {
             if (!data.WEBHOOK_URL) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -271,7 +234,7 @@ export const configSchema = z
             }
         }
 
-        if (data.IS_TELEGRAM_NOTIFICATIONS_ENABLED === 'true') {
+        if (data.IS_TELEGRAM_NOTIFICATIONS_ENABLED) {
             if (!data.TELEGRAM_BOT_TOKEN) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -282,7 +245,7 @@ export const configSchema = z
             }
         }
 
-        if (data.BANDWIDTH_USAGE_NOTIFICATIONS_ENABLED === 'true') {
+        if (data.BANDWIDTH_USAGE_NOTIFICATIONS_ENABLED) {
             if (!data.BANDWIDTH_USAGE_NOTIFICATIONS_THRESHOLD) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -332,7 +295,7 @@ export const configSchema = z
             }
         }
 
-        if (data.NOT_CONNECTED_USERS_NOTIFICATIONS_ENABLED === 'true') {
+        if (data.NOT_CONNECTED_USERS_NOTIFICATIONS_ENABLED) {
             if (!data.NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -382,7 +345,7 @@ export const configSchema = z
             }
         }
 
-        if (data.EXPIRATION_NOTIFICATIONS_ENABLED === 'true') {
+        if (data.EXPIRATION_NOTIFICATIONS_ENABLED) {
             if (!data.EXPIRATION_NOTIFICATIONS) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
