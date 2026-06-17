@@ -396,10 +396,7 @@ export class ResolveProxyConfigService {
             case 'reality': {
                 const reality = streamSettings.realitySettings;
                 const shortIds = reality?.shortIds || [];
-                const shortId =
-                    shortIds.length > 0
-                        ? shortIds[Math.floor(Math.random() * shortIds.length)]
-                        : '';
+                const shortId = shortIds.length > 0 ? shortIds[0] : '';
 
                 return {
                     security: 'reality',
