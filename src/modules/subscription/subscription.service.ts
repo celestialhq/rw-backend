@@ -48,9 +48,9 @@ import {
     SubscriptionWithConfigResponse,
 } from './models';
 import { getSubscriptionRefillDate, getSubscriptionUserInfo } from './utils/get-user-info.headers';
+import { ISubscriptionHeaders, IGetSubscriptionInfo, IHwidCheckupResult } from './interfaces';
 import { GetSubpageConfigResponseModel } from './models/get-subpage-config.response.model';
 import { GetHostsForUserQuery } from '../hosts/queries/get-hosts-for-user';
-import { ISubscriptionHeaders, IGetSubscriptionInfo } from './interfaces';
 import { GetAllSubscriptionsQueryDto } from './dto';
 
 @Injectable()
@@ -80,8 +80,6 @@ export class SubscriptionService {
     > {
         try {
             const { userAgent, hwidHeaders, matchedResponseType } = srrContext;
-
-            let isHwidLimitActive: boolean = false;
 
             if (matchedResponseType === 'BROWSER') {
                 const subscriptionInfo = await this.getSubscriptionInfo({
@@ -146,22 +144,26 @@ export class SubscriptionService {
 
             const subscriptionSettings = srrContext.subscriptionSettings;
 
+            let hwidCheckup: null | IHwidCheckupResult = null;
+
             if (subscriptionSettings.hwidSettings.enabled && !srrContext.disableHwidCheck) {
-                const isAllowed = await this.checkHwidDeviceLimit(
+                const hwidCheckupResult = await this.checkHwidDeviceLimit(
                     user.response,
                     hwidHeaders,
                     subscriptionSettings.hwidSettings,
                     srrContext.ip,
                 );
 
-                if (!isAllowed.isOk) {
-                    this.logger.error(`Error checking hwid device limit: ${isAllowed}`);
+                if (!hwidCheckupResult.isOk) {
+                    this.logger.error(`Error checking hwid device limit: ${hwidCheckupResult}`);
                     return new SubscriptionNotFoundResponse();
                 }
 
-                if (!isAllowed.response.isSubscriptionAllowed) {
+                hwidCheckup = hwidCheckupResult.response;
+
+                if (!hwidCheckup.subscriptionAllowed) {
                     const response = new SubscriptionWithConfigResponse({
-                        headers: await this.getUserProfileHeadersInfo(
+                        headers: this.getUserProfileHeadersInfo(
                             user.response,
                             /^Happ\//.test(userAgent),
                             subscriptionSettings,
@@ -170,12 +172,12 @@ export class SubscriptionService {
                         contentType: 'text/plain',
                     });
 
-                    if (!isAllowed.response.limitBypassed) {
+                    if (!hwidCheckup.limitBypassed) {
                         response.headers['x-hwid-active'] = 'true';
                     }
 
                     if (
-                        isAllowed.response.maxDeviceReached &&
+                        hwidCheckup.maxDeviceReached &&
                         subscriptionSettings.hwidSettings.maxDevicesAnnounce
                     ) {
                         response.headers.announce = `base64:${Buffer.from(
@@ -189,8 +191,7 @@ export class SubscriptionService {
                     }
 
                     if (
-                        (isAllowed.response.maxDeviceReached ||
-                            isAllowed.response.hwidNotSupported) &&
+                        (hwidCheckup.maxDeviceReached || hwidCheckup.hwidNotSupported) &&
                         subscriptionSettings.isShowCustomRemarks
                     ) {
                         const { subscription, contentType } =
@@ -199,9 +200,8 @@ export class SubscriptionService {
                                 user: user.response,
                                 hosts: [],
                                 fallbackOptions: {
-                                    showHwidMaxDeviceRemarks: isAllowed.response.maxDeviceReached,
-                                    showHwidNotSupportedRemarks:
-                                        isAllowed.response.hwidNotSupported,
+                                    showHwidMaxDeviceRemarks: hwidCheckup.maxDeviceReached,
+                                    showHwidNotSupportedRemarks: hwidCheckup.hwidNotSupported,
                                 },
                             });
 
@@ -209,11 +209,11 @@ export class SubscriptionService {
                         response.contentType = contentType;
                     }
 
-                    if (isAllowed.response.hwidNotSupported) {
+                    if (hwidCheckup.hwidNotSupported) {
                         response.headers['x-hwid-not-supported'] = 'true';
                     }
 
-                    if (isAllowed.response.maxDeviceReached) {
+                    if (hwidCheckup.maxDeviceReached) {
                         response.headers['x-hwid-max-devices-reached'] = 'true';
                     }
 
@@ -221,12 +221,8 @@ export class SubscriptionService {
 
                     return response;
                 }
-
-                if (!isAllowed.response.limitBypassed) {
-                    isHwidLimitActive = true;
-                }
             } else {
-                await this.checkAndUpsertHwidUserDevice(user.response, hwidHeaders, srrContext.ip);
+                void this.checkAndUpsertHwidUserDevice(user.response, hwidHeaders, srrContext.ip);
             }
 
             if (
@@ -252,11 +248,7 @@ export class SubscriptionService {
                 return new SubscriptionNotFoundResponse();
             }
 
-            if (subscriptionSettings.randomizeHosts) {
-                hosts.response = _.shuffle(hosts.response);
-            }
-
-            await this.updateAndReportSubscriptionRequest(
+            void this.updateAndReportSubscriptionRequest(
                 user.response.tId,
                 userAgent,
                 srrContext.ip,
@@ -265,16 +257,18 @@ export class SubscriptionService {
             const subscription = await this.renderTemplatesService.generateSubscription({
                 srrContext,
                 user: user.response,
-                hosts: hosts.response,
+                hosts: subscriptionSettings.randomizeHosts
+                    ? _.shuffle(hosts.response)
+                    : hosts.response,
                 hostsOverrides,
             });
 
             return new SubscriptionWithConfigResponse({
-                headers: await this.getUserProfileHeadersInfo(
+                headers: this.getUserProfileHeadersInfo(
                     user.response,
                     /^Happ\//.test(userAgent),
                     subscriptionSettings,
-                    isHwidLimitActive,
+                    hwidCheckup !== null && !hwidCheckup.limitBypassed,
                 ),
                 body: subscription.subscription,
                 contentType: subscription.contentType,
@@ -321,78 +315,86 @@ export class SubscriptionService {
                 hostsOverrides: patchedHostsOverrides,
             } = await this.applyMaybeExternalSquadOverrides(settingEntity, user.externalSquadUuid);
 
-            let isHwidLimited: boolean | undefined;
+            let hwidCheckup: null | IHwidCheckupResult = null;
 
-            const headers = await this.getUserProfileHeadersInfo(
+            const headers = this.getUserProfileHeadersInfo(
                 user,
                 /^Happ\//.test(userAgent),
                 patchedSettingEntity,
             );
 
             if (patchedSettingEntity.hwidSettings.enabled) {
-                const isAllowed = await this.checkHwidDeviceLimit(
+                const hwidCheckupResult = await this.checkHwidDeviceLimit(
                     user,
                     hwidHeaders,
                     patchedSettingEntity.hwidSettings,
                     requestIp,
                 );
 
-                if (!isAllowed.isOk) {
-                    this.logger.error(`Error checking hwid device limit: ${isAllowed}`);
+                if (!hwidCheckupResult.isOk) {
+                    this.logger.error(`Error checking hwid device limit: ${hwidCheckupResult}`);
                     return fail(ERRORS.INTERNAL_SERVER_ERROR);
                 }
 
-                if (!isAllowed.response.limitBypassed) {
+                hwidCheckup = hwidCheckupResult.response;
+
+                if (!hwidCheckup.limitBypassed) {
                     headers['x-hwid-active'] = 'true';
                 }
 
-                if (!isAllowed.response.isSubscriptionAllowed) {
+                if (!hwidCheckup.subscriptionAllowed) {
                     if (patchedSettingEntity.hwidSettings.maxDevicesAnnounce) {
                         headers.announce = `base64:${Buffer.from(
                             patchedSettingEntity.hwidSettings.maxDevicesAnnounce,
                         ).toString('base64')}`;
                     }
 
-                    if (isAllowed.response.hwidNotSupported) {
+                    if (hwidCheckup.hwidNotSupported) {
                         headers['x-hwid-not-supported'] = 'true';
                     }
 
-                    if (isAllowed.response.maxDeviceReached) {
+                    if (hwidCheckup.maxDeviceReached) {
                         headers['x-hwid-max-devices-reached'] = 'true';
                     }
 
                     headers['x-hwid-limit'] = 'true'; // v2rayTUN
-
-                    isHwidLimited = true;
                 }
             } else {
-                await this.checkAndUpsertHwidUserDevice(user, hwidHeaders, requestIp);
-
-                isHwidLimited = false;
+                void this.checkAndUpsertHwidUserDevice(user, hwidHeaders, requestIp);
             }
-
-            const hosts = await this.queryBus.execute(
-                new GetHostsForUserQuery(user.tId, withDisabledHosts, true),
-            );
-
-            if (!hosts.isOk) {
-                return fail(ERRORS.GET_ALL_HOSTS_ERROR);
-            }
-
-            if (patchedSettingEntity.randomizeHosts) {
-                hosts.response = _.shuffle(hosts.response);
-            }
-
-            await this.updateAndReportSubscriptionRequest(user.tId, userAgent, requestIp);
 
             let subscription: ResolvedProxyConfig[] | undefined;
 
-            if (!isHwidLimited) {
+            if (!hwidCheckup || hwidCheckup.subscriptionAllowed) {
+                const hosts = await this.queryBus.execute(
+                    new GetHostsForUserQuery(user.tId, withDisabledHosts, true),
+                );
+
+                if (!hosts.isOk) {
+                    return fail(ERRORS.GET_ALL_HOSTS_ERROR);
+                }
+
                 subscription = await this.renderTemplatesService.generateRawSubscription({
                     subscriptionSettings: patchedSettingEntity,
-                    user: user,
-                    hosts: hosts.response,
+                    user,
+                    hosts: patchedSettingEntity.randomizeHosts
+                        ? _.shuffle(hosts.response)
+                        : hosts.response,
                     hostsOverrides: patchedHostsOverrides,
+                });
+            } else if (
+                patchedSettingEntity.isShowCustomRemarks &&
+                (hwidCheckup.maxDeviceReached || hwidCheckup.hwidNotSupported)
+            ) {
+                subscription = await this.renderTemplatesService.generateRawSubscription({
+                    subscriptionSettings: patchedSettingEntity,
+                    user,
+                    hosts: [],
+                    hostsOverrides: patchedHostsOverrides,
+                    fallbackOptions: {
+                        showHwidMaxDeviceRemarks: hwidCheckup.maxDeviceReached,
+                        showHwidNotSupportedRemarks: hwidCheckup.hwidNotSupported,
+                    },
                 });
             }
 
@@ -406,7 +408,7 @@ export class SubscriptionService {
                         lifetimeTrafficUsed: prettyBytesUtil(
                             user.userTraffic.lifetimeUsedTrafficBytes,
                         ),
-                        isHwidLimited: isHwidLimited ?? false,
+                        hwidCheckup,
                     },
                     headers,
                     resolvedProxyConfigs: subscription ?? [],
@@ -583,12 +585,12 @@ export class SubscriptionService {
         }
     }
 
-    private async getUserProfileHeadersInfo(
+    private getUserProfileHeadersInfo(
         user: UserEntity,
         isHapp: boolean,
         settings: SubscriptionSettingsEntity,
         hwidLimit: boolean = false,
-    ): Promise<ISubscriptionHeaders> {
+    ): ISubscriptionHeaders {
         const headers: ISubscriptionHeaders = {
             'content-disposition': `attachment; filename=${user.username}`,
             'support-url': settings.supportLink,
@@ -735,14 +737,7 @@ export class SubscriptionService {
         hwidHeaders: HwidHeaders | null,
         hwidSettings: THwidSettings,
         requestIp?: string,
-    ): Promise<
-        TResult<{
-            isSubscriptionAllowed: boolean;
-            maxDeviceReached: boolean;
-            hwidNotSupported: boolean;
-            limitBypassed?: boolean;
-        }>
-    > {
+    ): Promise<TResult<IHwidCheckupResult>> {
         try {
             if (user.hwidDeviceLimit === 0) {
                 if (hwidHeaders !== null) {
@@ -757,7 +752,7 @@ export class SubscriptionService {
                     });
                 }
                 return ok({
-                    isSubscriptionAllowed: true,
+                    subscriptionAllowed: true,
                     maxDeviceReached: false,
                     hwidNotSupported: false,
                     limitBypassed: true,
@@ -766,9 +761,10 @@ export class SubscriptionService {
 
             if (hwidHeaders === null) {
                 return ok({
-                    isSubscriptionAllowed: false,
+                    subscriptionAllowed: false,
                     maxDeviceReached: false,
                     hwidNotSupported: true,
+                    limitBypassed: false,
                 });
             }
 
@@ -789,9 +785,10 @@ export class SubscriptionService {
                 });
 
                 return ok({
-                    isSubscriptionAllowed: true,
+                    subscriptionAllowed: true,
                     maxDeviceReached: false,
                     hwidNotSupported: false,
+                    limitBypassed: false,
                 });
             }
 
@@ -816,17 +813,19 @@ export class SubscriptionService {
                 this.logger.error(`Error creating Hwid user device, access forbidden.`);
 
                 return ok({
-                    isSubscriptionAllowed: false,
+                    subscriptionAllowed: false,
                     maxDeviceReached: true,
                     hwidNotSupported: false,
+                    limitBypassed: false,
                 });
             }
 
             if (!result.response.created || !result.response.hwidUserDevice) {
                 return ok({
-                    isSubscriptionAllowed: false,
+                    subscriptionAllowed: false,
                     maxDeviceReached: true,
                     hwidNotSupported: false,
+                    limitBypassed: false,
                 });
             }
 
@@ -840,16 +839,18 @@ export class SubscriptionService {
             );
 
             return ok({
-                isSubscriptionAllowed: true,
+                subscriptionAllowed: true,
                 maxDeviceReached: false,
                 hwidNotSupported: false,
+                limitBypassed: false,
             });
         } catch (error) {
             this.logger.error(`Error checking hwid device limit: ${error}`);
             return ok({
-                isSubscriptionAllowed: false,
+                subscriptionAllowed: false,
                 maxDeviceReached: true,
                 hwidNotSupported: false,
+                limitBypassed: false,
             });
         }
     }

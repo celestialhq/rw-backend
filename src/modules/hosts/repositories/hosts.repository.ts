@@ -10,7 +10,7 @@ import { Injectable } from '@nestjs/common';
 import { values } from '@common/helpers/kysely/values';
 import { TxKyselyService } from '@common/database';
 import { ICrud } from '@common/types/crud-port';
-import { TSecurityLayers } from '@libs/contracts/constants';
+import { getKyselyUuid } from '@common/helpers';
 
 import { HostWithRawInbound } from '../entities/host-with-inbound-tag.entity';
 import { HostsEntity } from '../entities/hosts.entity';
@@ -184,17 +184,6 @@ export class HostsRepository implements ICrud<HostsEntity> {
                 'internalSquadMembers.internalSquadUuid',
                 'internalSquadInbounds.internalSquadUuid',
             )
-            .innerJoin(
-                'configProfileInbounds',
-                'configProfileInbounds.uuid',
-                'hosts.configProfileInboundUuid',
-            )
-            .leftJoin(
-                'subscriptionTemplates',
-                'subscriptionTemplates.uuid',
-                'hosts.xrayJsonTemplateUuid',
-            )
-
             .where((eb) =>
                 eb.not(
                     eb.exists(
@@ -214,23 +203,77 @@ export class HostsRepository implements ICrud<HostsEntity> {
             .$if(!returnHiddenHosts, (eb) => eb.where('hosts.isHidden', '=', false))
             .where('internalSquadMembers.userId', '=', userId)
             .selectAll('hosts')
-
-            .select([
-                'configProfileInbounds.rawInbound',
-                'configProfileInbounds.tag as inboundTag',
-                'subscriptionTemplates.templateJson as xrayJsonTemplate',
-            ])
             .orderBy('hosts.viewPosition', 'asc')
             .execute();
 
-        return hosts.map(
-            (h) =>
-                new HostWithRawInbound({
-                    ...h,
-                    securityLayer: h.securityLayer as TSecurityLayers,
-                    xHttpExtraParams: h.xhttpExtraParams,
-                }),
-        );
+        const inboundUuids = [
+            ...new Set(
+                hosts.map((h) => h.configProfileInboundUuid).filter((v): v is string => !!v),
+            ),
+        ];
+        const templateUuids = [
+            ...new Set(hosts.map((h) => h.xrayJsonTemplateUuid).filter((v): v is string => !!v)),
+        ];
+
+        const inbounds = await this.getInboundsByUuids(inboundUuids);
+        const templates = await this.getTemplatesByUuids(templateUuids);
+
+        return hosts.flatMap((h) => {
+            const inbound = h.configProfileInboundUuid
+                ? inbounds.get(h.configProfileInboundUuid)
+                : undefined;
+
+            if (!inbound) {
+                return [];
+            }
+
+            return new HostWithRawInbound({
+                ...h,
+                rawInbound: inbound.rawInbound,
+                inboundTag: inbound.tag,
+                xrayJsonTemplate: h.xrayJsonTemplateUuid
+                    ? (templates.get(h.xrayJsonTemplateUuid) ?? null)
+                    : null,
+            });
+        });
+    }
+
+    private async getInboundsByUuids(
+        uuids: string[],
+    ): Promise<Map<string, { rawInbound: object | null; tag: string }>> {
+        if (uuids.length === 0) {
+            return new Map();
+        }
+
+        const rows = await this.qb.kysely
+            .selectFrom('configProfileInbounds')
+            .select(['uuid', 'rawInbound', 'tag'])
+            .where(
+                'uuid',
+                'in',
+                uuids.map((u) => getKyselyUuid(u)),
+            )
+            .execute();
+
+        return new Map(rows.map((r) => [r.uuid, { rawInbound: r.rawInbound, tag: r.tag }]));
+    }
+
+    private async getTemplatesByUuids(uuids: string[]): Promise<Map<string, object | null>> {
+        if (uuids.length === 0) {
+            return new Map();
+        }
+
+        const rows = await this.qb.kysely
+            .selectFrom('subscriptionTemplates')
+            .select(['uuid', 'templateJson'])
+            .where(
+                'uuid',
+                'in',
+                uuids.map((u) => getKyselyUuid(u)),
+            )
+            .execute();
+
+        return new Map(rows.map((r) => [r.uuid, r.templateJson]));
     }
 
     public async reorderMany(dto: IReorderHost[]): Promise<boolean> {

@@ -46,7 +46,7 @@ import {
 } from './interfaces';
 import { override, toNonEmptyRecord } from './utils';
 
-interface IResolveProxyConfigOptions {
+export interface IResolveProxyConfigOptions {
     subscriptionSettings: SubscriptionSettingsEntity | null;
     hosts: HostWithRawInbound[];
     user: UserEntity;
@@ -102,16 +102,17 @@ export class ResolveProxyConfigService {
         const knownRemarks = new Map<string, number>();
         const resolvedProxyConfigs: ResolvedProxyConfig[] = [];
 
+        const userValueMap = TemplateEngine.createUserValueMap(
+            user,
+            subscriptionSettings,
+            this.subPublicDomain,
+        );
+
         for (const inputHost of hosts) {
             this.applyHostOverrides(inputHost, hostsOverrides);
 
             const finalRemark = this.deduplicateRemark(
-                TemplateEngine.formatWithUser(
-                    inputHost.remark,
-                    user,
-                    subscriptionSettings,
-                    this.subPublicDomain,
-                ),
+                TemplateEngine.replace(inputHost.remark, userValueMap),
                 knownRemarks,
             );
 
@@ -396,10 +397,7 @@ export class ResolveProxyConfigService {
             case 'reality': {
                 const reality = streamSettings.realitySettings;
                 const shortIds = reality?.shortIds || [];
-                const shortId =
-                    shortIds.length > 0
-                        ? shortIds[Math.floor(Math.random() * shortIds.length)]
-                        : '';
+                const shortId = shortIds.length > 0 ? shortIds[0] : '';
 
                 return {
                     security: 'reality',

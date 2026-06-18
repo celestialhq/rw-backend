@@ -38,7 +38,14 @@ export namespace GetRawSubscriptionByShortUuidCommand {
                 trafficLimit: z.string(),
                 trafficUsed: z.string(),
                 lifetimeTrafficUsed: z.string(),
-                isHwidLimited: z.boolean(),
+                hwidCheckup: z
+                    .object({
+                        subscriptionAllowed: z.boolean(),
+                        maxDeviceReached: z.boolean(),
+                        hwidNotSupported: z.boolean(),
+                        limitBypassed: z.boolean(),
+                    })
+                    .nullable(),
             }),
             headers: z.record(z.string(), z.string().optional()),
             resolvedProxyConfigs: z.array(ResolvedProxyConfigSchema),

@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Send Telegram message
         uses: proDreams/actions-telegram-notifier@main
@@ -27,16 +27,28 @@ jobs:
           thread_id: ${{ secrets.TELEGRAM_TOPIC_ID }}
           status: pending
           notify_fields: 'repo_with_tag,commit,workflow'
-          title: 'Building docker image.'
+          title: 'Building docker images.'
 
-  build-docker-image:
-    runs-on: ubuntu-latest
+  build-docker-images:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
     steps:
+      - name: Prepare platform pair
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> "$GITHUB_ENV"
+
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker Hub
         env:
@@ -50,7 +62,7 @@ jobs:
           fi
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -65,27 +77,26 @@ jobs:
           FRONTEND_REPOSITORY: ${{ vars.FRONTEND_REPOSITORY }}
         run: |
           FRONTEND_REPOSITORY="${FRONTEND_REPOSITORY:-${GITHUB_REPOSITORY_OWNER}/rw-frontend}"
-          TAGS="ghcr.io/${GITHUB_REPOSITORY}:dev"
+          GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+          IMAGE_NAMES="$GHCR_IMAGE"
+
           if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
-            TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:dev"
+            IMAGE_NAMES="${IMAGE_NAMES},${DOCKERHUB_BACKEND_IMAGE}"
           fi
 
-          echo "tags<<EOF" >> $GITHUB_OUTPUT
-          echo "$TAGS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
-          echo "build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-          echo "frontend_url=https://github.com/${FRONTEND_REPOSITORY}/releases/download/dev-build/remnawave-frontend.zip" >> $GITHUB_OUTPUT
-          echo "frontend_commit=$(curl -s https://api.github.com/repos/${FRONTEND_REPOSITORY}/commits/${{ github.ref_name }} | jq -r '.sha // \"unknown\"')" >> $GITHUB_OUTPUT
+          echo "image_names=${IMAGE_NAMES}" >> "$GITHUB_OUTPUT"
+          echo "version=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+          echo "build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          echo "frontend_url=https://github.com/${FRONTEND_REPOSITORY}/releases/download/dev-build/remnawave-frontend.zip" >> "$GITHUB_OUTPUT"
+          echo "frontend_commit=$(curl -s https://api.github.com/repos/${FRONTEND_REPOSITORY}/commits/${{ github.ref_name }} | jq -r '.sha // \"unknown\"')" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: ${{ matrix.platform }}
           build-args: |
             FRONTEND_URL=${{ steps.meta.outputs.frontend_url }}
             BRANCH=dev
@@ -95,13 +106,82 @@ jobs:
             __RW_METADATA_BUILD_NUMBER=${{ github.run_number }}
             __RW_METADATA_GIT_BACKEND_COMMIT=${{ github.sha }}
             __RW_METADATA_GIT_FRONTEND_COMMIT=${{ steps.meta.outputs.frontend_commit }}
+          outputs: |
+            type=image,"name=${{ steps.meta.outputs.image_names }}",push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: Merge & push manifest
+    needs: [build-docker-images]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker Hub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          else
+            echo "Skipping Docker Hub login because credentials are not configured."
+          fi
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create manifest list and push
+        env:
+          DOCKERHUB_BACKEND_IMAGE: ${{ vars.DOCKERHUB_BACKEND_IMAGE }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+          docker buildx imagetools create -t "${GHCR_IMAGE}:dev" \
+            $(printf "${GHCR_IMAGE}@sha256:%s " *)
+
+          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            docker buildx imagetools create -t "${DOCKERHUB_BACKEND_IMAGE}:dev" \
+              $(printf "${DOCKERHUB_BACKEND_IMAGE}@sha256:%s " *)
+          fi
+
+      - name: Inspect image
+        run: docker buildx imagetools inspect "ghcr.io/${GITHUB_REPOSITORY}:dev"
+
   send-finish-tg-msg:
     name: Send TG message
-    needs: [build-docker-image]
+    needs: [merge]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Send Telegram message
         uses: proDreams/actions-telegram-notifier@main
@@ -115,11 +195,11 @@ jobs:
 
   notify-on-error:
     runs-on: ubuntu-latest
-    needs: [build-docker-image]
+    needs: [build-docker-images, merge]
     if: failure()
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Send error notification
         uses: proDreams/actions-telegram-notifier@main

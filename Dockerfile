@@ -27,7 +27,7 @@ COPY prisma.config.ts ./prisma.config.ts
 COPY patches ./patches
 
 
-RUN npm ci
+RUN npm ci --prefer-offline --no-audit --no-fund
 
 COPY . .
 
