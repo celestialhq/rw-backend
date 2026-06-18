@@ -163,7 +163,7 @@ export class SubscriptionService {
 
                 if (!hwidCheckup.subscriptionAllowed) {
                     const response = new SubscriptionWithConfigResponse({
-                        headers: await this.getUserProfileHeadersInfo(
+                        headers: this.getUserProfileHeadersInfo(
                             user.response,
                             /^Happ\//.test(userAgent),
                             subscriptionSettings,
@@ -222,7 +222,7 @@ export class SubscriptionService {
                     return response;
                 }
             } else {
-                await this.checkAndUpsertHwidUserDevice(user.response, hwidHeaders, srrContext.ip);
+                void this.checkAndUpsertHwidUserDevice(user.response, hwidHeaders, srrContext.ip);
             }
 
             if (
@@ -248,7 +248,7 @@ export class SubscriptionService {
                 return new SubscriptionNotFoundResponse();
             }
 
-            await this.updateAndReportSubscriptionRequest(
+            void this.updateAndReportSubscriptionRequest(
                 user.response.tId,
                 userAgent,
                 srrContext.ip,
@@ -264,7 +264,7 @@ export class SubscriptionService {
             });
 
             return new SubscriptionWithConfigResponse({
-                headers: await this.getUserProfileHeadersInfo(
+                headers: this.getUserProfileHeadersInfo(
                     user.response,
                     /^Happ\//.test(userAgent),
                     subscriptionSettings,
@@ -317,7 +317,7 @@ export class SubscriptionService {
 
             let hwidCheckup: null | IHwidCheckupResult = null;
 
-            const headers = await this.getUserProfileHeadersInfo(
+            const headers = this.getUserProfileHeadersInfo(
                 user,
                 /^Happ\//.test(userAgent),
                 patchedSettingEntity,
@@ -360,7 +360,7 @@ export class SubscriptionService {
                     headers['x-hwid-limit'] = 'true'; // v2rayTUN
                 }
             } else {
-                await this.checkAndUpsertHwidUserDevice(user, hwidHeaders, requestIp);
+                void this.checkAndUpsertHwidUserDevice(user, hwidHeaders, requestIp);
             }
 
             let subscription: ResolvedProxyConfig[] | undefined;
@@ -585,12 +585,12 @@ export class SubscriptionService {
         }
     }
 
-    private async getUserProfileHeadersInfo(
+    private getUserProfileHeadersInfo(
         user: UserEntity,
         isHapp: boolean,
         settings: SubscriptionSettingsEntity,
         hwidLimit: boolean = false,
-    ): Promise<ISubscriptionHeaders> {
+    ): ISubscriptionHeaders {
         const headers: ISubscriptionHeaders = {
             'content-disposition': `attachment; filename=${user.username}`,
             'support-url': settings.supportLink,
