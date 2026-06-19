@@ -46,9 +46,7 @@ jobs:
       - name: Publish package on NPM
         if: steps.published.outputs.exists != 'true'
         working-directory: 'libs/contract'
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       # - name: Install HashedSet dependencies and build
       #   working-directory: 'libs/hashed-set'
