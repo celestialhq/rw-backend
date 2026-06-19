@@ -1,17 +1,21 @@
 {
-  "name": "@remnawave/backend-contract",
+  "name": "@celestialhq/backend-contract",
   "version": "2.8.24",
   "public": true,
   "license": "AGPL-3.0-only",
   "description": "A contract library for Remnawave Backend. It can be used in backend and frontend.",
-  "author": "REMNAWAVE <github.com/remnawave>",
-  "homepage": "https://github.com/remnawave",
+  "author": "CelestialHQ",
+  "homepage": "https://github.com/celestialhq/rw-backend",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/remnawave/backend.git"
+    "url": "git+https://github.com/celestialhq/rw-backend.git",
+    "directory": "libs/contract"
   },
   "bugs": {
-    "url": "https://github.com/remnawave/backend/issues"
+    "url": "https://github.com/celestialhq/rw-backend/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "main": "build/backend/index.js",
   "browser": "build/frontend/index.js",
@@ -20,7 +24,7 @@
     "build/**/*"
   ],
   "scripts": {
-    "clean": "rm -rf build",
+    "clean": "node -e \"require('node:fs').rmSync('build', { recursive: true, force: true })\"",
     "build:backend": "tsc -p tsconfig.backend.json",
     "build:frontend": "tsc -p tsconfig.frontend.json",
     "build": "npm run clean && npm run build:backend && npm run build:frontend",
