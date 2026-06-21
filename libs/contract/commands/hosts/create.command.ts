@@ -52,7 +52,7 @@ export namespace CreateHostCommand {
         fingerprint: z.string().nullish(),
         isDisabled: z.optional(z.boolean().default(false)),
         securityLayer: z.optional(z.nativeEnum(SECURITY_LAYERS).default(SECURITY_LAYERS.DEFAULT)),
-        xHttpExtraParams: z.unknown().nullish(),
+        xhttpExtraParams: z.unknown().nullish(),
         muxParams: z.unknown().nullish(),
         sockoptParams: z.unknown().nullish(),
         finalMask: z.unknown().nullish(),

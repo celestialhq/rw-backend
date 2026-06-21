@@ -274,7 +274,7 @@ model Hosts {
   alpn                         String?  @map("alpn") // ENUM: h2, http/1.1, h2,http/1.1 
   fingerprint                  String?  @map("fingerprint") // ENUM: chrome, firefox, safari, ios, android, edge, 360, qq, random, randomized
   securityLayer                String   @default("DEFAULT") @map("security_layer") // ENUM: DEFAULT, TLS, NONE
-  xHttpExtraParams             Json?    @map("xhttp_extra_params")
+  xhttpExtraParams             Json?    @map("xhttp_extra_params")
   muxParams                    Json?    @map("mux_params")
   sockoptParams                Json?    @map("sockopt_params")
   finalMask                    Json?    @map("final_mask")

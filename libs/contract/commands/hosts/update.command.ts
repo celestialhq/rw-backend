@@ -56,7 +56,7 @@ export namespace UpdateHostCommand {
         fingerprint: z.string().nullish(),
         isDisabled: z.boolean().default(false),
         securityLayer: z.optional(z.nativeEnum(SECURITY_LAYERS)),
-        xHttpExtraParams: z.unknown().nullish(),
+        xhttpExtraParams: z.unknown().nullish(),
         muxParams: z.unknown().nullish(),
         sockoptParams: z.unknown().nullish(),
         finalMask: z.unknown().nullish(),

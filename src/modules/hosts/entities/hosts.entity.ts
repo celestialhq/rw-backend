@@ -19,7 +19,7 @@ export class HostsEntity implements Hosts {
     alpn: null | string;
     fingerprint: null | string;
     securityLayer: TSecurityLayers;
-    xHttpExtraParams: null | object;
+    xhttpExtraParams: null | object;
     muxParams: null | object;
     sockoptParams: null | object;
     finalMask: null | object;

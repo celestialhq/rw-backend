@@ -21,7 +21,7 @@ export class HostResponseModel {
     public fingerprint: null | string;
     public isDisabled: boolean;
     public securityLayer: TSecurityLayers;
-    public xHttpExtraParams: null | object;
+    public xhttpExtraParams: null | object;
     public muxParams: null | object;
     public sockoptParams: null | object;
     public finalMask: null | object;
@@ -66,7 +66,7 @@ export class HostResponseModel {
 
         this.isDisabled = data.isDisabled;
         this.securityLayer = data.securityLayer;
-        this.xHttpExtraParams = data.xHttpExtraParams;
+        this.xhttpExtraParams = data.xhttpExtraParams;
         this.muxParams = data.muxParams;
         this.sockoptParams = data.sockoptParams;
         this.finalMask = data.finalMask;

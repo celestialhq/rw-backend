@@ -220,7 +220,7 @@ export class ResolveProxyConfigService {
                 path: override(inputHost.path, settings?.path),
                 host: this.resolveRandomizedValue(override(inputHost.host, settings?.host) ?? ''),
                 mode: settings?.mode ?? 'auto',
-                extra: override(toNonEmptyRecord(inputHost.xHttpExtraParams), settings?.extra),
+                extra: override(toNonEmptyRecord(inputHost.xhttpExtraParams), settings?.extra),
             },
         };
     }
