@@ -27,7 +27,6 @@ import { proxyCheckMiddleware, getRealIp, noRobotsMiddleware } from '@common/mid
 import { TypedConfigService } from '@common/config/app-config/typed-config.service';
 import { getStartMessage } from '@common/utils/startup-app/get-start-message';
 import { customLogFilter } from '@common/utils/filter-logs';
-import { AxiosService } from '@common/axios';
 
 import { AppModule } from './app.module';
 
@@ -145,9 +144,6 @@ async function bootstrap(): Promise<void> {
     app.enableShutdownHooks();
 
     await app.listen(Number(config.getOrThrow('APP_PORT')));
-
-    const axiosService = app.get(AxiosService);
-    await axiosService.setJwt();
 
     logger.info('\n' + (await getStartMessage()) + '\n');
 }

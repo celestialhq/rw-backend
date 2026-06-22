@@ -13,7 +13,6 @@ import { RuntimeMetricsModule } from '@common/runtime-metrics/runtime-metrics.mo
 import { disableFrontend } from '@common/utils/startup-app/is-development';
 import { RawCacheModule } from '@common/raw-cache/raw-cache.module';
 import { PrismaService } from '@common/database/prisma.service';
-import { AxiosModule } from '@common/axios/axios.module';
 import { PrismaModule } from '@common/database';
 
 import { IntegrationModules } from '@integration-modules/integration-modules';
@@ -25,7 +24,6 @@ import { QueueModule } from '@queue/queue.module';
 @Module({
     imports: [
         RawCacheModule,
-        AxiosModule,
         CommonConfigModule,
         PrismaModule,
         ClsModule.forRoot({

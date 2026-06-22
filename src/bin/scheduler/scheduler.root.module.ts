@@ -13,7 +13,6 @@ import { RawCacheModule } from '@common/raw-cache/raw-cache.module';
 import { CommonConfigModule } from '@common/config/common-config';
 import { PrismaService } from '@common/database/prisma.service';
 import { PrismaModule } from '@common/database';
-import { AxiosModule } from '@common/axios';
 
 import { PrometheusReporterModule } from '@integration-modules/prometheus-reporter/prometheus-reporter.module';
 import { HealthModule } from '@integration-modules/health/health.module';
@@ -25,7 +24,6 @@ import { SchedulerModule } from '@scheduler/scheduler.module';
 @Module({
     imports: [
         RawCacheModule,
-        AxiosModule,
         CommonConfigModule,
         PrismaModule,
         ClsModule.forRoot({
