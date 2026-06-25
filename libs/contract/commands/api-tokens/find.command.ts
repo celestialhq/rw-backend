@@ -18,9 +18,9 @@ export namespace FindAllApiTokensCommand {
 
     export const ResponseSchema = z.object({
         response: z.object({
-            apiKeys: z.array(ApiTokensSchema),
+            tokens: z.array(ApiTokensSchema),
             docs: z.object({
-                isDocsEnabled: z.boolean(),
+                enabled: z.boolean(),
                 scalarPath: z.string().nullable(),
                 swaggerPath: z.string().nullable(),
             }),

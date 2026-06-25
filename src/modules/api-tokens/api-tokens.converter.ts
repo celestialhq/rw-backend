@@ -13,8 +13,8 @@ const modelToEntity = (model: ApiTokens): ApiTokenEntity => {
 const entityToModel = (entity: ApiTokenEntity): ApiTokens => {
     return {
         uuid: entity.uuid,
-        token: entity.token,
-        tokenName: entity.tokenName,
+        name: entity.name,
+        expireAt: entity.expireAt,
         scopes: entity.scopes,
 
         createdAt: entity.createdAt,

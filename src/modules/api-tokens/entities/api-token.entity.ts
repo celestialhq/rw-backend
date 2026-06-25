@@ -2,8 +2,8 @@ import { ApiTokens } from '@prisma/client';
 
 export class ApiTokenEntity implements ApiTokens {
     public uuid: string;
-    public token: string;
-    public tokenName: string;
+    public name: string;
+    public expireAt: Date;
     public scopes: string[];
 
     public createdAt: Date;

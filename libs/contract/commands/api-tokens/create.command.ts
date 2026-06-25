@@ -17,14 +17,17 @@ export namespace CreateApiTokenCommand {
     );
 
     export const RequestSchema = z.object({
-        tokenName: z.string(),
+        name: z.string().min(2).max(30),
+        expiresInDays: z.number().min(1),
         scopes: z.array(z.string()).optional().default(['*']),
     });
 
     export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
-        response: ApiTokensSchema,
+        response: ApiTokensSchema.extend({
+            token: z.string(),
+        }),
     });
 
     export type Response = z.infer<typeof ResponseSchema>;

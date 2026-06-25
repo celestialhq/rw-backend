@@ -1,21 +1,23 @@
 import { Prisma } from '@prisma/client';
-import { randomUUID } from 'crypto';
+import dayjs from 'dayjs';
+import { randomUUID } from 'node:crypto';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { TypedConfigService } from '@common/config/app-config/typed-config.service';
 import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
-import { ERRORS } from '@libs/contracts/constants';
+import { ERRORS, EVENTS } from '@libs/contracts/constants';
+
+import { ServiceEvent } from '@integration-modules/notifications/interfaces';
 
 import { SignApiTokenCommand } from '../auth/commands/sign-api-token/sign-api-token.command';
+import { CreateApiTokenRequestDto } from './dtos';
 import { ApiTokenEntity } from './entities/api-token.entity';
-import {
-    IApiTokenDeleteResponse,
-    ICreateApiTokenRequest,
-    IGroupedScopeCatalog,
-} from './interfaces';
+import { IApiTokenDeleteResponse, IGroupedScopeCatalog } from './interfaces';
+import { CreateApiTokenResponseModel } from './models';
 import { FindAllApiTokensResponseModel } from './models/find.model';
 import { ApiTokensRepository } from './repositories/api-tokens.repository';
 import { ScopeCatalogService } from './scope-catalog.service';
@@ -29,10 +31,13 @@ export class ApiTokensService {
         private readonly commandBus: CommandBus,
         private readonly configService: TypedConfigService,
         private readonly scopeCatalogService: ScopeCatalogService,
+        private readonly eventEmitter: EventEmitter2,
     ) {}
 
-    public async create(body: ICreateApiTokenRequest): Promise<TResult<ApiTokenEntity>> {
-        const { tokenName, scopes } = body;
+    public async create(
+        body: CreateApiTokenRequestDto,
+    ): Promise<TResult<CreateApiTokenResponseModel>> {
+        const { name, expiresInDays, scopes } = body;
 
         try {
             const invalidScopes = this.scopeCatalogService.findInvalidScopes(scopes);
@@ -44,10 +49,11 @@ export class ApiTokensService {
             }
 
             const uuid = randomUUID();
+            const expireAt = dayjs().utc().add(expiresInDays, 'days').toDate();
 
-            const token = await this.signApiToken({
-                uuid,
-            });
+            const token = await this.commandBus.execute(
+                new SignApiTokenCommand(uuid, expiresInDays),
+            );
 
             if (!token.isOk) {
                 return fail(ERRORS.CREATE_API_TOKEN_ERROR);
@@ -55,14 +61,26 @@ export class ApiTokensService {
 
             const apiTokenEntity = new ApiTokenEntity({
                 uuid,
-                tokenName,
-                token: token.response,
+                name,
+                expireAt,
                 scopes,
             });
 
             const newApiTokenEntity = await this.apiTokensRepository.create(apiTokenEntity);
 
-            return ok(newApiTokenEntity);
+            this.eventEmitter.emit(
+                EVENTS.SERVICE.API_TOKEN_CREATED,
+                new ServiceEvent(EVENTS.SERVICE.API_TOKEN_CREATED, {
+                    apiToken: {
+                        name,
+                        uuid,
+                        expireAt,
+                        scopes,
+                    },
+                }),
+            );
+
+            return ok(new CreateApiTokenResponseModel(newApiTokenEntity, token.response));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.CREATE_API_TOKEN_ERROR);
@@ -71,10 +89,27 @@ export class ApiTokensService {
 
     public async delete(uuid: string): Promise<TResult<IApiTokenDeleteResponse>> {
         try {
+            const apiToken = await this.apiTokensRepository.findByUUID(uuid);
+
+            if (!apiToken) {
+                return fail(ERRORS.REQUESTED_TOKEN_NOT_FOUND);
+            }
+
             const result = await this.apiTokensRepository.deleteByUUID(uuid);
 
             await this.rawCacheService.del(`api:${uuid}`);
 
+            this.eventEmitter.emit(
+                EVENTS.SERVICE.API_TOKEN_DELETED,
+                new ServiceEvent(EVENTS.SERVICE.API_TOKEN_DELETED, {
+                    apiToken: {
+                        name: apiToken.name,
+                        uuid: apiToken.uuid,
+                        expireAt: apiToken.expireAt,
+                        scopes: apiToken.scopes,
+                    },
+                }),
+            );
             return ok({ result });
         } catch (error) {
             this.logger.error(JSON.stringify(error));
@@ -93,9 +128,9 @@ export class ApiTokensService {
             const result = await this.apiTokensRepository.findByCriteria({});
 
             return ok({
-                apiKeys: result.map((item) => item),
+                tokens: result.map((item) => item),
                 docs: {
-                    isDocsEnabled: this.configService.getOrThrow('IS_DOCS_ENABLED'),
+                    enabled: this.configService.getOrThrow('IS_DOCS_ENABLED'),
                     scalarPath: this.configService.get('SCALAR_PATH'),
                     swaggerPath: this.configService.get('SWAGGER_PATH'),
                 },
@@ -108,11 +143,5 @@ export class ApiTokensService {
 
     public getAvailableScopes(): TResult<IGroupedScopeCatalog> {
         return ok(this.scopeCatalogService.getGroupedCatalog());
-    }
-
-    private async signApiToken(dto: SignApiTokenCommand): Promise<TResult<string>> {
-        return this.commandBus.execute<SignApiTokenCommand, TResult<string>>(
-            new SignApiTokenCommand(dto.uuid),
-        );
     }
 }

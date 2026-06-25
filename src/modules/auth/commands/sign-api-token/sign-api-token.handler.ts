@@ -20,7 +20,7 @@ export class SignApiTokenHandler implements ICommandHandler<SignApiTokenCommand,
 
         return ok(
             this.jwtService.sign(payload, {
-                expiresIn: '99999d',
+                expiresIn: `${command.expireInDays}d`,
             }),
         );
     }

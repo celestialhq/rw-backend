@@ -25,7 +25,6 @@ import {
     FindAllApiTokensResponseDto,
     GetApiTokenScopesResponseDto,
 } from './dtos';
-import { CreateApiTokenResponseModel } from './models';
 
 @ApiBearerAuth('Authorization')
 @ApiTags(CONTROLLERS_INFO.API_TOKENS.tag)
@@ -51,7 +50,7 @@ export class ApiTokensController {
 
         const data = errorHandler(result);
         return {
-            response: new CreateApiTokenResponseModel(data),
+            response: data,
         };
     }
 
