@@ -12,6 +12,12 @@ export class RawCacheService {
         return raw ? JSON.parse(raw) : null;
     }
 
+    async mget<T>(keys: string[]): Promise<(T | null)[]> {
+        if (keys.length === 0) return [];
+        const raws = await this.redis.mget(...keys);
+        return raws.map((raw) => (raw ? JSON.parse(raw) : null));
+    }
+
     async set(key: string, value: unknown, ttlSeconds?: number): Promise<void> {
         const raw = JSON.stringify(value);
         if (ttlSeconds) {
@@ -95,5 +101,37 @@ export class RawCacheService {
 
     async rename(oldKey: string, newKey: string): Promise<void> {
         await this.redis.rename(oldKey, newKey);
+    }
+
+    async cachedByKeys<TRow, TVal>(
+        ids: string[],
+        opts: {
+            cacheKey: (id: string) => string;
+            ttlSeconds: number;
+            fetch: (missed: string[]) => Promise<TRow[]>;
+            rowId: (row: TRow) => string;
+            toValue: (row: TRow) => TVal;
+        },
+    ): Promise<Map<string, TVal>> {
+        if (ids.length === 0) return new Map();
+
+        const cached = await this.mget<{ v: TVal }>(ids.map(opts.cacheKey));
+        const result = new Map<string, TVal>();
+        const missed: string[] = [];
+
+        ids.forEach((id, i) => (cached[i] ? result.set(id, cached[i]!.v) : missed.push(id)));
+
+        if (missed.length) {
+            const rows = await opts.fetch(missed);
+            await this.setMany(
+                rows.map((r) => ({
+                    key: opts.cacheKey(opts.rowId(r)),
+                    value: { v: opts.toValue(r) },
+                    ttlSeconds: opts.ttlSeconds,
+                })),
+            );
+            rows.forEach((r) => result.set(opts.rowId(r), opts.toValue(r)));
+        }
+        return result;
     }
 }

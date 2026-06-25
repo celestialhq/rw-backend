@@ -144,7 +144,7 @@ export class SubscriptionTemplateService {
                     : undefined,
             });
 
-            await this.removeCachedTemplate(template.templateType, template.name);
+            await this.removeCachedTemplate(template.uuid, template.templateType, template.name);
 
             return ok(new BaseTemplateResponseModel(updatedTemplate));
         } catch (error) {
@@ -180,7 +180,7 @@ export class SubscriptionTemplateService {
                 return fail(ERRORS.RESERVED_TEMPLATE_CANNOT_BE_DELETED);
             }
 
-            await this.removeCachedTemplate(template.templateType, template.name);
+            await this.removeCachedTemplate(template.uuid, template.templateType, template.name);
 
             const deletedTemplate = await this.subscriptionTemplateRepository.deleteByUUID(uuid);
 
@@ -354,9 +354,13 @@ export class SubscriptionTemplateService {
     }
 
     private async removeCachedTemplate(
+        uuid: string,
         type: TSubscriptionTemplateType,
         name: string = DEFAULT_TEMPLATE_NAME,
     ): Promise<void> {
         await this.rawCacheService.del(CACHE_KEYS.SUBSCRIPTION_TEMPLATE(name, type));
+        if (type === 'XRAY_JSON') {
+            await this.rawCacheService.del(CACHE_KEYS.XRAY_JSON_TEMPLATE(uuid));
+        }
     }
 }
