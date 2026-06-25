@@ -524,7 +524,6 @@ model UserSubscriptionRequestHistory {
   user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
 
   @@index([userId])
-  @@index([requestAt(sort: Asc)])
   @@map("user_subscription_request_history")
 }
 
