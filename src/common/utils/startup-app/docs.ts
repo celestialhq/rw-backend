@@ -103,7 +103,6 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
                 hideDownloadButton: false,
                 hideTestRequestButton: false,
                 isEditable: false,
-                isLoading: false,
                 hideDarkModeToggle: false,
                 withDefaultFonts: true,
                 hideSearch: false,
