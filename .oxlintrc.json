@@ -6,52 +6,6 @@
   "categories": { "correctness": "error" },
   "ignorePatterns": ["node_modules", "**/*.js", "**/*.d.ts"],
   "rules": {
-    "perfectionist/sort-imports": [
-      "error",
-      {
-        "type": "line-length",
-        "order": "desc",
-        "ignoreCase": true,
-        "specialCharacters": "keep",
-        "internalPattern": ["^~/.+"],
-        "partitionByComment": false,
-        "partitionByNewLine": false,
-        "newlinesBetween": 1,
-        "environment": "node",
-        "tsconfig": { "rootDir": "." },
-        "groups": [
-          "type",
-          ["value-builtin", "value-external"],
-          "type-internal",
-          "value-internal",
-          "nestJs",
-          "remnawave",
-          "aliasCommon",
-          { "newlinesBetween": 0 },
-          "aliasLibs",
-          "aliasIntegrationModules",
-          "aliasModules",
-          "aliasScheduler",
-          "aliasQueue",
-          ["type-parent", "type-sibling", "type-index"],
-          ["value-parent", "value-sibling", "value-index"],
-          "unknown"
-        ],
-        "customGroups": [
-          { "groupName": "nestJs", "elementNamePattern": "^@nestjs/" },
-          { "groupName": "remnawave", "elementNamePattern": "^@remnawave/" },
-          { "groupName": "aliasCommon", "elementNamePattern": "^@common/" },
-          { "groupName": "aliasLibs", "elementNamePattern": "^@libs/" },
-          {
-            "groupName": "aliasIntegrationModules",
-            "elementNamePattern": "^@integration-modules/"
-          },
-          { "groupName": "aliasModules", "elementNamePattern": "^@modules/" },
-          { "groupName": "aliasScheduler", "elementNamePattern": "^@scheduler/" },
-          { "groupName": "aliasQueue", "elementNamePattern": "^@queue/" }
-        ]
-      }
-    ],
     "perfectionist/sort-decorators": [
       "error",
       {
