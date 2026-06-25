@@ -21,26 +21,6 @@ module.exports = {
             namespace: 'api',
         },
         {
-            name: 'remnawave-scheduler',
-            script: 'dist/src/bin/scheduler/scheduler.js',
-            watch: false,
-            instances: 1, // DO NOT SCALE
-            exec_mode: 'fork',
-            merge_logs: true,
-            out_file: '/dev/null',
-            error_file: '/dev/null',
-            instance_var: 'INSTANCE_ID',
-            env_development: {
-                NODE_ENV: 'development',
-                INSTANCE_TYPE: 'scheduler',
-            },
-            env_production: {
-                NODE_ENV: 'production',
-                INSTANCE_TYPE: 'scheduler',
-            },
-            namespace: 'scheduler',
-        },
-        {
             name: 'remnawave-jobs',
             script: 'dist/src/bin/processors/processors.js',
             watch: false,
@@ -59,6 +39,26 @@ module.exports = {
                 INSTANCE_TYPE: 'processor',
             },
             namespace: 'jobs',
+        },
+        {
+            name: 'remnawave-scheduler',
+            script: 'dist/src/bin/scheduler/scheduler.js',
+            watch: false,
+            instances: 1, // DO NOT SCALE
+            exec_mode: 'fork',
+            merge_logs: true,
+            out_file: '/dev/null',
+            error_file: '/dev/null',
+            instance_var: 'INSTANCE_ID',
+            env_development: {
+                NODE_ENV: 'development',
+                INSTANCE_TYPE: 'scheduler',
+            },
+            env_production: {
+                NODE_ENV: 'production',
+                INSTANCE_TYPE: 'scheduler',
+            },
+            namespace: 'scheduler',
         },
     ],
 };

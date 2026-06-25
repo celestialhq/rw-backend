@@ -1,7 +1,7 @@
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Prisma } from '@prisma/client';
 
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { TransactionHost } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 
 import { TxKyselyService } from '@common/database/tx-kysely.service';
@@ -9,6 +9,10 @@ import { ICrudHistoricalRecords } from '@common/types/crud-port';
 
 import { IGetNodesUsageByRange } from '@modules/nodes-usage-history/interfaces';
 
+import { BulkUpsertHistoryEntryBuilder } from '../builders/bulk-upsert-history-entry/bulk-upsert-history-entry.builder';
+import { GetNodeUsersUsageByRangeBuilder } from '../builders/get-node-users-usage-by-range/get-node-users-usage-by-range.builder';
+import { GetUserUsageByRangeBuilder } from '../builders/get-user-usage-by-range/get-user-usage-by-range.builder';
+import { NodesUserUsageHistoryEntity } from '../entities/nodes-user-usage-history.entity';
 import {
     IGetLegacyStatsNodesUsersUsage,
     IGetUniversalTopNode,
@@ -16,10 +20,6 @@ import {
     IGetLegacyStatsUserUsage,
     IGetUniversalTopUser,
 } from '../interfaces';
-import { GetNodeUsersUsageByRangeBuilder } from '../builders/get-node-users-usage-by-range/get-node-users-usage-by-range.builder';
-import { BulkUpsertHistoryEntryBuilder } from '../builders/bulk-upsert-history-entry/bulk-upsert-history-entry.builder';
-import { GetUserUsageByRangeBuilder } from '../builders/get-user-usage-by-range/get-user-usage-by-range.builder';
-import { NodesUserUsageHistoryEntity } from '../entities/nodes-user-usage-history.entity';
 import { NodesUserUsageHistoryConverter } from '../nodes-user-usage-history.converter';
 
 @Injectable()

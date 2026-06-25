@@ -106,9 +106,10 @@ model UserTraffic {
 }
 
 model ApiTokens {
-  uuid      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  token     String @unique @map("token")
-  tokenName String @map("token_name")
+  uuid     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String   @map("name")
+  expireAt DateTime @default(dbgenerated("now() + interval '99999 days'")) @map("expire_at")
+  scopes   String[] @default(["*"]) @map("scopes")
 
   createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
   updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
@@ -275,7 +276,7 @@ model Hosts {
   alpn                         String?  @map("alpn") // ENUM: h2, http/1.1, h2,http/1.1 
   fingerprint                  String?  @map("fingerprint") // ENUM: chrome, firefox, safari, ios, android, edge, 360, qq, random, randomized
   securityLayer                String   @default("DEFAULT") @map("security_layer") // ENUM: DEFAULT, TLS, NONE
-  xHttpExtraParams             Json?    @map("xhttp_extra_params")
+  xhttpExtraParams             Json?    @map("xhttp_extra_params")
   muxParams                    Json?    @map("mux_params")
   sockoptParams                Json?    @map("sockopt_params")
   finalMask                    Json?    @map("final_mask")
@@ -484,13 +485,16 @@ model InfraProviders {
 }
 
 model InfraBillingNodes {
-  uuid          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nodeUuid      String   @map("node_uuid") @db.Uuid
-  providerUuid  String   @map("provider_uuid") @db.Uuid
+  uuid     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nodeUuid String? @map("node_uuid") @db.Uuid
+  name     String? @map("name")
+
+  providerUuid String @map("provider_uuid") @db.Uuid
+
   nextBillingAt DateTime @map("next_billing_at")
 
   provider InfraProviders @relation(fields: [providerUuid], references: [uuid], onDelete: Cascade)
-  node     Nodes          @relation(fields: [nodeUuid], references: [uuid], onDelete: Cascade)
+  node     Nodes?         @relation(fields: [nodeUuid], references: [uuid], onDelete: Cascade)
 
   createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
   updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")

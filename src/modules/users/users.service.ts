@@ -1,37 +1,28 @@
-import { randomUUID } from 'node:crypto';
 import { Prisma } from '@prisma/client';
-import { customAlphabet } from 'nanoid';
 import dayjs from 'dayjs';
+import { customAlphabet } from 'nanoid';
+import { randomUUID } from 'node:crypto';
 
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { mapDefined, wrapBigInt, wrapBigIntNullable } from '@common/utils';
 import { TypedConfigService } from '@common/config/app-config';
 import { fail, ok, TResult } from '@common/types';
+import { mapDefined, wrapBigInt, wrapBigIntNullable } from '@common/utils';
+import { GetAllUsersCommand, GetUsersStreamCommand } from '@libs/contracts/commands';
 import { ERRORS, USERS_STATUS, EVENTS } from '@libs/contracts/constants';
-import { GetAllUsersCommand } from '@libs/contracts/commands';
 
 import { UserEvent } from '@integration-modules/notifications/interfaces';
 
-import { GetUserSubscriptionRequestHistoryQuery } from '@modules/user-subscription-request-history/queries/get-user-subscription-request-history';
-import { RemoveUsersFromNodeEvent } from '@modules/nodes/events/remove-users-from-node';
-import { RemoveUserFromNodeEvent } from '@modules/nodes/events/remove-user-from-node';
-import { AddUsersToNodeEvent } from '@modules/nodes/events/add-users-to-node';
 import { AddUserToNodeEvent } from '@modules/nodes/events/add-user-to-node';
+import { AddUsersToNodeEvent } from '@modules/nodes/events/add-users-to-node';
+import { RemoveUserFromNodeEvent } from '@modules/nodes/events/remove-user-from-node';
+import { RemoveUsersFromNodeEvent } from '@modules/nodes/events/remove-users-from-node';
+import { GetUserSubscriptionRequestHistoryQuery } from '@modules/user-subscription-request-history/queries/get-user-subscription-request-history';
 
 import { UsersQueuesService } from '@queue/_users';
 
-import {
-    DeleteUserResponseModel,
-    BulkDeleteByStatusResponseModel,
-    BulkOperationResponseModel,
-    BulkAllResponseModel,
-    GetUserAccessibleNodesResponseModel,
-    GetUserSubscriptionRequestHistoryResponseModel,
-    ResolveUserResponseModel,
-} from './models';
 import {
     CreateUserRequestDto,
     UpdateUserRequestDto,
@@ -41,9 +32,18 @@ import {
     RevokeUserSubscriptionBodyDto,
     ResolveUserRequestBodyDto,
 } from './dtos';
-import { IGetUserByUnique, IGetUsersByTelegramIdOrEmail, IUpdateUserDto } from './interfaces';
-import { UsersRepository } from './repositories/users.repository';
 import { BaseUserEntity, UserEntity } from './entities';
+import { IGetUserByUnique, IGetUsersByTelegramIdOrEmail, IUpdateUserDto } from './interfaces';
+import {
+    DeleteUserResponseModel,
+    BulkDeleteByStatusResponseModel,
+    BulkOperationResponseModel,
+    BulkAllResponseModel,
+    GetUserAccessibleNodesResponseModel,
+    GetUserSubscriptionRequestHistoryResponseModel,
+    ResolveUserResponseModel,
+} from './models';
+import { UsersRepository } from './repositories/users.repository';
 
 @Injectable()
 export class UsersService {
@@ -259,6 +259,23 @@ export class UsersService {
             const [users, total] = await this.userRepository.getAllUsers(dto);
 
             return ok({ users, total });
+        } catch (error) {
+            this.logger.error(error);
+            return fail(ERRORS.GET_ALL_USERS_ERROR);
+        }
+    }
+
+    public async getUsersStream(dto: GetUsersStreamCommand.RequestQuery): Promise<
+        TResult<{
+            users: UserEntity[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        }>
+    > {
+        try {
+            const result = await this.userRepository.getUsersStream(dto);
+
+            return ok(result);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.GET_ALL_USERS_ERROR);

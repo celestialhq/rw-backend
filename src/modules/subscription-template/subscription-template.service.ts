@@ -15,12 +15,12 @@ import {
     DEFAULT_TEMPLATE_STASH,
     DEFAULT_TEMPLATE_XRAY_JSON,
 } from './constants';
-import { SubscriptionTemplateRepository } from './repositories/subscription-template.repository';
-import { GetSubscriptionTemplatesResponseModel } from './models/get-templates.response.model';
-import { SubscriptionTemplateEntity } from './entities/subscription-template.entity';
-import { BaseTemplateResponseModel } from './models/base-template.response.model';
-import { DeleteSubscriptionTemplateResponseModel } from './models';
 import { ReorderSubscriptionTemplatesRequestDto } from './dtos';
+import { SubscriptionTemplateEntity } from './entities/subscription-template.entity';
+import { DeleteSubscriptionTemplateResponseModel } from './models';
+import { BaseTemplateResponseModel } from './models/base-template.response.model';
+import { GetSubscriptionTemplatesResponseModel } from './models/get-templates.response.model';
+import { SubscriptionTemplateRepository } from './repositories/subscription-template.repository';
 
 const DEFAULT_TEMPLATE_NAME = 'Default';
 

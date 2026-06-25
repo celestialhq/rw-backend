@@ -1,8 +1,7 @@
-import axios, { AxiosError, AxiosInstance } from 'axios';
-import { compress } from '@mongodb-js/zstd';
-import https from 'node:https';
-
 import { ERRORS } from '@contract/constants';
+import { compress } from '@mongodb-js/zstd';
+import axios, { AxiosError, AxiosInstance } from 'axios';
+import https from 'node:https';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -29,14 +28,14 @@ import {
     UnblockIpsCommand,
 } from '@remnawave/node-contract';
 
-import { formatExecutionTime, getTime } from '@common/utils/get-elapsed-time';
 import { prettyBytesUtil } from '@common/utils/bytes';
+import { formatExecutionTime, getTime } from '@common/utils/get-elapsed-time';
 
 import { GetNodeJwtCommand } from '@modules/keygen/commands/get-node-jwt';
 
+import { fail, ok, TResult } from '../types';
 import { INodeConnectionOpts, IMtlsOptions } from './axios.interfaces';
 import { MtlsSocksProxyAgent } from './mtls-agent';
-import { fail, ok, TResult } from '../types';
 
 @Injectable()
 export class AxiosService {

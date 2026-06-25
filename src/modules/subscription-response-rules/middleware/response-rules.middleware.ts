@@ -14,8 +14,8 @@ import {
 import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
 import { isExtendedClient } from '@modules/subscription-template/constants';
 
-import { ResponseRulesMatcherService } from '../services/response-rules-matcher.service';
 import { ISRRContext } from '../interfaces';
+import { ResponseRulesMatcherService } from '../services/response-rules-matcher.service';
 
 @Injectable()
 export class ResponseRulesMiddleware implements NestMiddleware {

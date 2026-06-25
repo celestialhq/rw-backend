@@ -11,6 +11,7 @@ export namespace CloudflareAccessCommand {
         AUTH_ROUTES.CLOUDFLARE_ACCESS,
         'post',
         'Login with Cloudflare Access',
+        { scope: 'cloudflare-access', kind: 'write' },
     );
 
     export const RequestSchema = z.object({});

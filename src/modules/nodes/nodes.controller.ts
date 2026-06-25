@@ -1,6 +1,7 @@
 import { CONTROLLERS_INFO, NODES_CONTROLLER } from '@contract/api';
 import { ROLE } from '@contract/constants';
 
+import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
 import {
     ApiBearerAuth,
     ApiCreatedResponse,
@@ -8,14 +9,15 @@ import {
     ApiParam,
     ApiTags,
 } from '@nestjs/swagger';
-import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
 
-import { HttpExceptionFilter } from '@common/exception/http-exception.filter';
-import { JwtDefaultGuard } from '@common/guards/jwt-guards/def-jwt-guard';
-import { errorHandler } from '@common/helpers/error-handler.helper';
-import { RolesGuard } from '@common/guards/roles/roles.guard';
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
+import { ApiScopeResource } from '@common/decorators/scopes';
+import { HttpExceptionFilter } from '@common/exception/http-exception.filter';
+import { JwtDefaultGuard } from '@common/guards/jwt-guards/def-jwt-guard';
+import { RolesGuard } from '@common/guards/roles/roles.guard';
+import { ScopesGuard } from '@common/guards/scopes';
+import { errorHandler } from '@common/helpers/error-handler.helper';
 import {
     CreateNodeCommand,
     DeleteNodeCommand,
@@ -64,14 +66,15 @@ import {
     UpdateNodeRequestDto,
     UpdateNodeResponseDto,
 } from './dtos';
-import { GetAllNodesTagsResponseModel } from './models';
 import { EnableNodeRequestParamDto } from './dtos';
+import { GetAllNodesTagsResponseModel } from './models';
 import { NodesService } from './nodes.service';
 
 @ApiBearerAuth('Authorization')
+@ApiScopeResource(CONTROLLERS_INFO.NODES.resource)
 @ApiTags(CONTROLLERS_INFO.NODES.tag)
 @Roles(ROLE.ADMIN, ROLE.API)
-@UseGuards(JwtDefaultGuard, RolesGuard)
+@UseGuards(JwtDefaultGuard, RolesGuard, ScopesGuard)
 @UseFilters(HttpExceptionFilter)
 @Controller(NODES_CONTROLLER)
 export class NodesController {

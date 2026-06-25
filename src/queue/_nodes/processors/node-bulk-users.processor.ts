@@ -7,6 +7,7 @@ import { AxiosService } from '@common/axios';
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 
+import { NODES_JOB_NAMES } from '../constants/nodes-job-name.constant';
 import {
     IAddUsersToNodePayload,
     IDropIpsConnectionsPayload,
@@ -18,7 +19,6 @@ import {
     IRecreateTablesPayload,
     IUnblockIpsPayload,
 } from '../interfaces/executor.payload.interface';
-import { NODES_JOB_NAMES } from '../constants/nodes-job-name.constant';
 
 @Processor(QUEUES_NAMES.NODES.BULK_USERS, {
     concurrency: 25,

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { HOSTS_ROUTES, REST_API } from '../../api';
 import {
     getEndpointDetails,
     SECURITY_LAYERS,
@@ -7,7 +8,6 @@ import {
     SUBSCRIPTION_TEMPLATE_TYPE,
     MIHOMO_IP_VERSION,
 } from '../../constants';
-import { HOSTS_ROUTES, REST_API } from '../../api';
 import { HostsSchema } from '../../models';
 
 export namespace UpdateHostCommand {
@@ -18,6 +18,7 @@ export namespace UpdateHostCommand {
         HOSTS_ROUTES.UPDATE,
         'patch',
         'Update a host',
+        { scope: 'update', kind: 'write' },
     );
 
     export const RequestSchema = HostsSchema.pick({
@@ -55,7 +56,7 @@ export namespace UpdateHostCommand {
         fingerprint: z.string().nullish(),
         isDisabled: z.boolean().default(false),
         securityLayer: z.optional(z.nativeEnum(SECURITY_LAYERS)),
-        xHttpExtraParams: z.unknown().nullish(),
+        xhttpExtraParams: z.unknown().nullish(),
         muxParams: z.unknown().nullish(),
         sockoptParams: z.unknown().nullish(),
         finalMask: z.unknown().nullish(),

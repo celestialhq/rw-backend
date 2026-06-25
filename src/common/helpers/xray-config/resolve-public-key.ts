@@ -1,5 +1,5 @@
-import { createPrivateKey, createPublicKey, KeyObject } from 'node:crypto';
 import { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js';
+import { createPrivateKey, createPublicKey, KeyObject } from 'node:crypto';
 
 import { generateEncryptionFromDecryption } from '../vless-encryption/generate-encryption-from-decryption';
 

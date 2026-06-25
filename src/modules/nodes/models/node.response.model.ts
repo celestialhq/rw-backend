@@ -3,8 +3,8 @@ import { fromNanoToNumber } from '@common/utils/nano';
 import { ConfigProfileInboundEntity } from '@modules/config-profiles/entities';
 import { InfraProviderEntity } from '@modules/infra-billing/entities';
 
-import { INodeHotCache, INodeSystem, INodeVersions } from '../interfaces';
 import { NodesEntity } from '../entities';
+import { INodeHotCache, INodeSystem, INodeVersions } from '../interfaces';
 
 export class NodeResponseModel {
     public uuid: string;

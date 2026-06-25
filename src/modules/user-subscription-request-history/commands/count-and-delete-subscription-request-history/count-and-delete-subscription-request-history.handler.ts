@@ -1,5 +1,5 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { UserSubscriptionRequestHistoryRepository } from '../../repositories/user-subscription-request-history.repository';
 import { CountAndDeleteSubscriptionRequestHistoryCommand } from './count-and-delete-subscription-request-history.command';

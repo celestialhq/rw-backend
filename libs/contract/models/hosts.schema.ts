@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { ALPN, MIHOMO_IP_VERSION, SECURITY_LAYERS } from '../constants/hosts';
 import { SUBSCRIPTION_TEMPLATE_TYPE } from '../constants';
+import { ALPN, MIHOMO_IP_VERSION, SECURITY_LAYERS } from '../constants/hosts';
 
 export const HostsSchema = z.object({
     uuid: z.string().uuid(),
@@ -16,7 +16,7 @@ export const HostsSchema = z.object({
     fingerprint: z.string().nullable(),
     isDisabled: z.boolean(),
     securityLayer: z.nativeEnum(SECURITY_LAYERS).default(SECURITY_LAYERS.DEFAULT),
-    xHttpExtraParams: z.nullable(z.unknown()),
+    xhttpExtraParams: z.nullable(z.unknown()),
     muxParams: z.nullable(z.unknown()),
     sockoptParams: z.nullable(z.unknown()),
     finalMask: z.nullable(z.unknown()),

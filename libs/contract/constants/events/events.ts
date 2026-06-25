@@ -51,6 +51,8 @@ export const EVENTS = {
         LOGIN_ATTEMPT_FAILED: 'service.login_attempt_failed',
         LOGIN_ATTEMPT_SUCCESS: 'service.login_attempt_success',
         SUBPAGE_CONFIG_CHANGED: 'service.subpage_config_changed',
+        API_TOKEN_CREATED: 'service.api_token_created',
+        API_TOKEN_DELETED: 'service.api_token_deleted',
     },
     ERRORS: {
         BANDWIDTH_USAGE_THRESHOLD_REACHED_MAX_NOTIFICATIONS:

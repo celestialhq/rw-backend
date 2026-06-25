@@ -2,21 +2,21 @@ import { Job } from 'bullmq';
 import semver from 'semver';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { formatExecutionTime, getTime } from '@common/utils/get-elapsed-time';
 import { AxiosService } from '@common/axios/axios.service';
 import { RawCacheService } from '@common/raw-cache';
+import { formatExecutionTime, getTime } from '@common/utils/get-elapsed-time';
 import { CACHE_KEYS, CACHE_KEYS_TTL, EVENTS } from '@libs/contracts/constants';
 
 import { NodeEvent } from '@integration-modules/notifications/interfaces';
 
-import { GetPreparedConfigWithUsersQuery } from '@modules/users/queries/get-prepared-config-with-users';
 import { GetPluginByUuidQuery } from '@modules/node-plugins/queries/get-plugin-by-uuid';
-import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
 import { UpdateNodeCommand } from '@modules/nodes/commands/update-node';
+import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
+import { GetPreparedConfigWithUsersQuery } from '@modules/users/queries/get-prepared-config-with-users';
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 

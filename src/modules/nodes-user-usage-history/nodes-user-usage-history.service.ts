@@ -3,17 +3,17 @@ import dayjs from 'dayjs';
 import { Injectable, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { getDateRangeArrayUtil } from '@common/utils/get-date-range-array.util';
 import { fail, ok, TResult } from '@common/types';
+import { getDateRangeArrayUtil } from '@common/utils/get-date-range-array.util';
 import { ERRORS } from '@libs/contracts/constants';
 
-import { GetUserByUniqueFieldQuery } from '@modules/users/queries/get-user-by-unique-field';
-import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
 import { GetAllNodesQuery } from '@modules/nodes/queries/get-all-nodes';
+import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
+import { GetUserByUniqueFieldQuery } from '@modules/users/queries/get-user-by-unique-field';
 
-import { NodesUserUsageHistoryRepository } from './repositories/nodes-user-usage-history.repository';
-import { GetStatsNodesUsersUsageResponseModel, GetStatsUserUsageResponseModel } from './models';
 import { IGetLegacyStatsNodesUsersUsage, IGetLegacyStatsUserUsage } from './interfaces';
+import { GetStatsNodesUsersUsageResponseModel, GetStatsUserUsageResponseModel } from './models';
+import { NodesUserUsageHistoryRepository } from './repositories/nodes-user-usage-history.repository';
 
 @Injectable()
 export class NodesUserUsageHistoryService {

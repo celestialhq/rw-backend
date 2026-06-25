@@ -1,17 +1,17 @@
-import ems from 'enhanced-ms';
 import { Job } from 'bullmq';
+import ems from 'enhanced-ms';
 import { t } from 'try';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { CommandBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 
 import { GetUsersStatsCommand } from '@remnawave/node-contract';
 
-import { TypedConfigService } from '@common/config/app-config';
-import { multiplyConsumption } from '@common/utils/nano';
-import { RawCacheService } from '@common/raw-cache';
 import { AxiosService } from '@common/axios';
+import { TypedConfigService } from '@common/config/app-config';
+import { RawCacheService } from '@common/raw-cache';
+import { multiplyConsumption } from '@common/utils/nano';
 import {
     CACHE_KEYS,
     CACHE_KEYS_TTL,
@@ -19,8 +19,8 @@ import {
     INTERNAL_CACHE_KEYS_TTL,
 } from '@libs/contracts/constants';
 
-import { PushFromRedisQueueService } from '@queue/push-from-redis/push-from-redis.service';
 import { UsersQueuesService } from '@queue/_users';
+import { PushFromRedisQueueService } from '@queue/push-from-redis/push-from-redis.service';
 import { QUEUES_NAMES } from '@queue/queue.enum';
 
 import { NODES_JOB_NAMES } from '../constants/nodes-job-name.constant';
@@ -111,9 +111,10 @@ export class RecordUserUsageQueueProcessor extends WorkerHost {
                 return;
             }
 
-            const userUsageList: { u: string; b: string; n: string }[] = new Array(
-                response.response.users.length,
-            );
+            const userUsageList: { u: string; b: string; n: string }[] = Array.from({
+                length: response.response.users.length,
+            });
+
             let userUsageIndex = 0;
 
             const nodeRedisKey = INTERNAL_CACHE_KEYS.NODE_USER_USAGE(nodeId);

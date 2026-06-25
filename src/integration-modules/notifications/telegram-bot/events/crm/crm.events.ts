@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { NotificationsConfigService } from '@common/config/common-config';
 import { TypedConfigService } from '@common/config/app-config';
+import { NotificationsConfigService } from '@common/config/common-config';
 import { TCRMEvents } from '@libs/contracts/constants';
 
 import { CrmEvent } from '@integration-modules/notifications/interfaces';

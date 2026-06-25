@@ -1139,4 +1139,14 @@ export const ERRORS = {
         message: 'Update hosts error',
         httpCode: 500,
     },
+    INVALID_API_TOKEN_SCOPE: {
+        code: 'A229',
+        message: 'One or more provided API token scopes are invalid',
+        httpCode: 400,
+    },
+    CREATE_INFRA_BILLING_NODE_MISSING_TARGET: {
+        code: 'A230',
+        message: 'Either nodeUuid or name must be provided',
+        httpCode: 400,
+    },
 } as const;

@@ -2,16 +2,16 @@ import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import { Counter, Gauge } from 'prom-client';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import { QueryBus } from '@nestjs/cqrs';
+import { Cron } from '@nestjs/schedule';
 
 import { resolveCountryEmoji } from '@common/utils/resolve-country-emoji';
 import { METRIC_NAMES } from '@libs/contracts/constants';
 
 import { GetAllNodesQuery } from '@modules/nodes/queries/get-all-nodes/get-all-nodes.query';
 
-import { INodeBaseMetricLabels } from '@scheduler/metrics-providers';
 import { JOBS_INTERVALS } from '@scheduler/intervals';
+import { INodeBaseMetricLabels } from '@scheduler/metrics-providers';
 
 @Injectable()
 export class SyncMetricsTask {

@@ -1,19 +1,24 @@
-import parsePrometheusTextFormat from 'parse-prometheus-text-format';
-import { createHappCryptoLink } from '@kastov/cryptohapp';
-import { generateKeyPair } from '@stablelib/x25519';
-import { encodeURLSafe } from '@stablelib/base64';
-import { Request, Response } from 'express';
-import { readPackageJSON } from 'pkg-types';
-import axios, { AxiosError } from 'axios';
-import { groupBy } from 'lodash';
-import dayjs from 'dayjs';
-import os from 'node:os';
-
 import { ERRORS, INTERNAL_CACHE_KEYS } from '@contract/constants';
+import { createHappCryptoLink } from '@kastov/cryptohapp';
+import { encodeURLSafe } from '@stablelib/base64';
+import { generateKeyPair } from '@stablelib/x25519';
+import axios, { AxiosError } from 'axios';
+import dayjs from 'dayjs';
+import { Request, Response } from 'express';
+import { groupBy } from 'lodash';
+import os from 'node:os';
+import parsePrometheusTextFormat from 'parse-prometheus-text-format';
+import { readPackageJSON } from 'pkg-types';
 
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
+import { TypedConfigService } from '@common/config/app-config';
+import { RawCacheService } from '@common/raw-cache';
+import { RuntimeMetric } from '@common/runtime-metrics/interfaces';
+import { fail, ok, TResult } from '@common/types';
+import { prettyBytesUtil } from '@common/utils/bytes';
+import { calcDiff } from '@common/utils/calc-percent-diff.util';
 import {
     getCalendarMonthRanges,
     getCalendarYearRanges,
@@ -22,24 +27,24 @@ import {
     getLastTwoWeeksRanges,
 } from '@common/utils/get-date-ranges.uti';
 import { resolveCountryEmoji } from '@common/utils/resolve-country-emoji';
-import { RuntimeMetric } from '@common/runtime-metrics/interfaces';
-import { calcDiff } from '@common/utils/calc-percent-diff.util';
-import { TypedConfigService } from '@common/config/app-config';
-import { prettyBytesUtil } from '@common/utils/bytes';
-import { RawCacheService } from '@common/raw-cache';
-import { fail, ok, TResult } from '@common/types';
 
+import { IGet7DaysStats } from '@modules/nodes-usage-history/interfaces';
+import { Get7DaysStatsQuery } from '@modules/nodes-usage-history/queries/get-7days-stats';
+import { GetSumLifetimeQuery } from '@modules/nodes-usage-history/queries/get-sum-lifetime';
+import { CountOnlineUsersQuery } from '@modules/nodes/queries/count-online-users';
+import { GetAllNodesQuery } from '@modules/nodes/queries/get-all-nodes';
+import { GetNodesRecapQuery } from '@modules/nodes/queries/get-nodes-recap';
+import { GetInitDateQuery } from '@modules/remnawave-settings/queries/get-init-date';
 import { ResponseRulesMatcherService } from '@modules/subscription-response-rules/services/response-rules-matcher.service';
 import { ResponseRulesParserService } from '@modules/subscription-response-rules/services/response-rules-parser.service';
-import { GetSumLifetimeQuery } from '@modules/nodes-usage-history/queries/get-sum-lifetime';
-import { Get7DaysStatsQuery } from '@modules/nodes-usage-history/queries/get-7days-stats';
-import { GetInitDateQuery } from '@modules/remnawave-settings/queries/get-init-date';
-import { CountOnlineUsersQuery } from '@modules/nodes/queries/count-online-users';
 import { GetUsersRecapQuery } from '@modules/users/queries/get-users-recap';
-import { GetNodesRecapQuery } from '@modules/nodes/queries/get-nodes-recap';
-import { IGet7DaysStats } from '@modules/nodes-usage-history/interfaces';
-import { GetAllNodesQuery } from '@modules/nodes/queries/get-all-nodes';
 
+import { GetSumByDtRangeQuery } from '../nodes-usage-history/queries/get-sum-by-dt-range';
+import { ShortUserStats } from '../users/interfaces/user-stats.interface';
+import { GetShortUserStatsQuery } from '../users/queries/get-short-user-stats';
+import { DebugSrrMatcherRequestDto } from './dtos';
+import { GetStatsRequestQueryDto } from './dtos/get-stats.dto';
+import { InboundStats, Metric, NodeMetrics, OutboundStats } from './interfaces';
 import {
     GenerateX25519ResponseModel,
     GetBandwidthStatsResponseModel,
@@ -50,13 +55,7 @@ import {
     GetRemnawaveHealthResponseModel,
     IBaseStat,
 } from './models';
-import { GetSumByDtRangeQuery } from '../nodes-usage-history/queries/get-sum-by-dt-range';
-import { InboundStats, Metric, NodeMetrics, OutboundStats } from './interfaces';
-import { GetShortUserStatsQuery } from '../users/queries/get-short-user-stats';
 import { GetStatsResponseModel } from './models/get-stats.response.model';
-import { ShortUserStats } from '../users/interfaces/user-stats.interface';
-import { GetStatsRequestQueryDto } from './dtos/get-stats.dto';
-import { DebugSrrMatcherRequestDto } from './dtos';
 
 const TYPE_ORDER: Record<string, number> = {
     api: 0,

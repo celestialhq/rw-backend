@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { getEndpointDetails } from '../../constants';
 import { REST_API, USERS_ROUTES } from '../../api';
+import { getEndpointDetails } from '../../constants';
 
 export namespace GetUserSubscriptionRequestHistoryCommand {
     export const url = REST_API.USERS.SUBSCRIPTION_REQUEST_HISTORY;
@@ -11,6 +11,7 @@ export namespace GetUserSubscriptionRequestHistoryCommand {
         USERS_ROUTES.SUBSCRIPTION_REQUEST_HISTORY(':uuid'),
         'get',
         'Get user subscription request history, recent 24 records',
+        { scope: 'subscription-request-history', kind: 'read' },
     );
 
     export const RequestSchema = z.object({

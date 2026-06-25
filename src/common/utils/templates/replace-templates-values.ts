@@ -1,8 +1,8 @@
-import { transliterate } from 'transliteration';
 import dayjs from 'dayjs';
+import { transliterate } from 'transliteration';
 
-import { TemplateKeys } from '@libs/contracts/constants/templates/template-keys';
 import { USER_STATUSES_TEMPLATE } from '@libs/contracts/constants';
+import { TemplateKeys } from '@libs/contracts/constants/templates/template-keys';
 
 import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities';
 import { UserEntity } from '@modules/users/entities';

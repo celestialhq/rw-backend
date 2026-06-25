@@ -2,8 +2,8 @@ import { Job } from 'bullmq';
 import dayjs from 'dayjs';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { TypedConfigService } from '@common/config/app-config';
 import { TResult } from '@common/types';
@@ -11,8 +11,8 @@ import { EVENTS } from '@libs/contracts/constants/events/events';
 
 import { TriggerThresholdNotificationCommand } from '@modules/users/commands/trigger-threshold-notification';
 import { UpdateExceededTrafficUsersCommand } from '@modules/users/commands/update-exceeded-users';
-import { GetNotConnectedUsersQuery } from '@modules/users/queries/get-not-connected-users';
 import { UpdateExpiredUsersCommand } from '@modules/users/commands/update-expired-users';
+import { GetNotConnectedUsersQuery } from '@modules/users/queries/get-not-connected-users';
 
 import { NodesQueuesService } from '@queue/_nodes';
 import { QUEUES_NAMES } from '@queue/queue.enum';

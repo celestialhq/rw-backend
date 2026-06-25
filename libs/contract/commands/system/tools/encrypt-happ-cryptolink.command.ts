@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { getEndpointDetails } from '../../../constants';
 import { REST_API, SYSTEM_ROUTES } from '../../../api';
+import { getEndpointDetails } from '../../../constants';
 
 export namespace EncryptHappCryptoLinkCommand {
     export const url = REST_API.SYSTEM.TOOLS.ENCRYPT_HAPP_CRYPTO_LINK;
@@ -11,6 +11,7 @@ export namespace EncryptHappCryptoLinkCommand {
         SYSTEM_ROUTES.TOOLS.ENCRYPT_HAPP_CRYPTO_LINK,
         'post',
         'Encrypt Happ Crypto Link',
+        { scope: 'encrypt-happ-crypto-link', kind: 'read' },
     );
     export const RequestSchema = z.object({
         linkToEncrypt: z.string().url(),

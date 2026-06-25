@@ -1,10 +1,10 @@
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { readPackageJSON } from 'pkg-types';
 import { SwaggerThemeNameEnum } from 'swagger-themes';
 import { SwaggerTheme } from 'swagger-themes';
-import { readPackageJSON } from 'pkg-types';
 
-import { DocumentBuilder } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 
 import { TypedConfigService } from '@common/config/app-config';
@@ -103,7 +103,6 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
                 hideDownloadButton: false,
                 hideTestRequestButton: false,
                 isEditable: false,
-                isLoading: false,
                 hideDarkModeToggle: false,
                 withDefaultFonts: true,
                 hideSearch: false,

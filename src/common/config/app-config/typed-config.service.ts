@@ -1,5 +1,5 @@
-import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { ConfigSchema } from '@common/config/app-config';
 

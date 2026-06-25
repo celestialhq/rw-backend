@@ -1,8 +1,9 @@
-import yaml from 'yaml';
 import _ from 'lodash';
+import yaml from 'yaml';
 
 import { Injectable, Logger } from '@nestjs/common';
 
+import { isNonEmptyObject } from '@common/utils';
 import { FINGERPRINTS } from '@libs/contracts/constants';
 
 import { SubscriptionTemplateService } from '@modules/subscription-template/subscription-template.service';
@@ -177,6 +178,10 @@ export class MihomoGeneratorService {
         this.applyTransportOpts(node, host);
 
         node['client-fingerprint'] = this.resolveFingerprint(host);
+
+        if (isNonEmptyObject(host.mux) && 'smux' in host.mux) {
+            node['smux'] = host.mux['smux'];
+        }
 
         if (isExtendedClient && host.clientOverrides.serverDescription) {
             node.serverDescription = Buffer.from(

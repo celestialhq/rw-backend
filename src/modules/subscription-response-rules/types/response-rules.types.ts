@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { TResponseRulesResponseType } from '@libs/contracts/constants';
 import {
     ResponseRuleConditionSchema,
     ResponseRuleSchema,
@@ -7,7 +8,6 @@ import {
     ResponseRuleEncryptionSchema,
     ResponseRuleModificationsSchema,
 } from '@libs/contracts/models';
-import { TResponseRulesResponseType } from '@libs/contracts/constants';
 
 export type TResponseRulesConfig = z.infer<typeof ResponseRulesConfigSchema>;
 export type TResponseRule = z.infer<typeof ResponseRuleSchema>;

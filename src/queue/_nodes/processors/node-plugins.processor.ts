@@ -4,8 +4,8 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { AxiosService } from '@common/axios/axios.service';
 import { INodeConnectionOpts } from '@common/axios';
+import { AxiosService } from '@common/axios/axios.service';
 import { EVENTS } from '@libs/contracts/constants/events/events';
 
 import { GetPluginByUuidQuery } from '@modules/node-plugins/queries/get-plugin-by-uuid';

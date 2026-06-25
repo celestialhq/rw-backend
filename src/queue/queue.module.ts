@@ -1,21 +1,21 @@
 import { ExpressAdapter } from '@bull-board/express';
 import { BullBoardModule } from '@bull-board/nestjs';
 
+import { BullModule } from '@nestjs/bullmq';
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { BullModule } from '@nestjs/bullmq';
 
 import { TypedConfigService } from '@common/config/app-config';
-import { getRedisConnectionOptions } from '@common/utils';
 import { BasicAuthMiddleware } from '@common/middlewares';
+import { getRedisConnectionOptions } from '@common/utils';
 import { useBullBoard } from '@common/utils/startup-app';
 import { BULLBOARD_ROOT } from '@libs/contracts/api';
 
-import { PushFromRedisQueueModule } from './push-from-redis/push-from-redis.module';
-import { NOTIFICATIONS_MODULES } from './notifications/notifications-modules';
-import { SquadsQueueModule } from './_squads/squads-queue.module';
 import { NodesQueuesModule } from './_nodes/nodes-queues.module';
+import { SquadsQueueModule } from './_squads/squads-queue.module';
 import { UsersQueuesModule } from './_users/users-queues.module';
+import { NOTIFICATIONS_MODULES } from './notifications/notifications-modules';
+import { PushFromRedisQueueModule } from './push-from-redis/push-from-redis.module';
 import { ServiceQueueModule } from './service/service.module';
 
 const queueModules = [

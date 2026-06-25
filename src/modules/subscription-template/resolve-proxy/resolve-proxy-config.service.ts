@@ -1,3 +1,5 @@
+import { filter, shuffle } from 'lodash';
+import { customAlphabet } from 'nanoid';
 import {
     GRPCConfig,
     HTTPUpgradeConfig,
@@ -9,26 +11,24 @@ import {
     TCPConfig,
     WebSocketConfig,
 } from 'xray-typed';
-import { filter, shuffle } from 'lodash';
-import { customAlphabet } from 'nanoid';
 
 import { Injectable } from '@nestjs/common';
 
+import { TypedConfigService } from '@common/config/app-config';
 import {
     resolveEncryptionFromDecryption,
     resolveInboundAndMlDsa65PublicKey,
     resolveInboundAndPublicKey,
 } from '@common/helpers/xray-config';
 import { getSsPassword, isSS2022MethodFromMethod } from '@common/helpers/xray-config/ss-cipher';
+import { getVlessFlow } from '@common/utils/flow';
 import { TemplateEngine } from '@common/utils/templates/replace-templates-values';
 import { setVlessRouteForUuid } from '@common/utils/vless-route';
-import { TypedConfigService } from '@common/config/app-config';
-import { getVlessFlow } from '@common/utils/flow';
 import { SECURITY_LAYERS, USERS_STATUS } from '@libs/contracts/constants';
 
-import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities/subscription-settings.entity';
-import { HostWithRawInbound } from '@modules/hosts/entities/host-with-inbound-tag.entity';
 import { ExternalSquadEntity } from '@modules/external-squads/entities';
+import { HostWithRawInbound } from '@modules/hosts/entities/host-with-inbound-tag.entity';
+import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities/subscription-settings.entity';
 import { UserEntity } from '@modules/users/entities';
 
 import {
@@ -170,7 +170,10 @@ export class ResolveProxyConfigService {
     private resolveTransport(
         streamSettings: StreamSettingsConfig | undefined,
         inputHost: HostWithRawInbound,
-        vlessUuid: string,
+        protocol: ProtocolVariant,
+        authOptions: {
+            vlessUuid: string;
+        },
     ): TransportVariant {
         const rawNetwork = streamSettings?.network;
 
@@ -199,7 +202,11 @@ export class ResolveProxyConfigService {
             case 'kcp':
                 return this.resolveKcp(streamSettings.kcpSettings);
             case 'hysteria':
-                return this.resolveHysteria(streamSettings.hysteriaSettings, vlessUuid);
+                return this.resolveHysteria(
+                    streamSettings.hysteriaSettings,
+                    authOptions.vlessUuid,
+                    protocol,
+                );
             default:
                 return {
                     transport: 'tcp',
@@ -220,7 +227,7 @@ export class ResolveProxyConfigService {
                 path: override(inputHost.path, settings?.path),
                 host: this.resolveRandomizedValue(override(inputHost.host, settings?.host) ?? ''),
                 mode: settings?.mode ?? 'auto',
-                extra: override(toNonEmptyRecord(inputHost.xHttpExtraParams), settings?.extra),
+                extra: override(toNonEmptyRecord(inputHost.xhttpExtraParams), settings?.extra),
             },
         };
     }
@@ -331,12 +338,13 @@ export class ResolveProxyConfigService {
     private resolveHysteria(
         settings: HysteriaConfig | undefined,
         vlessUuid: string,
+        protocol: ProtocolVariant,
     ): HysteriaTransport {
         return {
             transport: 'hysteria',
             transportOptions: {
                 version: 2,
-                auth: vlessUuid,
+                auth: protocol.protocol !== 'hysteria' ? vlessUuid : (settings?.auth ?? vlessUuid),
             },
         };
     }
@@ -530,7 +538,9 @@ export class ResolveProxyConfigService {
             return null;
         }
 
-        const transport = this.resolveTransport(inbound.streamSettings, inputHost, user.vlessUuid);
+        const transport = this.resolveTransport(inbound.streamSettings, inputHost, protocol, {
+            vlessUuid: user.vlessUuid,
+        });
 
         const security = this.resolveSecurity(
             inbound.streamSettings,

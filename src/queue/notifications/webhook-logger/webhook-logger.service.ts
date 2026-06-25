@@ -1,13 +1,13 @@
 import { Queue } from 'bullmq';
 import _ from 'lodash';
 
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 
-import { AbstractQueueService } from '../../queue.service';
-import { IBaseWebhookLogger } from './interfaces';
-import { WebhookLoggerJobNames } from './enums';
 import { QUEUES_NAMES } from '../../queue.enum';
+import { AbstractQueueService } from '../../queue.service';
+import { WebhookLoggerJobNames } from './enums';
+import { IBaseWebhookLogger } from './interfaces';
 
 @Injectable()
 export class WebhookLoggerQueueService

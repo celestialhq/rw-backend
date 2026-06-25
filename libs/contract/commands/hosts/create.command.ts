@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { HOSTS_ROUTES, REST_API } from '../../api';
 import {
     getEndpointDetails,
     SECURITY_LAYERS,
@@ -7,7 +8,6 @@ import {
     SUBSCRIPTION_TEMPLATE_TYPE,
     MIHOMO_IP_VERSION,
 } from '../../constants';
-import { HOSTS_ROUTES, REST_API } from '../../api';
 import { HostsSchema } from '../../models';
 
 export namespace CreateHostCommand {
@@ -18,6 +18,7 @@ export namespace CreateHostCommand {
         HOSTS_ROUTES.CREATE,
         'post',
         'Create a new host',
+        { scope: 'create', kind: 'write' },
     );
 
     export const RequestSchema = z.object({
@@ -51,7 +52,7 @@ export namespace CreateHostCommand {
         fingerprint: z.string().nullish(),
         isDisabled: z.optional(z.boolean().default(false)),
         securityLayer: z.optional(z.nativeEnum(SECURITY_LAYERS).default(SECURITY_LAYERS.DEFAULT)),
-        xHttpExtraParams: z.unknown().nullish(),
+        xhttpExtraParams: z.unknown().nullish(),
         muxParams: z.unknown().nullish(),
         sockoptParams: z.unknown().nullish(),
         finalMask: z.unknown().nullish(),

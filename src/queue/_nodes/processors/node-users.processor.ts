@@ -7,8 +7,8 @@ import { AxiosService } from '@common/axios';
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 
-import { IAddUserToNodePayload, IRemoveUserFromNodePayload } from '../interfaces';
 import { NODES_JOB_NAMES } from '../constants/nodes-job-name.constant';
+import { IAddUserToNodePayload, IRemoveUserFromNodePayload } from '../interfaces';
 
 @Processor(QUEUES_NAMES.NODES.USERS, {
     concurrency: 75,

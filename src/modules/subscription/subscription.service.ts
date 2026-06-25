@@ -1,45 +1,48 @@
 import dayjs from 'dayjs';
-import pMap from 'p-map';
 import _ from 'lodash';
+import pMap from 'p-map';
 
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { TemplateEngine } from '@common/utils/templates/replace-templates-values';
-import { prettyBytesUtil } from '@common/utils/bytes/pretty-bytes.util';
-import { HwidHeaders } from '@common/utils/extract-hwid-headers';
 import { TypedConfigService } from '@common/config/app-config';
-import { hasContent } from '@common/utils/convert-type';
 import { fail, ok, TResult } from '@common/types';
+import { prettyBytesUtil } from '@common/utils/bytes/pretty-bytes.util';
+import { hasContent } from '@common/utils/convert-type';
+import { HwidHeaders } from '@common/utils/extract-hwid-headers';
+import { TemplateEngine } from '@common/utils/templates/replace-templates-values';
 import { ERRORS, EVENTS, TSubscriptionTemplateType, USERS_STATUS } from '@libs/contracts/constants';
 import { THwidSettings } from '@libs/contracts/models';
 
 import { UserHwidDeviceEvent } from '@integration-modules/notifications/interfaces';
 
-import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
-import { ResponseRulesMatcherService } from '@modules/subscription-response-rules/services/response-rules-matcher.service';
-import { GetCachedExternalSquadSettingsQuery } from '@modules/external-squads/queries/get-cached-external-squad-settings';
-import { ResolveProxyConfigService } from '@modules/subscription-template/resolve-proxy/resolve-proxy-config.service';
-import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities/subscription-settings.entity';
-import { CreateWithAdvisoryLockCommand } from '@modules/hwid-user-devices/commands/create-with-advisory-lock';
-import { XrayGeneratorService } from '@modules/subscription-template/generators/xray.generator.service';
-import { HwidUserDeviceEntity } from '@modules/hwid-user-devices/entities/hwid-user-device.entity';
-import { RenderTemplatesService } from '@modules/subscription-template/render-templates.service';
-import { GetUsersWithPaginationQuery } from '@modules/users/queries/get-users-with-pagination';
-import { isJsonSubscriptionFallbackSupported } from '@modules/subscription-template/constants';
 import { ExternalSquadEntity } from '@modules/external-squads/entities/external-squad.entity';
-import { ResolvedProxyConfig } from '@modules/subscription-template/resolve-proxy/interfaces';
-import { CheckHwidExistsQuery } from '@modules/hwid-user-devices/queries/check-hwid-exists';
-import { GetUserByUniqueFieldQuery } from '@modules/users/queries/get-user-by-unique-field';
-import { GetUserSubpageConfigQuery } from '@modules/users/queries/get-user-subpage-config';
+import { GetCachedExternalSquadSettingsQuery } from '@modules/external-squads/queries/get-cached-external-squad-settings';
 import { GetTemplateNameQuery } from '@modules/external-squads/queries/get-template-name';
+import { CreateWithAdvisoryLockCommand } from '@modules/hwid-user-devices/commands/create-with-advisory-lock';
+import { HwidUserDeviceEntity } from '@modules/hwid-user-devices/entities/hwid-user-device.entity';
+import { CheckHwidExistsQuery } from '@modules/hwid-user-devices/queries/check-hwid-exists';
 import { ISRRContext } from '@modules/subscription-response-rules/interfaces';
+import { ResponseRulesMatcherService } from '@modules/subscription-response-rules/services/response-rules-matcher.service';
+import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities/subscription-settings.entity';
+import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
+import { isJsonSubscriptionFallbackSupported } from '@modules/subscription-template/constants';
+import { XrayGeneratorService } from '@modules/subscription-template/generators/xray.generator.service';
+import { RenderTemplatesService } from '@modules/subscription-template/render-templates.service';
+import { ResolvedProxyConfig } from '@modules/subscription-template/resolve-proxy/interfaces';
+import { ResolveProxyConfigService } from '@modules/subscription-template/resolve-proxy/resolve-proxy-config.service';
 import { UserEntity } from '@modules/users/entities/user.entity';
 import { GetFullUserResponseModel } from '@modules/users/models';
+import { GetUserByUniqueFieldQuery } from '@modules/users/queries/get-user-by-unique-field';
+import { GetUserSubpageConfigQuery } from '@modules/users/queries/get-user-subpage-config';
+import { GetUsersWithPaginationQuery } from '@modules/users/queries/get-users-with-pagination';
 
 import { UsersQueuesService } from '@queue/_users/users-queues.service';
 
+import { GetHostsForUserQuery } from '../hosts/queries/get-hosts-for-user';
+import { GetAllSubscriptionsQueryDto } from './dto';
+import { ISubscriptionHeaders, IGetSubscriptionInfo, IHwidCheckupResult } from './interfaces';
 import {
     ConnectionKeysResponseModel,
     RawSubscriptionWithHostsResponse,
@@ -47,11 +50,8 @@ import {
     SubscriptionRawResponse,
     SubscriptionWithConfigResponse,
 } from './models';
-import { getSubscriptionRefillDate, getSubscriptionUserInfo } from './utils/get-user-info.headers';
-import { ISubscriptionHeaders, IGetSubscriptionInfo, IHwidCheckupResult } from './interfaces';
 import { GetSubpageConfigResponseModel } from './models/get-subpage-config.response.model';
-import { GetHostsForUserQuery } from '../hosts/queries/get-hosts-for-user';
-import { GetAllSubscriptionsQueryDto } from './dto';
+import { getSubscriptionRefillDate, getSubscriptionUserInfo } from './utils/get-user-info.headers';
 
 @Injectable()
 export class SubscriptionService {
@@ -165,7 +165,7 @@ export class SubscriptionService {
                     const response = new SubscriptionWithConfigResponse({
                         headers: this.getUserProfileHeadersInfo(
                             user.response,
-                            /^Happ\//.test(userAgent),
+                            userAgent.startsWith('Happ/'),
                             subscriptionSettings,
                         ),
                         body: '',
@@ -266,7 +266,7 @@ export class SubscriptionService {
             return new SubscriptionWithConfigResponse({
                 headers: this.getUserProfileHeadersInfo(
                     user.response,
-                    /^Happ\//.test(userAgent),
+                    userAgent.startsWith('Happ/'),
                     subscriptionSettings,
                     hwidCheckup !== null && !hwidCheckup.limitBypassed,
                 ),
@@ -319,7 +319,7 @@ export class SubscriptionService {
 
             const headers = this.getUserProfileHeadersInfo(
                 user,
-                /^Happ\//.test(userAgent),
+                userAgent.startsWith('Happ/'),
                 patchedSettingEntity,
             );
 

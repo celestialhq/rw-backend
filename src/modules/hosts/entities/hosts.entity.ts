@@ -1,11 +1,10 @@
-import { Hosts } from '@prisma/client';
-
 import {
     SUBSCRIPTION_TEMPLATE_TYPE_VALUES,
     TMihomoIpVersion,
     TSecurityLayers,
     TSubscriptionTemplateType,
 } from '@contract/constants';
+import { Hosts } from '@prisma/client';
 
 export class HostsEntity implements Hosts {
     uuid: string;
@@ -19,7 +18,7 @@ export class HostsEntity implements Hosts {
     alpn: null | string;
     fingerprint: null | string;
     securityLayer: TSecurityLayers;
-    xHttpExtraParams: null | object;
+    xhttpExtraParams: null | object;
     muxParams: null | object;
     sockoptParams: null | object;
     finalMask: null | object;

@@ -1,5 +1,5 @@
-import { randomBytes, scrypt, scryptSync, timingSafeEqual } from 'node:crypto';
 import { NextFunction, Request, Response } from 'express';
+import { randomBytes, scrypt, scryptSync, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 
 import { Injectable, NestMiddleware } from '@nestjs/common';

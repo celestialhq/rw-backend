@@ -1,12 +1,12 @@
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { sql } from 'kysely';
 
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { TransactionHost } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 
-import { ICrudWithId } from '@common/types/crud-port';
 import { TxKyselyService } from '@common/database';
 import { paginateQuery } from '@common/helpers';
+import { ICrudWithId } from '@common/types/crud-port';
 import { GetSubscriptionRequestHistoryCommand } from '@libs/contracts/commands';
 
 import { UserSubscriptionRequestHistoryEntity } from '../entities/user-subscription-request-history.entity';

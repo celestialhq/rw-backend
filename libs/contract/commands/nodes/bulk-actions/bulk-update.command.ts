@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { getEndpointDetails } from '../../../constants';
 import { NODES_ROUTES, REST_API } from '../../../api';
+import { getEndpointDetails } from '../../../constants';
 
 export namespace BulkNodesUpdateCommand {
     export const url = REST_API.NODES.BULK_ACTIONS.UPDATE;
@@ -11,6 +11,7 @@ export namespace BulkNodesUpdateCommand {
         NODES_ROUTES.BULK_ACTIONS.UPDATE,
         'post',
         'Update many nodes',
+        { scope: 'bulk-update', kind: 'write' },
     );
 
     export const RequestSchema = z.object({

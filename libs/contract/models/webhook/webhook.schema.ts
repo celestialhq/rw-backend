@@ -1,8 +1,8 @@
 import z from 'zod';
 
 import { EVENTS, EVENTS_SCOPES, toZodEnum, CRUD_ACTIONS } from '../../constants';
-import { HwidUserDeviceSchema } from '../hwid-user-device.schema';
 import { ExtendedUsersSchema } from '../extended-users.schema';
+import { HwidUserDeviceSchema } from '../hwid-user-device.schema';
 import { NodesSchema } from '../nodes.schema';
 
 export const RemnawaveWebhookUserEvents = z.object({
@@ -68,6 +68,17 @@ export const RemnawaveWebhookServiceEvents = z.object({
                 uuid: z.string().uuid(),
             })
 
+            .optional(),
+        apiToken: z
+            .object({
+                name: z.string(),
+                uuid: z.string().uuid(),
+                expireAt: z
+                    .string()
+                    .datetime()
+                    .transform((str) => new Date(str)),
+                scopes: z.array(z.string()),
+            })
             .optional(),
     }),
 });

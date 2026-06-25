@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { getEndpointDetails } from '../../constants';
 import { HWID_ROUTES, REST_API } from '../../api';
+import { getEndpointDetails } from '../../constants';
 
 export namespace GetHwidDevicesStatsCommand {
     export const url = REST_API.HWID.STATS;
@@ -11,6 +11,7 @@ export namespace GetHwidDevicesStatsCommand {
         HWID_ROUTES.STATS,
         'get',
         'Get HWID devices stats',
+        { scope: 'stats', kind: 'read' },
     );
 
     export const ResponseSchema = z.object({

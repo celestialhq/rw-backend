@@ -1,20 +1,19 @@
+import { Injectable, Logger } from '@nestjs/common';
+
+import { isNonEmptyObject } from '@common/utils';
 import type {
     TRemnawaveInjectorSelectFrom,
     TRemnawaveInjectorSelector,
 } from '@libs/contracts/models';
 
-import { Injectable, Logger } from '@nestjs/common';
-
-import { isNonEmptyObject } from '@common/utils';
-
+import { ResolvedProxyConfig } from '../resolve-proxy/interfaces';
+import { SubscriptionTemplateService } from '../subscription-template.service';
 import {
     IGenerateConfigParams,
     Outbound,
     StreamSettings,
     XrayJsonConfig,
 } from './interfaces/xray-json-config.interface';
-import { SubscriptionTemplateService } from '../subscription-template.service';
-import { ResolvedProxyConfig } from '../resolve-proxy/interfaces';
 
 type VlessConfig = Extract<ResolvedProxyConfig, { protocol: 'vless' }>;
 type TrojanConfig = Extract<ResolvedProxyConfig, { protocol: 'trojan' }>;
@@ -284,7 +283,11 @@ export class XrayJsonGeneratorService {
         };
 
         if (isNonEmptyObject(host.mux)) {
-            outbound.mux = host.mux;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { smux: _, ...mux } = host.mux;
+            if (Object.keys(mux).length > 0) {
+                outbound.mux = mux;
+            }
         }
 
         return outbound;

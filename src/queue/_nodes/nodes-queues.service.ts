@@ -1,7 +1,7 @@
 import { Queue } from 'bullmq';
 
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 
 import { INodeConnectionOpts } from '@common/axios';
 
@@ -9,6 +9,7 @@ import { IGetEnabledNodesPartialResponse } from '@modules/nodes/queries/get-enab
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 
+import { NODES_JOB_NAMES } from './constants/nodes-job-name.constant';
 import {
     IAddUsersToNodePayload,
     IAddUserToNodePayload,
@@ -28,7 +29,6 @@ import {
     IUnblockIpsPayload,
     IRecreateTablesPayload,
 } from './interfaces/executor.payload.interface';
-import { NODES_JOB_NAMES } from './constants/nodes-job-name.constant';
 
 @Injectable()
 export class NodesQueuesService implements OnApplicationBootstrap {

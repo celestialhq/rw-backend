@@ -1,3 +1,10 @@
+import type {
+    TResponseRule,
+    TResponseRuleCondition,
+    ISrrMatchedResult,
+    TResponseRulesConfig,
+} from '../types/response-rules.types';
+
 import { Injectable, Logger } from '@nestjs/common';
 
 import {
@@ -8,13 +15,6 @@ import {
     TRequestTemplateTypeKeys,
     TResponseRulesConditionOperator,
 } from '@libs/contracts/constants';
-
-import type {
-    TResponseRule,
-    TResponseRuleCondition,
-    ISrrMatchedResult,
-    TResponseRulesConfig,
-} from '../types/response-rules.types';
 
 @Injectable()
 export class ResponseRulesMatcherService {

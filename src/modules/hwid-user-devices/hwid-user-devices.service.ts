@@ -1,6 +1,6 @@
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { fail, ok, TResult } from '@common/types';
 import { GetAllHwidDevicesCommand } from '@libs/contracts/commands';
@@ -9,14 +9,14 @@ import { THwidSettings } from '@libs/contracts/models';
 
 import { UserHwidDeviceEvent } from '@integration-modules/notifications/interfaces';
 
-import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
 import { GetCachedExternalSquadSettingsQuery } from '@modules/external-squads/queries/get-cached-external-squad-settings';
+import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
 import { GetUserByUniqueFieldQuery } from '@modules/users/queries/get-user-by-unique-field';
 
+import { CreateUserHwidDeviceRequestDto } from './dtos';
+import { HwidUserDeviceEntity } from './entities/hwid-user-device.entity';
 import { GetHwidDevicesStatsResponseModel, GetTopUsersByHwidDevicesResponseModel } from './models';
 import { HwidUserDevicesRepository } from './repositories/hwid-user-devices.repository';
-import { HwidUserDeviceEntity } from './entities/hwid-user-device.entity';
-import { CreateUserHwidDeviceRequestDto } from './dtos';
 
 @Injectable()
 export class HwidUserDevicesService {

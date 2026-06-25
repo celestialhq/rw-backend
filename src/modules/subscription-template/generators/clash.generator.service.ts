@@ -1,5 +1,5 @@
-import yaml from 'yaml';
 import _ from 'lodash';
+import yaml from 'yaml';
 
 import { Injectable, Logger } from '@nestjs/common';
 

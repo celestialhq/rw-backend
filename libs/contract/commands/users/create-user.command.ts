@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
+import { REST_API, USERS_ROUTES } from '../../api';
 import { getEndpointDetails, RESET_PERIODS, USERS_STATUS } from '../../constants';
 import { ExtendedUsersSchema, UsersSchema } from '../../models';
-import { REST_API, USERS_ROUTES } from '../../api';
 
 export namespace CreateUserCommand {
     export const url = REST_API.USERS.CREATE;
@@ -12,6 +12,7 @@ export namespace CreateUserCommand {
         USERS_ROUTES.CREATE,
         'post',
         'Create a new user',
+        { scope: 'create', kind: 'write' },
     );
 
     export const RequestSchema = z.object({

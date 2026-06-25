@@ -1,19 +1,19 @@
-import { jsonArrayFrom } from 'kysely/helpers/postgres';
-import { sql } from 'kysely';
-
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { sql } from 'kysely';
+import { jsonArrayFrom } from 'kysely/helpers/postgres';
+
 import { Injectable } from '@nestjs/common';
 
-import { values } from '@common/helpers/kysely/values';
 import { TxKyselyService } from '@common/database';
-import { ICrud } from '@common/types/crud-port';
 import { getKyselyUuid } from '@common/helpers';
+import { values } from '@common/helpers/kysely/values';
+import { ICrud } from '@common/types/crud-port';
 
-import { IGetSquadAccessibleNodes } from '../interfaces/get-squad-accessible-nodes.interface';
-import { InternalSquadEntity } from '../entities/internal-squad.entity';
-import { InternalSquadConverter } from '../internal-squad.converter';
 import { InternalSquadWithInfoEntity } from '../entities';
+import { InternalSquadEntity } from '../entities/internal-squad.entity';
+import { IGetSquadAccessibleNodes } from '../interfaces/get-squad-accessible-nodes.interface';
+import { InternalSquadConverter } from '../internal-squad.converter';
 
 @Injectable()
 export class InternalSquadRepository implements ICrud<InternalSquadEntity> {

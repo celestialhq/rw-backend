@@ -1,19 +1,19 @@
+import { Job } from 'bullmq';
 import { createHmac } from 'node:crypto';
-import { retry } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs';
-import { Job } from 'bullmq';
+import { retry } from 'rxjs/operators';
 
-import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { HttpService } from '@nestjs/axios';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 
 import { TypedConfigService } from '@common/config/app-config';
 
-import { IBaseWebhookLogger } from './interfaces';
-import { WebhookLoggerJobNames } from './enums';
 import { QUEUES_NAMES } from '../../queue.enum';
+import { WebhookLoggerJobNames } from './enums';
+import { IBaseWebhookLogger } from './interfaces';
 
 @Processor(QUEUES_NAMES.NOTIFICATIONS.WEBHOOK, {
     concurrency: 100,

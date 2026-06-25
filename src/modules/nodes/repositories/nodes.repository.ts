@@ -1,21 +1,21 @@
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Prisma } from '@prisma/client';
 import { sql } from 'kysely';
 
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { TransactionHost } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 
-import { getKyselyUuid } from '@common/helpers/kysely/get-kysely-uuid';
-import { values } from '@common/helpers/kysely/values';
 import { INodeConnectionOpts } from '@common/axios';
 import { TxKyselyService } from '@common/database';
+import { getKyselyUuid } from '@common/helpers/kysely/get-kysely-uuid';
+import { values } from '@common/helpers/kysely/values';
 import { ICrud } from '@common/types/crud-port';
 
+import { NodesEntity } from '../entities/nodes.entity';
+import { IReorderNode } from '../interfaces';
+import { NodesConverter } from '../nodes.converter';
 import { IGetEnabledNodesPartialResponse } from '../queries/get-enabled-nodes-partial/get-enabled-nodes-partial.query';
 import { IGetOnlineNodesPartialResponse } from '../queries/get-online-nodes';
-import { NodesEntity } from '../entities/nodes.entity';
-import { NodesConverter } from '../nodes.converter';
-import { IReorderNode } from '../interfaces';
 
 export type INodesWithResolvedInbounds = Prisma.NodesGetPayload<{
     include: {

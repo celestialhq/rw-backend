@@ -1,14 +1,14 @@
 import { Job } from 'bullmq';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { AxiosService } from '@common/axios';
 
 import { DeleteNodeByUuidCommand } from '@modules/nodes/commands/delete-node-by-uuid';
-import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
 import { UpdateNodeCommand } from '@modules/nodes/commands/update-node';
+import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 

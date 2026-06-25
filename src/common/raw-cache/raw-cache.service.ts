@@ -1,5 +1,5 @@
-import Redis, { ChainableCommander, ScanStream } from 'ioredis';
 import { InjectRedis } from '@songkeys/nestjs-redis';
+import Redis, { ChainableCommander, ScanStream } from 'ioredis';
 
 import { Injectable } from '@nestjs/common';
 

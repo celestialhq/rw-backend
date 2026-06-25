@@ -1,19 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { nullifyEmpty } from '@common/utils/convert-type';
 import { fail, ok, TResult } from '@common/types';
+import { nullifyEmpty } from '@common/utils/convert-type';
 import { ERRORS } from '@libs/contracts/constants';
 
-import { GetSubscriptionTemplateByUuidQuery } from '@modules/subscription-template/queries/get-template-by-uuid';
 import { GetConfigProfileByUuidQuery } from '@modules/config-profiles/queries/get-config-profile-by-uuid';
 import { ReorderHostRequestDto } from '@modules/hosts/dtos/reorder-hosts.dto';
+import { GetSubscriptionTemplateByUuidQuery } from '@modules/subscription-template/queries/get-template-by-uuid';
 
-import { DeleteHostResponseModel } from './models/delete-host.response.model';
 import { UpdateHostRequestDto, UpdateManyHostsRequestDto } from './dtos';
-import { HostsRepository } from './repositories/hosts.repository';
 import { CreateHostRequestDto } from './dtos/create-host.dto';
 import { HostsEntity } from './entities/hosts.entity';
+import { DeleteHostResponseModel } from './models/delete-host.response.model';
+import { HostsRepository } from './repositories/hosts.repository';
 
 @Injectable()
 export class HostsService {
@@ -43,7 +43,7 @@ export class HostsService {
                 inbound: inboundObj,
                 nodes,
                 excludedInternalSquads,
-                xHttpExtraParams,
+                xhttpExtraParams,
                 muxParams,
                 sockoptParams,
                 finalMask,
@@ -68,7 +68,7 @@ export class HostsService {
             const hostEntity = new HostsEntity({
                 ...rest,
                 address: dto.address.trim(),
-                xHttpExtraParams: nullifyEmpty(xHttpExtraParams),
+                xhttpExtraParams: nullifyEmpty(xhttpExtraParams),
                 muxParams: nullifyEmpty(muxParams),
                 sockoptParams: nullifyEmpty(sockoptParams),
                 finalMask: nullifyEmpty(finalMask),
@@ -128,13 +128,13 @@ export class HostsService {
                 }
             }
 
-            let xHttpExtraParams: null | object | undefined;
-            if (dto.xHttpExtraParams !== undefined && dto.xHttpExtraParams !== null) {
-                xHttpExtraParams = dto.xHttpExtraParams;
-            } else if (dto.xHttpExtraParams === null) {
-                xHttpExtraParams = null;
+            let xhttpExtraParams: null | object | undefined;
+            if (dto.xhttpExtraParams !== undefined && dto.xhttpExtraParams !== null) {
+                xhttpExtraParams = dto.xhttpExtraParams;
+            } else if (dto.xhttpExtraParams === null) {
+                xhttpExtraParams = null;
             } else {
-                xHttpExtraParams = undefined;
+                xhttpExtraParams = undefined;
             }
 
             let muxParams: null | object | undefined;
@@ -220,7 +220,7 @@ export class HostsService {
             const result = await this.hostsRepository.update({
                 ...rest,
                 address: dto.address ? dto.address.trim() : undefined,
-                xHttpExtraParams,
+                xhttpExtraParams,
                 muxParams,
                 sockoptParams,
                 configProfileUuid,
@@ -363,7 +363,7 @@ export class HostsService {
                 inbound: inboundObj,
                 nodes,
                 excludedInternalSquads,
-                xHttpExtraParams,
+                xhttpExtraParams,
                 muxParams,
                 sockoptParams,
                 finalMask,
@@ -425,7 +425,7 @@ export class HostsService {
                 data: {
                     ...rest,
                     address: dto.address ? dto.address.trim() : undefined,
-                    xHttpExtraParams: nullifyEmpty(xHttpExtraParams),
+                    xhttpExtraParams: nullifyEmpty(xhttpExtraParams),
                     muxParams: nullifyEmpty(muxParams),
                     sockoptParams: nullifyEmpty(sockoptParams),
                     finalMask: nullifyEmpty(finalMask),

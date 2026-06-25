@@ -1,20 +1,19 @@
+import { ERRORS, EVENTS, NODES_BULK_ACTIONS } from '@contract/constants';
 import { Prisma } from '@prisma/client';
 
-import { ERRORS, EVENTS, NODES_BULK_ACTIONS } from '@contract/constants';
-
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { mapDefined, wrapBigInt } from '@common/utils';
 import { fail, ok, TResult } from '@common/types';
+import { mapDefined, wrapBigInt } from '@common/utils';
 import { toNano } from '@common/utils/nano';
 
 import { NodeEvent } from '@integration-modules/notifications/interfaces';
 
+import { GetConfigProfileByUuidQuery } from '@modules/config-profiles/queries/get-config-profile-by-uuid';
 import { CreateNodeTrafficUsageHistoryCommand } from '@modules/nodes-traffic-usage-history/commands/create-node-traffic-usage-history';
 import { NodesTrafficUsageHistoryEntity } from '@modules/nodes-traffic-usage-history/entities/nodes-traffic-usage-history.entity';
-import { GetConfigProfileByUuidQuery } from '@modules/config-profiles/queries/get-config-profile-by-uuid';
 
 import { NodesQueuesService } from '@queue/_nodes';
 
@@ -26,6 +25,7 @@ import {
     ReorderNodeRequestDto,
     UpdateNodeRequestDto,
 } from './dtos';
+import { NodesEntity } from './entities';
 import {
     BaseEventResponseModel,
     DeleteNodeResponseModel,
@@ -34,7 +34,6 @@ import {
 } from './models';
 import { NodesSystemCacheService } from './nodes-system-cache.service';
 import { NodesRepository } from './repositories/nodes.repository';
-import { NodesEntity } from './entities';
 
 @Injectable()
 export class NodesService {

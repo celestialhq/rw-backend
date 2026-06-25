@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
+import { SUBSCRIPTION_CONFIG_TYPES } from './constants/config-types';
+import { ClashGeneratorService } from './generators/clash.generator.service';
+import { MihomoGeneratorService } from './generators/mihomo.generator.service';
+import { SingBoxGeneratorService } from './generators/singbox.generator.service';
+import { XrayJsonGeneratorService } from './generators/xray-json.generator.service';
+import { XrayGeneratorService } from './generators/xray.generator.service';
+import { IGenerateSubscription } from './interfaces';
+import { ResolvedProxyConfig } from './resolve-proxy/interfaces';
 import {
     IResolveProxyConfigOptions,
     ResolveProxyConfigService,
 } from './resolve-proxy/resolve-proxy-config.service';
-import { XrayJsonGeneratorService } from './generators/xray-json.generator.service';
-import { SingBoxGeneratorService } from './generators/singbox.generator.service';
-import { MihomoGeneratorService } from './generators/mihomo.generator.service';
-import { ClashGeneratorService } from './generators/clash.generator.service';
-import { XrayGeneratorService } from './generators/xray.generator.service';
-import { SUBSCRIPTION_CONFIG_TYPES } from './constants/config-types';
-import { ResolvedProxyConfig } from './resolve-proxy/interfaces';
-import { IGenerateSubscription } from './interfaces';
 
 @Injectable()
 export class RenderTemplatesService {

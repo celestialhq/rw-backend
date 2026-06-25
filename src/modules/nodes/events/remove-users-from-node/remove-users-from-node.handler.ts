@@ -1,12 +1,12 @@
-import { IEventHandler, EventsHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { IEventHandler, EventsHandler } from '@nestjs/cqrs';
 
 import { RemoveUsersCommand as RemoveUsersFromNodeCommandSdk } from '@remnawave/node-contract';
 
 import { NodesQueuesService } from '@queue/_nodes';
 
-import { RemoveUsersFromNodeEvent } from './remove-users-from-node.event';
 import { NodesRepository } from '../../repositories/nodes.repository';
+import { RemoveUsersFromNodeEvent } from './remove-users-from-node.event';
 
 @EventsHandler(RemoveUsersFromNodeEvent)
 export class RemoveUsersFromNodeHandler implements IEventHandler<RemoveUsersFromNodeEvent> {

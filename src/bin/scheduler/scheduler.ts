@@ -4,27 +4,26 @@
 
 process.title = 'rw-scheduler';
 
-import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import compression from 'compression';
+import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
-import { createLogger } from 'winston';
-import compression from 'compression';
-import * as winston from 'winston';
 import utc from 'dayjs/plugin/utc';
 import { json } from 'express';
 import helmet from 'helmet';
-import dayjs from 'dayjs';
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import { createLogger } from 'winston';
+import * as winston from 'winston';
 
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
+import { TypedConfigService } from '@common/config/app-config';
 import { NotFoundExceptionFilter } from '@common/exception/not-found-exception.filter';
-import { getRedisConnectionOptions } from '@common/utils/get-redis-connection-options';
 import { WorkerRoutesGuard } from '@common/guards/worker-routes/worker-routes.guard';
 import { customLogFilter } from '@common/utils/filter-logs/filter-logs';
+import { getRedisConnectionOptions } from '@common/utils/get-redis-connection-options';
 import { isDevOrDebugLogsEnabled } from '@common/utils/startup-app';
-import { TypedConfigService } from '@common/config/app-config';
-import { AxiosService } from '@common/axios';
 import { BULLBOARD_ROOT, HEALTH_ROOT, METRICS_ROOT } from '@libs/contracts/api';
 
 import { SchedulerRootModule } from './scheduler.root.module';
@@ -117,8 +116,5 @@ async function bootstrap(): Promise<void> {
     app.enableShutdownHooks();
 
     await app.listen(config.getOrThrow('METRICS_PORT'));
-
-    const axiosService = app.get(AxiosService);
-    await axiosService.setJwt();
 }
 void bootstrap();

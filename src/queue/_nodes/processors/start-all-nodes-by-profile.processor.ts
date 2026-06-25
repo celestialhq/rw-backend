@@ -1,22 +1,22 @@
 import { Job } from 'bullmq';
-import semver from 'semver';
 import pMap from 'p-map';
+import semver from 'semver';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Logger, Scope } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { AxiosService } from '@common/axios/axios.service';
 import { RawCacheService } from '@common/raw-cache';
 import { CACHE_KEYS, CACHE_KEYS_TTL } from '@libs/contracts/constants';
 
-import { GetPreparedConfigWithUsersQuery } from '@modules/users/queries/get-prepared-config-with-users/get-prepared-config-with-users.query';
-import { FindNodesByCriteriaQuery } from '@modules/nodes/queries/find-nodes-by-criteria';
-import { GetAllPluginsQuery } from '@modules/node-plugins/queries/get-all-plugins';
 import { ConfigProfileInboundEntity } from '@modules/config-profiles/entities';
-import { UpdateNodeCommand } from '@modules/nodes/commands/update-node';
 import { NodePluginEntity } from '@modules/node-plugins/entities';
+import { GetAllPluginsQuery } from '@modules/node-plugins/queries/get-all-plugins';
 import { NodesEntity } from '@modules/nodes';
+import { UpdateNodeCommand } from '@modules/nodes/commands/update-node';
+import { FindNodesByCriteriaQuery } from '@modules/nodes/queries/find-nodes-by-criteria';
+import { GetPreparedConfigWithUsersQuery } from '@modules/users/queries/get-prepared-config-with-users/get-prepared-config-with-users.query';
 
 import { NodesQueuesService } from '@queue/_nodes';
 

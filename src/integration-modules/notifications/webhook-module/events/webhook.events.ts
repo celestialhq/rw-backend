@@ -1,12 +1,12 @@
 import { instanceToPlain } from 'class-transformer';
-import { serialize } from 'superjson';
 import dayjs from 'dayjs';
+import { serialize } from 'superjson';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
-import { NotificationsConfigService } from '@common/config/common-config';
 import { TypedConfigService } from '@common/config/app-config';
+import { NotificationsConfigService } from '@common/config/common-config';
 import { RawCacheService } from '@common/raw-cache';
 import { CACHE_KEYS, EVENTS, EVENTS_SCOPES } from '@libs/contracts/constants';
 
@@ -21,8 +21,8 @@ import {
 } from '@integration-modules/notifications/interfaces';
 
 import { INodeHotCache, INodeSystem, INodeVersions } from '@modules/nodes/interfaces';
-import { GetFullUserResponseModel } from '@modules/users/models';
 import { NodeResponseModel } from '@modules/nodes/models';
+import { GetFullUserResponseModel } from '@modules/users/models';
 
 import { WebhookLoggerQueueService } from '@queue/notifications/webhook-logger/webhook-logger.service';
 

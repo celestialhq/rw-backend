@@ -2,20 +2,20 @@ import { Job } from 'bullmq';
 import dayjs from 'dayjs';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { TypedConfigService } from '@common/config/app-config';
-import { wrapBigInt, wrapBigIntNullable } from '@common/utils';
 import { ok, TResult } from '@common/types';
+import { wrapBigInt, wrapBigIntNullable } from '@common/utils';
 import { EVENTS, TUsersStatus, USERS_STATUS } from '@libs/contracts/constants';
 
-import { GetUsersByExpireAtQuery } from '@modules/users/queries/get-users-by-expire-at/get-users-by-expire-at.query';
 import { BulkAllExtendExpirationDateCommand } from '@modules/users/commands/bulk-all-extend-expiration-date';
-import { BulkAllUpdateUsersRequestDto } from '@modules/users/dtos/bulk/bulk-operations.dto';
 import { BulkDeleteByStatusCommand } from '@modules/users/commands/bulk-delete-by-status';
-import { BulkUpdateAllUsersCommand } from '@modules/users/commands/bulk-update-all-users';
 import { BulkSyncUsersCommand } from '@modules/users/commands/bulk-sync-users';
+import { BulkUpdateAllUsersCommand } from '@modules/users/commands/bulk-update-all-users';
+import { BulkAllUpdateUsersRequestDto } from '@modules/users/dtos/bulk/bulk-operations.dto';
+import { GetUsersByExpireAtQuery } from '@modules/users/queries/get-users-by-expire-at/get-users-by-expire-at.query';
 
 import { NodesQueuesService } from '@queue/_nodes/nodes-queues.service';
 import { QUEUES_NAMES } from '@queue/queue.enum';

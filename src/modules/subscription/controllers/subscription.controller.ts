@@ -3,11 +3,11 @@ import { Response } from 'express';
 import { Controller, Get, HttpStatus, Param, Res, UseFilters } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { PublicHttpExceptionFilter } from '@common/exception/public-http-exception.filter';
-import { HttpExceptionFilter } from '@common/exception/http-exception.filter';
-import { errorHandler } from '@common/helpers/error-handler.helper';
-import { GetSrrContext } from '@common/decorators/get-srr-context';
 import { Endpoint } from '@common/decorators/base-endpoint';
+import { GetSrrContext } from '@common/decorators/get-srr-context';
+import { HttpExceptionFilter } from '@common/exception/http-exception.filter';
+import { PublicHttpExceptionFilter } from '@common/exception/public-http-exception.filter';
+import { errorHandler } from '@common/helpers/error-handler.helper';
 import {
     CONTROLLERS_INFO,
     SUBSCRIPTION_CONTROLLER,
@@ -16,20 +16,20 @@ import {
 import { GetSubscriptionInfoByShortUuidCommand } from '@libs/contracts/commands';
 import { REQUEST_TEMPLATE_TYPE } from '@libs/contracts/constants';
 
-import { ResponseRulesEncryptionService } from '@modules/subscription-response-rules/services/response-rules-encryption.service';
 import { ISRRContext } from '@modules/subscription-response-rules/interfaces';
+import { ResponseRulesEncryptionService } from '@modules/subscription-response-rules/services/response-rules-encryption.service';
 
 import {
     GetSubscriptionByShortUuidByClientTypeRequestDto,
     GetSubscriptionInfoRequestDto,
     GetSubscriptionInfoResponseDto,
 } from '../dto';
+import { GetSubscriptionByShortUuidRequestDto } from '../dto/get-subscription.dto';
 import {
     SubscriptionNotFoundResponse,
     SubscriptionRawResponse,
     SubscriptionWithConfigResponse,
 } from '../models';
-import { GetSubscriptionByShortUuidRequestDto } from '../dto/get-subscription.dto';
 import { SubscriptionService } from '../subscription.service';
 
 @ApiTags(CONTROLLERS_INFO.SUBSCRIPTION.tag)

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { getEndpointDetails } from '../../../constants';
 import { NODES_ROUTES, REST_API } from '../../../api';
+import { getEndpointDetails } from '../../../constants';
 
 export namespace RestartAllNodesCommand {
     export const url = REST_API.NODES.ACTIONS.RESTART_ALL;
@@ -11,6 +11,7 @@ export namespace RestartAllNodesCommand {
         NODES_ROUTES.ACTIONS.RESTART_ALL,
         'post',
         'Restart all nodes',
+        { scope: 'restart-all', kind: 'write' },
     );
 
     export const RequestBodySchema = z.object({

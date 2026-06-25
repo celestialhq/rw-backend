@@ -1,8 +1,8 @@
 import { Queue } from 'bullmq';
 import { chunk } from 'lodash';
 
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 
 import { TypedConfigService } from '@common/config/app-config';
 import { md5 } from '@common/utils';
@@ -12,6 +12,7 @@ import { BulkAllUpdateUsersRequestDto, BulkUpdateUsersRequestDto } from '@module
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 
+import { USERS_JOB_NAMES } from './constants/users-job-name.constant';
 import {
     IAddUserSubscriptionRequestHistoryPayload,
     ICheckAndUpsertHwidDevicePayload,
@@ -19,7 +20,6 @@ import {
     IFireUserEventJobData,
     IFireUserEventPayload,
 } from './interfaces';
-import { USERS_JOB_NAMES } from './constants/users-job-name.constant';
 
 @Injectable()
 export class UsersQueuesService implements OnApplicationBootstrap {

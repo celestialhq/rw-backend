@@ -1,9 +1,9 @@
 import { Job } from 'bullmq';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CommandBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { GetSystemStatsCommand } from '@remnawave/node-contract';
 

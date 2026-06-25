@@ -1,7 +1,7 @@
+import { Transactional } from '@nestjs-cls/transactional';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import _ from 'lodash';
 
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
@@ -11,15 +11,15 @@ import { ERRORS } from '@libs/contracts/constants/errors';
 
 import { NodesQueuesService } from '@queue/_nodes';
 
-import { GetConfigProfileByUuidResponseModel } from './models/get-config-profile-by-uuid.response.model';
-import { DeleteConfigProfileByUuidResponseModel, GetAllInboundsResponseModel } from './models';
-import { GetConfigProfilesResponseModel } from './models/get-config-profiles.response.model';
-import { ConfigProfileInboundEntity } from './entities/config-profile-inbound.entity';
-import { ConfigProfileRepository } from './repositories/config-profile.repository';
-import { ConfigProfileEntity } from './entities/config-profile.entity';
-import { ConfigProfileWithInboundsAndNodesEntity } from './entities';
-import { GetSnippetsQuery } from './queries/get-snippets';
 import { ReorderConfigProfilesRequestDto } from './dtos';
+import { ConfigProfileWithInboundsAndNodesEntity } from './entities';
+import { ConfigProfileInboundEntity } from './entities/config-profile-inbound.entity';
+import { ConfigProfileEntity } from './entities/config-profile.entity';
+import { DeleteConfigProfileByUuidResponseModel, GetAllInboundsResponseModel } from './models';
+import { GetConfigProfileByUuidResponseModel } from './models/get-config-profile-by-uuid.response.model';
+import { GetConfigProfilesResponseModel } from './models/get-config-profiles.response.model';
+import { GetSnippetsQuery } from './queries/get-snippets';
+import { ConfigProfileRepository } from './repositories/config-profile.repository';
 
 @Injectable()
 export class ConfigProfileService {
@@ -250,45 +250,41 @@ export class ConfigProfileService {
         name?: string,
         config?: object,
     ): Promise<boolean> {
-        try {
-            const configProfileEntity = new ConfigProfileEntity({
-                uuid,
-                name,
-            });
+        const configProfileEntity = new ConfigProfileEntity({
+            uuid,
+            name,
+        });
 
-            if (config) {
-                const existingInbounds = existingConfigProfile.inbounds;
+        if (config) {
+            const existingInbounds = existingConfigProfile.inbounds;
 
-                const validatedConfig = new XRayConfig(config);
-                validatedConfig.cleanInboundClients(false);
-                validatedConfig.fixIncorrectServerNames();
-                const sortedConfig = validatedConfig.getSortedConfig();
-                const inbounds = validatedConfig.getAllInbounds();
+            const validatedConfig = new XRayConfig(config);
+            validatedConfig.cleanInboundClients(false);
+            validatedConfig.fixIncorrectServerNames();
+            const sortedConfig = validatedConfig.getSortedConfig();
+            const inbounds = validatedConfig.getAllInbounds();
 
-                const inboundsEntities = inbounds.map(
-                    (inbound) =>
-                        new ConfigProfileInboundEntity({
-                            profileUuid: existingConfigProfile.uuid,
-                            tag: inbound.tag,
-                            type: inbound.type,
-                            network: inbound.network,
-                            security: inbound.security,
-                            port: inbound.port,
-                            rawInbound: inbound.rawInbound as unknown as object,
-                        }),
-                );
+            const inboundsEntities = inbounds.map(
+                (inbound) =>
+                    new ConfigProfileInboundEntity({
+                        profileUuid: existingConfigProfile.uuid,
+                        tag: inbound.tag,
+                        type: inbound.type,
+                        network: inbound.network,
+                        security: inbound.security,
+                        port: inbound.port,
+                        rawInbound: inbound.rawInbound as unknown as object,
+                    }),
+            );
 
-                await this.syncInbounds(existingInbounds, inboundsEntities);
+            await this.syncInbounds(existingInbounds, inboundsEntities);
 
-                configProfileEntity.config = sortedConfig as object;
-            }
-
-            await this.configProfileRepository.update(configProfileEntity);
-
-            return true;
-        } catch (error) {
-            throw error;
+            configProfileEntity.config = sortedConfig as object;
         }
+
+        await this.configProfileRepository.update(configProfileEntity);
+
+        return true;
     }
 
     public async getInboundsByProfileUuid(

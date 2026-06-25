@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { getEndpointDetails } from '../../constants';
 import { NODES_ROUTES, REST_API } from '../../api';
+import { getEndpointDetails } from '../../constants';
 import { NodesSchema } from '../../models';
 export namespace CreateNodeCommand {
     export const url = REST_API.NODES.CREATE;
@@ -11,6 +11,7 @@ export namespace CreateNodeCommand {
         NODES_ROUTES.CREATE,
         'post',
         'Create a new node',
+        { scope: 'create', kind: 'write' },
     );
 
     export const RequestSchema = z.object({
