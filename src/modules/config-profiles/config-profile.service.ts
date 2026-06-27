@@ -6,7 +6,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
 import { XRayConfig } from '@common/helpers/xray-config';
+import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
+import { CACHE_KEYS } from '@libs/contracts/constants';
 import { ERRORS } from '@libs/contracts/constants/errors';
 
 import { NodesQueuesService } from '@queue/_nodes';
@@ -29,6 +31,7 @@ export class ConfigProfileService {
         private readonly configProfileRepository: ConfigProfileRepository,
         private readonly nodesQueuesService: NodesQueuesService,
         private readonly queryBus: QueryBus,
+        private readonly rawCache: RawCacheService,
     ) {}
 
     public async getConfigProfiles(): Promise<TResult<GetConfigProfilesResponseModel>> {
@@ -118,6 +121,10 @@ export class ConfigProfileService {
                     isNeedToBeDeleted: false,
                 });
             }
+
+            await this.rawCache.delMany(
+                configProfile.inbounds.map((inbound) => CACHE_KEYS.RAW_INBOUND(inbound.uuid)),
+            );
 
             const result = await this.configProfileRepository.deleteByUUID(uuid);
 
@@ -213,6 +220,12 @@ export class ConfigProfileService {
                     profileUuid: existingConfigProfile.uuid,
                     emitter: 'updateConfigProfile',
                 });
+
+                await this.rawCache.delMany(
+                    existingConfigProfile.inbounds.map((inbound) =>
+                        CACHE_KEYS.RAW_INBOUND(inbound.uuid),
+                    ),
+                );
             }
 
             return this.getConfigProfileByUUID(existingConfigProfile.uuid);

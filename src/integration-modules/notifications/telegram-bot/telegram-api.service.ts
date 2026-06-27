@@ -1,10 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { ProxyAgent } from 'proxy-agent';
 
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import { isProcessor } from '@common/utils/startup-app';
 
 import { IInlineKeyboard } from '@queue/notifications/telegram-bot-logger/interfaces';
 
@@ -16,15 +14,14 @@ type TelegramErrorBody = {
 };
 
 @Injectable()
-export class TelegramApiService implements OnModuleInit {
+export class TelegramApiService {
     private readonly logger = new Logger(TelegramApiService.name);
     private readonly http: AxiosInstance;
-    private isHealthy = false;
 
-    constructor(config: ConfigService) {
-        const token = config.getOrThrow<string>('TELEGRAM_BOT_TOKEN');
-        const apiRoot = config.getOrThrow<string>('TELEGRAM_BOT_API_ROOT');
-        const proxy = config.get<string>('TELEGRAM_BOT_PROXY');
+    constructor(private readonly config: ConfigService) {
+        const token = this.config.getOrThrow<string>('TELEGRAM_BOT_TOKEN');
+        const apiRoot = this.config.getOrThrow<string>('TELEGRAM_BOT_API_ROOT');
+        const proxy = this.config.get<string>('TELEGRAM_BOT_PROXY');
         const agent = proxy ? new ProxyAgent({ getProxyForUrl: () => proxy }) : undefined;
 
         this.http = axios.create({
@@ -33,16 +30,6 @@ export class TelegramApiService implements OnModuleInit {
             httpAgent: agent,
             httpsAgent: agent,
         });
-    }
-
-    async onModuleInit(): Promise<void> {
-        if (!isProcessor()) return;
-        this.isHealthy = await this.healthcheck();
-        if (!this.isHealthy) this.logger.error('Telegram API is not healthy.');
-    }
-
-    get isApiHealthy(): boolean {
-        return this.isHealthy;
     }
 
     async sendMessage(
@@ -69,7 +56,7 @@ export class TelegramApiService implements OnModuleInit {
         }
     }
 
-    private async healthcheck(): Promise<boolean> {
+    public async healthcheck(): Promise<boolean> {
         try {
             const { data } = await this.http.get('/getMe');
             this.logger.log(

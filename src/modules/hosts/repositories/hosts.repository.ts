@@ -11,7 +11,6 @@ import { getKyselyUuid } from '@common/helpers';
 import { values } from '@common/helpers/kysely/values';
 import { ICrud } from '@common/types/crud-port';
 
-import { HostWithRawInbound } from '../entities/host-with-inbound-tag.entity';
 import { HostsEntity } from '../entities/hosts.entity';
 import { HostsConverter } from '../hosts.converter';
 
@@ -169,82 +168,59 @@ export class HostsRepository implements ICrud<HostsEntity> {
         userId: bigint,
         returnDisabledHosts: boolean = false,
         returnHiddenHosts: boolean = false,
-    ): Promise<HostWithRawInbound[]> {
-        const hosts = await this.qb.kysely
+    ) {
+        return await this.qb.kysely
             .selectFrom('hosts')
-            .distinct()
-            .innerJoin(
-                'internalSquadInbounds',
-                'internalSquadInbounds.inboundUuid',
-                'hosts.configProfileInboundUuid',
-            )
-            .innerJoin(
-                'internalSquadMembers',
-                'internalSquadMembers.internalSquadUuid',
-                'internalSquadInbounds.internalSquadUuid',
-            )
+            .selectAll('hosts')
             .where((eb) =>
-                eb.not(
-                    eb.exists(
-                        eb
-                            .selectFrom('internalSquadHostExclusions')
-                            .whereRef('internalSquadHostExclusions.hostUuid', '=', 'hosts.uuid')
-                            .whereRef(
-                                'internalSquadHostExclusions.squadUuid',
-                                '=',
-                                'internalSquadInbounds.internalSquadUuid',
-                            )
-                            .select(eb.val(1).as('one')),
-                    ),
+                eb.exists(
+                    eb
+                        .selectFrom('internalSquadInbounds')
+                        .innerJoin(
+                            'internalSquadMembers',
+                            'internalSquadMembers.internalSquadUuid',
+                            'internalSquadInbounds.internalSquadUuid',
+                        )
+                        .whereRef(
+                            'internalSquadInbounds.inboundUuid',
+                            '=',
+                            'hosts.configProfileInboundUuid',
+                        )
+                        .where('internalSquadMembers.userId', '=', userId)
+                        .where((eb2) =>
+                            eb2.not(
+                                eb2.exists(
+                                    eb2
+                                        .selectFrom('internalSquadHostExclusions')
+                                        .whereRef(
+                                            'internalSquadHostExclusions.hostUuid',
+                                            '=',
+                                            'hosts.uuid',
+                                        )
+                                        .whereRef(
+                                            'internalSquadHostExclusions.squadUuid',
+                                            '=',
+                                            'internalSquadInbounds.internalSquadUuid',
+                                        )
+                                        .select(eb2.val(1).as('one')),
+                                ),
+                            ),
+                        )
+                        .select(eb.val(1).as('one')),
                 ),
             )
             .$if(!returnDisabledHosts, (eb) => eb.where('hosts.isDisabled', '=', false))
             .$if(!returnHiddenHosts, (eb) => eb.where('hosts.isHidden', '=', false))
-            .where('internalSquadMembers.userId', '=', userId)
-            .selectAll('hosts')
             .orderBy('hosts.viewPosition', 'asc')
             .execute();
-
-        const inboundUuids = [
-            ...new Set(
-                hosts.map((h) => h.configProfileInboundUuid).filter((v): v is string => !!v),
-            ),
-        ];
-        const templateUuids = [
-            ...new Set(hosts.map((h) => h.xrayJsonTemplateUuid).filter((v): v is string => !!v)),
-        ];
-
-        const inbounds = await this.getInboundsByUuids(inboundUuids);
-        const templates = await this.getTemplatesByUuids(templateUuids);
-
-        return hosts.flatMap((h) => {
-            const inbound = h.configProfileInboundUuid
-                ? inbounds.get(h.configProfileInboundUuid)
-                : undefined;
-
-            if (!inbound) {
-                return [];
-            }
-
-            return new HostWithRawInbound({
-                ...h,
-                rawInbound: inbound.rawInbound,
-                inboundTag: inbound.tag,
-                xrayJsonTemplate: h.xrayJsonTemplateUuid
-                    ? (templates.get(h.xrayJsonTemplateUuid) ?? null)
-                    : null,
-            });
-        });
     }
 
-    private async getInboundsByUuids(
-        uuids: string[],
-    ): Promise<Map<string, { rawInbound: object | null; tag: string }>> {
+    public async getInboundsByUuids(uuids: string[]) {
         if (uuids.length === 0) {
-            return new Map();
+            return [];
         }
 
-        const rows = await this.qb.kysely
+        return await this.qb.kysely
             .selectFrom('configProfileInbounds')
             .select(['uuid', 'rawInbound', 'tag'])
             .where(
@@ -253,16 +229,14 @@ export class HostsRepository implements ICrud<HostsEntity> {
                 uuids.map((u) => getKyselyUuid(u)),
             )
             .execute();
-
-        return new Map(rows.map((r) => [r.uuid, { rawInbound: r.rawInbound, tag: r.tag }]));
     }
 
-    private async getTemplatesByUuids(uuids: string[]): Promise<Map<string, object | null>> {
+    public async getTemplatesByUuids(uuids: string[]) {
         if (uuids.length === 0) {
-            return new Map();
+            return [];
         }
 
-        const rows = await this.qb.kysely
+        return await this.qb.kysely
             .selectFrom('subscriptionTemplates')
             .select(['uuid', 'templateJson'])
             .where(
@@ -271,8 +245,6 @@ export class HostsRepository implements ICrud<HostsEntity> {
                 uuids.map((u) => getKyselyUuid(u)),
             )
             .execute();
-
-        return new Map(rows.map((r) => [r.uuid, r.templateJson]));
     }
 
     public async reorderMany(dto: IReorderHost[]): Promise<boolean> {
