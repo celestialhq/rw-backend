@@ -79,6 +79,8 @@ async function bootstrap(): Promise<void> {
 
     const config = app.get(TypedConfigService);
 
+    await getDocs(app, config);
+
     if (!isDevelopment()) {
         app.use(
             helmet({
@@ -119,8 +121,6 @@ async function bootstrap(): Promise<void> {
     app.use(noRobotsMiddleware, proxyCheckMiddleware);
 
     app.setGlobalPrefix(ROOT);
-
-    await getDocs(app, config);
 
     app.enableCors({
         origin: isDevelopment() ? '*' : config.getOrThrow('FRONT_END_DOMAIN'),
