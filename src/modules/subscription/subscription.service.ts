@@ -820,7 +820,7 @@ export class SubscriptionService {
                 });
             }
 
-            if (!result.response.created || !result.response.hwidUserDevice) {
+            if (!result.response.hwidDevice) {
                 return ok({
                     subscriptionAllowed: false,
                     maxDeviceReached: true,
@@ -833,7 +833,7 @@ export class SubscriptionService {
                 EVENTS.USER_HWID_DEVICES.ADDED,
                 new UserHwidDeviceEvent(
                     user,
-                    result.response.hwidUserDevice,
+                    result.response.hwidDevice,
                     EVENTS.USER_HWID_DEVICES.ADDED,
                 ),
             );

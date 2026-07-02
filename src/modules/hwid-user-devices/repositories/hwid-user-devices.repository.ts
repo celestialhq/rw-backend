@@ -1,4 +1,4 @@
-import { TransactionHost } from '@nestjs-cls/transactional';
+import { Transactional, TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { sql } from 'kysely';
 
@@ -89,10 +89,21 @@ export class HwidUserDevicesRepository implements Omit<
     }
 
     public async checkHwidExists(hwid: string, userId: bigint): Promise<boolean> {
-        const count = await this.prisma.tx.hwidUserDevices.count({
-            where: { hwid, userId },
-        });
-        return count > 0;
+        const result = await this.qb.kysely
+            .selectNoFrom((eb) =>
+                eb
+                    .exists(
+                        eb
+                            .selectFrom('hwidUserDevices')
+                            .select(sql`1`.as('one'))
+                            .where('hwid', '=', hwid)
+                            .where('userId', '=', userId),
+                    )
+                    .as('exists'),
+            )
+            .executeTakeFirstOrThrow();
+
+        return !!result.exists;
     }
 
     public async deleteByHwidAndUserId(hwid: string, userId: bigint): Promise<boolean> {
@@ -290,37 +301,34 @@ export class HwidUserDevicesRepository implements Omit<
         };
     }
 
+    @Transactional()
     public async createWithAdvisoryLock(
         entity: HwidUserDeviceEntity,
         deviceLimit: number,
-    ): Promise<{ created: boolean; hwidUserDevice: HwidUserDeviceEntity | null }> {
-        let created = false;
-        let hwidUserDevice: HwidUserDeviceEntity | null = null;
-
-        await this.prisma.withTransaction(async () => {
-            await this.prisma.tx.$executeRaw`
+    ): Promise<{
+        hwidDevice: HwidUserDeviceEntity | null;
+    }> {
+        await this.prisma.tx.$executeRaw`
                 SELECT pg_advisory_xact_lock(${HWID_LOCK_PREFIX + entity.userId})
             `;
 
-            const count = await this.prisma.tx.hwidUserDevices.count({
-                where: { userId: entity.userId },
-            });
+        const hwids = await this.qb.kysely
+            .selectFrom('hwidUserDevices')
+            .select('hwid')
+            .where('userId', '=', entity.userId)
+            .limit(deviceLimit)
+            .execute();
 
-            if (count >= deviceLimit) {
-                return;
-            }
+        if (hwids.length >= deviceLimit) {
+            return { hwidDevice: null };
+        }
 
-            const model = this.converter.fromEntityToPrismaModel(entity);
-            const result = await this.prisma.tx.hwidUserDevices.upsert({
-                where: { hwid_userId: { hwid: entity.hwid, userId: entity.userId } },
-                update: { ...model, updatedAt: new Date() },
-                create: model,
-            });
+        const model = this.converter.fromEntityToPrismaModel(entity);
 
-            created = true;
-            hwidUserDevice = this.converter.fromPrismaModelToEntity(result);
+        const result = await this.prisma.tx.hwidUserDevices.create({
+            data: model,
         });
 
-        return { created, hwidUserDevice };
+        return { hwidDevice: this.converter.fromPrismaModelToEntity(result) };
     }
 }
