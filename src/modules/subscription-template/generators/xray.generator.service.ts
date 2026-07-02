@@ -2,6 +2,21 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { ResolvedProxyConfig } from '../resolve-proxy/interfaces';
 
+interface Hysteria2FinalMask {
+    quicParams?: {
+        brutalUp?: string | number;
+        brutalDown?: string | number;
+        udpHop?: {
+            ports?: string | number;
+            interval?: string | number;
+        };
+    };
+    udp?: Array<{
+        type?: string;
+        settings?: { password?: string };
+    }>;
+}
+
 /**
  * Generates VLESS/Trojan/Shadowsocks share links per the standard:
  * https://github.com/XTLS/Xray-core/discussions/716
@@ -135,6 +150,15 @@ export class XrayGeneratorService {
         if (host.transport !== 'hysteria') return null;
 
         const params: Record<string, unknown> = {};
+
+        // Obfuscation
+        const finalMask = host.streamOverrides.finalMask as Hysteria2FinalMask | null;
+        const obfsPassword = finalMask?.udp?.find((m) => m?.type === 'salamander')?.settings
+            ?.password;
+        if (obfsPassword) {
+            params.obfs = 'salamander';
+            params['obfs-password'] = obfsPassword;
+        }
 
         // TLS
         if (host.security === 'tls') {
