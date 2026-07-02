@@ -9,9 +9,10 @@ export interface HwidHeaders {
 }
 
 export function extractHwidHeaders(request: Request): HwidHeaders | null {
-    const hwid = request.headers['x-hwid'] as string | undefined;
+    const rawHwid = request.headers['x-hwid'];
+    const hwid = (Array.isArray(rawHwid) ? rawHwid[0] : rawHwid)?.trim();
 
-    if (!hwid) {
+    if (!hwid || hwid.length < 6) {
         return null;
     }
 

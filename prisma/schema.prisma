@@ -374,6 +374,7 @@ model HwidUserDevices {
   updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
 
   @@id([hwid, userId])
+  @@index([userId])
   @@map("hwid_user_devices")
 }
 
