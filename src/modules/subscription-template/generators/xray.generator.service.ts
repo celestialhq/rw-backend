@@ -165,6 +165,9 @@ export class XrayGeneratorService {
             if (host.securityOptions.serverName) {
                 params.sni = host.securityOptions.serverName;
             }
+            if (host.securityOptions.pinnedPeerCertSha256) {
+                params.pinSHA256 = host.securityOptions.pinnedPeerCertSha256;
+            }
         }
 
         if (host.streamOverrides.finalMask) {
