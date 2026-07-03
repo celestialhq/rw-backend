@@ -28,12 +28,13 @@ import {
     BulkUpdateUsersBodyDto,
     CreateUserBodyDto,
     GetUsersQueryDto,
+    GetUsersStreamQueryDto,
     ResolveUserBodyDto,
     RevokeUserSubscriptionBodyDto,
     UpdateUserBodyDto,
 } from './dtos';
 import { BaseUserEntity, UserEntity } from './entities';
-import { IGetUserByUnique, IGetUsersByTelegramIdOrEmail, IUpdateUserDto } from './interfaces';
+import { IGetUserByUnique, IUpdateUserDto } from './interfaces';
 import {
     DeleteUserResponseModel,
     BulkDeleteByStatusResponseModel,
@@ -265,7 +266,7 @@ export class UsersService {
         }
     }
 
-    public async getUsersStream(dto: any): Promise<
+    public async getUsersStream(dto: GetUsersStreamQueryDto): Promise<
         TResult<{
             users: UserEntity[];
             nextCursor: string | null;
@@ -292,23 +293,6 @@ export class UsersService {
             });
 
             if (!result) return fail(ERRORS.GET_USER_BY_UNIQUE_FIELDS_NOT_FOUND);
-
-            return ok(result);
-        } catch (error) {
-            this.logger.error(error);
-            return fail(ERRORS.GET_USER_BY_ERROR);
-        }
-    }
-
-    public async getUsersByNonUniqueFields(
-        dto: IGetUsersByTelegramIdOrEmail,
-    ): Promise<TResult<UserEntity[]>> {
-        try {
-            const result = await this.userRepository.findByNonUniqueCriteria({
-                email: dto.email || undefined,
-                telegramId: dto.telegramId ? BigInt(dto.telegramId) : undefined,
-                tag: dto.tag || undefined,
-            });
 
             return ok(result);
         } catch (error) {

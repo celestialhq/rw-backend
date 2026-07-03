@@ -25,11 +25,8 @@ import {
     GetUsersTagsCommand,
     GetUsersCommand,
     GetUserAccessibleNodesCommand,
-    GetUserByEmailCommand,
     GetUserByIdCommand,
     GetUserByShortUuidCommand,
-    GetUserByTagCommand,
-    GetUserByTelegramIdCommand,
     GetUserByUsernameCommand,
     GetUserByUuidCommand,
     GetUsersStreamCommand,
@@ -57,8 +54,6 @@ import {
     GetUserByIdResponseDto,
     GetUserByShortUuidParamDto,
     GetUserByShortUuidResponseDto,
-    GetUserByTagParamDto,
-    GetUserByTagResponseDto,
     GetUserByUsernameParamDto,
     GetUserByUsernameResponseDto,
     GetUserByUuidParamDto,
@@ -78,10 +73,6 @@ import {
     UpdateUserResponseDto,
     GetUsersResponseDto,
     GetUserByIdParamDto,
-    GetUserByTelegramIdResponseDto,
-    GetUserByTelegramIdParamDto,
-    GetUserByEmailResponseDto,
-    GetUserByEmailParamDto,
 } from '../dtos';
 import {
     GetAllTagsResponseModel,
@@ -203,9 +194,7 @@ export class UsersController {
     async getUsersStream(
         @Query() query: GetUsersStreamQueryDto,
     ): Promise<GetUsersStreamResponseDto> {
-        const { cursor, size } = query;
-
-        const result = await this.usersService.getUsersStream({ cursor, size });
+        const result = await this.usersService.getUsersStream(query);
 
         const data = errorHandler(result);
         return {
@@ -376,67 +365,6 @@ export class UsersController {
         const data = errorHandler(result);
         return {
             response: new GetFullUserResponseModel(data, this.subPublicDomain),
-        };
-    }
-
-    @ApiOkResponse({
-        type: GetUserByTelegramIdResponseDto,
-        description: 'Users fetched successfully',
-    })
-    @Endpoint({
-        command: GetUserByTelegramIdCommand,
-        httpCode: HttpStatus.OK,
-    })
-    async getUserByTelegramId(
-        @Param() param: GetUserByTelegramIdParamDto,
-    ): Promise<GetUserByTelegramIdResponseDto> {
-        const result = await this.usersService.getUsersByNonUniqueFields({
-            telegramId: param.telegramId,
-        });
-
-        const data = errorHandler(result);
-        return {
-            response: data.map((item) => new GetFullUserResponseModel(item, this.subPublicDomain)),
-        };
-    }
-
-    @ApiOkResponse({
-        type: GetUserByEmailResponseDto,
-        description: 'Users fetched successfully',
-    })
-    @Endpoint({
-        command: GetUserByEmailCommand,
-        httpCode: HttpStatus.OK,
-    })
-    async getUsersByEmail(
-        @Param() param: GetUserByEmailParamDto,
-    ): Promise<GetUserByEmailResponseDto> {
-        const result = await this.usersService.getUsersByNonUniqueFields({
-            email: param.email,
-        });
-
-        const data = errorHandler(result);
-        return {
-            response: data.map((item) => new GetFullUserResponseModel(item, this.subPublicDomain)),
-        };
-    }
-
-    @ApiOkResponse({
-        type: GetUserByTagResponseDto,
-        description: 'Users fetched successfully',
-    })
-    @Endpoint({
-        command: GetUserByTagCommand,
-        httpCode: HttpStatus.OK,
-    })
-    async getUsersByTag(@Param() param: GetUserByTagParamDto): Promise<GetUserByTagResponseDto> {
-        const result = await this.usersService.getUsersByNonUniqueFields({
-            tag: param.tag,
-        });
-
-        const data = errorHandler(result);
-        return {
-            response: data.map((item) => new GetFullUserResponseModel(item, this.subPublicDomain)),
         };
     }
 
