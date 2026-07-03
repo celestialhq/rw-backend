@@ -1,6 +1,6 @@
 import { IGetUserIpListItem, IGetUsersIpsListResult } from '@queue/_nodes/interfaces';
 
-export class FetchUsersIpsResponseModel {
+export class ConnectionsByNodeResponseModel {
     public readonly jobId: string;
 
     constructor(data: { jobId: string }) {
@@ -8,7 +8,7 @@ export class FetchUsersIpsResponseModel {
     }
 }
 
-export class FetchUsersIpsResultResponseModel {
+export class ConnectionsByNodeResultResponseModel {
     public readonly isCompleted: boolean;
     public readonly isFailed: boolean;
     public readonly result: {

@@ -1,21 +1,21 @@
 import { z } from 'zod';
 
-import { IP_CONTROL_ROUTES, REST_API } from '../../api';
+import { CONNECTIONS_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
 
-export namespace FetchIpsCommand {
-    export const url = REST_API.IP_CONTROL.FETCH_IPS;
-    export const TSQ_url = url(':uuid');
+export namespace ConnectionsByNodeCommand {
+    export const url = REST_API.CONNECTIONS.CONNECTIONS_BY_NODE;
+    export const TSQ_url = url(':nodeUuid');
 
     export const endpointDetails = getEndpointDetails(
-        IP_CONTROL_ROUTES.FETCH_IPS(':uuid'),
+        CONNECTIONS_ROUTES.CONNECTIONS_BY_NODE(':nodeUuid'),
         'post',
-        'Request IP List for User',
-        { scope: 'fetch-ips', kind: 'read' },
+        'Request Connections for Node',
+        { scope: 'by-node', kind: 'read' },
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('User UUID'),
+        nodeUuid: z.string().uuid().describe('Node UUID'),
     });
 
     export const ResponseSchema = z.object({

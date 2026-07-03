@@ -13,21 +13,23 @@ import { GetUserIdsByUserUuidsQuery } from '@modules/users/queries/get-user-ids-
 import { NodesQueuesService } from '@queue/_nodes';
 
 import { DropConnectionsBodyDto } from './dtos';
-import { FetchUsersIpsResponseModel, FetchUsersIpsResultResponseModel } from './models';
+import { ConnectionsByNodeResponseModel, ConnectionsByNodeResultResponseModel } from './models';
 import {
-    FetchIpsResponseModel,
-    FetchIpsResultResponseModel,
-} from './models/fetch-user-ips.response.model';
+    ConnectionsByUserResponseModel,
+    ConnectionsByUserResultResponseModel,
+} from './models/connections-by-user.response.model';
 
 @Injectable()
-export class IpControlService {
-    private readonly logger = new Logger(IpControlService.name);
+export class ConnectionsService {
+    private readonly logger = new Logger(ConnectionsService.name);
     constructor(
         private readonly queryBus: QueryBus,
         private readonly nodesQueuesService: NodesQueuesService,
     ) {}
 
-    public async fetchUserIps(userUuid: string): Promise<TResult<FetchIpsResponseModel>> {
+    public async connectionsByUser(
+        userUuid: string,
+    ): Promise<TResult<ConnectionsByUserResponseModel>> {
         try {
             const user = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery({ uuid: userUuid }),
@@ -36,7 +38,7 @@ export class IpControlService {
                 return fail(ERRORS.USER_NOT_FOUND);
             }
 
-            const result = await this.nodesQueuesService.queryNodes({
+            const result = await this.nodesQueuesService.connectionsByUser({
                 userId: user.response.tId.toString(),
                 userUuid: userUuid,
             });
@@ -45,21 +47,23 @@ export class IpControlService {
                 return fail(ERRORS.JOB_CREATION_FAILED);
             }
 
-            return ok(new FetchIpsResponseModel({ jobId: result.jobId }));
+            return ok(new ConnectionsByUserResponseModel({ jobId: result.jobId }));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.JOB_CREATION_FAILED);
         }
     }
 
-    public async getFetchIpsResult(jobId: string): Promise<TResult<FetchIpsResultResponseModel>> {
+    public async connectionsByUserResult(
+        jobId: string,
+    ): Promise<TResult<ConnectionsByUserResultResponseModel>> {
         try {
-            const result = await this.nodesQueuesService.getIpsListResult(jobId);
+            const result = await this.nodesQueuesService.connectionsByUserResult(jobId);
             if (!result) {
                 return fail(ERRORS.JOB_RESULT_FETCH_FAILED);
             }
 
-            return ok(new FetchIpsResultResponseModel(result));
+            return ok(new ConnectionsByUserResultResponseModel(result));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.JOB_RESULT_FETCH_FAILED);
@@ -139,14 +143,16 @@ export class IpControlService {
         }
     }
 
-    public async fetchUsersIps(nodeUuid: string): Promise<TResult<FetchUsersIpsResponseModel>> {
+    public async connectionsByNode(
+        nodeUuid: string,
+    ): Promise<TResult<ConnectionsByNodeResponseModel>> {
         try {
             const node = await this.queryBus.execute(new GetNodeByUuidQuery(nodeUuid));
             if (!node.isOk) {
                 return fail(ERRORS.NODE_NOT_FOUND);
             }
 
-            const result = await this.nodesQueuesService.queryUsersIpsList({
+            const result = await this.nodesQueuesService.connectionsByNode({
                 nodeUuid: nodeUuid,
             });
 
@@ -154,23 +160,23 @@ export class IpControlService {
                 return fail(ERRORS.JOB_CREATION_FAILED);
             }
 
-            return ok(new FetchUsersIpsResponseModel({ jobId: result.jobId }));
+            return ok(new ConnectionsByNodeResponseModel({ jobId: result.jobId }));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.JOB_CREATION_FAILED);
         }
     }
 
-    public async getFetchUsersIpsResult(
+    public async connectionsByNodeResult(
         jobId: string,
-    ): Promise<TResult<FetchUsersIpsResultResponseModel>> {
+    ): Promise<TResult<ConnectionsByNodeResultResponseModel>> {
         try {
-            const result = await this.nodesQueuesService.getUsersIpsListResult(jobId);
+            const result = await this.nodesQueuesService.connectionsByNodeResult(jobId);
             if (!result) {
                 return fail(ERRORS.JOB_RESULT_FETCH_FAILED);
             }
 
-            return ok(new FetchUsersIpsResultResponseModel(result));
+            return ok(new ConnectionsByNodeResultResponseModel(result));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.JOB_RESULT_FETCH_FAILED);
