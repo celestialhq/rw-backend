@@ -15,7 +15,7 @@ export namespace UpdateNodePluginCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuid: z.string().uuid(),
         name: z
             .string()
@@ -29,13 +29,12 @@ export namespace UpdateNodePluginCommand {
         pluginConfig: z.optional(z.unknown()),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: NodePluginSchema.extend({
             pluginConfig: z.unknown(),
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

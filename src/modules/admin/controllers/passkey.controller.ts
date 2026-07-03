@@ -13,7 +13,7 @@ import {
     GetPasskeyRegistrationOptionsCommand,
     VerifyPasskeyRegistrationCommand,
     DeletePasskeyCommand,
-    GetAllPasskeysCommand,
+    GetPasskeysCommand,
     UpdatePasskeyCommand,
 } from '@libs/contracts/commands';
 import { ROLE } from '@libs/contracts/constants';
@@ -21,13 +21,13 @@ import { ROLE } from '@libs/contracts/constants';
 import { IJWTAuthPayload } from '@modules/auth/interfaces';
 
 import {
-    DeletePasskeyRequestDto,
+    DeletePasskeyBodyDto,
     DeletePasskeyResponseDto,
-    GetAllPasskeysResponseDto,
     GetPasskeyRegistrationOptionsResponseDto,
-    UpdatePasskeyRequestDto,
+    GetPasskeysResponseDto,
+    UpdatePasskeyBodyDto,
     UpdatePasskeyResponseDto,
-    VerifyPasskeyRegistrationRequestDto,
+    VerifyPasskeyRegistrationBodyDto,
     VerifyPasskeyRegistrationResponseDto,
 } from '../dtos';
 import { PasskeyService } from '../services/passkey.service';
@@ -67,10 +67,9 @@ export class PasskeyController {
     @Endpoint({
         command: VerifyPasskeyRegistrationCommand,
         httpCode: HttpStatus.OK,
-        apiBody: VerifyPasskeyRegistrationRequestDto,
     })
     async passkeyRegistrationVerify(
-        @Body() body: VerifyPasskeyRegistrationRequestDto,
+        @Body() body: VerifyPasskeyRegistrationBodyDto,
         @GetJWTPayload() payload: IJWTAuthPayload,
     ): Promise<VerifyPasskeyRegistrationResponseDto> {
         const result = await this.passkeyService.verifyPasskeyRegistration(payload, body);
@@ -82,16 +81,16 @@ export class PasskeyController {
     }
 
     @ApiResponse({
-        type: GetAllPasskeysResponseDto,
+        type: GetPasskeysResponseDto,
         description: 'Get all passkeys',
     })
     @Endpoint({
-        command: GetAllPasskeysCommand,
+        command: GetPasskeysCommand,
         httpCode: HttpStatus.OK,
     })
     async getActivePasskeys(
         @GetJWTPayload() payload: IJWTAuthPayload,
-    ): Promise<GetAllPasskeysResponseDto> {
+    ): Promise<GetPasskeysResponseDto> {
         const result = await this.passkeyService.getActivePasskeys(payload);
 
         const data = errorHandler(result);
@@ -107,10 +106,9 @@ export class PasskeyController {
     @Endpoint({
         command: DeletePasskeyCommand,
         httpCode: HttpStatus.OK,
-        apiBody: DeletePasskeyRequestDto,
     })
     async deletePasskey(
-        @Body() body: DeletePasskeyRequestDto,
+        @Body() body: DeletePasskeyBodyDto,
         @GetJWTPayload() payload: IJWTAuthPayload,
     ): Promise<DeletePasskeyResponseDto> {
         const result = await this.passkeyService.deletePasskey(payload, body.id);
@@ -128,10 +126,9 @@ export class PasskeyController {
     @Endpoint({
         command: UpdatePasskeyCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdatePasskeyRequestDto,
     })
     async updatePasskey(
-        @Body() body: UpdatePasskeyRequestDto,
+        @Body() body: UpdatePasskeyBodyDto,
         @GetJWTPayload() payload: IJWTAuthPayload,
     ): Promise<UpdatePasskeyResponseDto> {
         const result = await this.passkeyService.updatePasskey(payload, body);

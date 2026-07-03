@@ -35,14 +35,14 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    GetBandwidthStatsRequestQueryDto,
+    GetBandwidthStatsQueryDto,
     GetBandwidthStatsResponseDto,
     GetNodesMetricsResponseDto,
     GetNodesStatisticsResponseDto,
     GetRemnawaveHealthResponseDto,
     GetStatsResponseDto,
     GenerateX25519ResponseDto,
-    DebugSrrMatcherRequestDto,
+    DebugSrrMatcherBodyDto,
     DebugSrrMatcherResponseDto,
     GetMetadataResponseDto,
     GetRecapResponseDto,
@@ -105,7 +105,7 @@ export class SystemController {
         httpCode: HttpStatus.OK,
     })
     async getBandwidthStats(
-        @Query() query: GetBandwidthStatsRequestQueryDto,
+        @Query() query: GetBandwidthStatsQueryDto,
     ): Promise<GetBandwidthStatsResponseDto> {
         const result = await this.systemService.getBandwidthStats(query);
 
@@ -194,12 +194,11 @@ export class SystemController {
     @Endpoint({
         command: TestSrrMatcherCommand,
         httpCode: HttpStatus.OK,
-        apiBody: DebugSrrMatcherRequestDto,
     })
     async debugSrrMatcher(
         @Res() response: Response,
         @Req() request: Request,
-        @Body() body: DebugSrrMatcherRequestDto,
+        @Body() body: DebugSrrMatcherBodyDto,
     ): Promise<Response> {
         return await this.systemService.debugSrrMatcher(request, response, body);
     }

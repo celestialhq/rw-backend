@@ -22,8 +22,8 @@ export namespace UpdateExternalSquadCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
-        uuid: z.string().uuid(),
+    export const RequestBodySchema = z.object({
+        uuid: z.string().uuid().describe('UUID of the external squad'),
         name: z
             .string()
             .min(2, 'Name must be at least 2 characters')
@@ -36,8 +36,10 @@ export namespace UpdateExternalSquadCommand {
         templates: z
             .array(
                 z.object({
-                    templateUuid: z.string().uuid(),
-                    templateType: z.nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE),
+                    templateUuid: z.string().uuid().describe('UUID of the subscription template'),
+                    templateType: z
+                        .nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE)
+                        .describe('Type of the subscription template'),
                 }),
             )
             .optional(),
@@ -49,11 +51,10 @@ export namespace UpdateExternalSquadCommand {
         subpageConfigUuid: z.optional(z.nullable(z.string().uuid())),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: ExternalSquadSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

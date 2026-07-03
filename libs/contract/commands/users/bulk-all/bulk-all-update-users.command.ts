@@ -16,7 +16,7 @@ export namespace BulkAllUpdateUsersCommand {
         { scope: 'bulk-all-update-users', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         status: UsersSchema.shape.status.optional(),
         trafficLimitBytes: z.optional(
             z
@@ -61,13 +61,12 @@ export namespace BulkAllUpdateUsersCommand {
         ),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             eventSent: z.boolean(),
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

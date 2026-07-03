@@ -7,26 +7,30 @@ import {
 } from '@contract/commands';
 import { createZodDto } from 'nestjs-zod';
 
-export class FetchIpsRequestDto extends createZodDto(FetchIpsCommand.RequestSchema) {}
+export class FetchIpsBodyParamDto extends createZodDto(FetchIpsCommand.RequestParamSchema) {}
 
 export class FetchIpsResponseDto extends createZodDto(FetchIpsCommand.ResponseSchema) {}
 
-export class FetchIpsResultRequestDto extends createZodDto(FetchIpsResultCommand.RequestSchema) {}
+export class FetchIpsResultParamDto extends createZodDto(
+    FetchIpsResultCommand.RequestParamSchema,
+) {}
 
 export class FetchIpsResultResponseDto extends createZodDto(FetchIpsResultCommand.ResponseSchema) {}
 
-export class DropConnectionsRequestDto extends createZodDto(DropConnectionsCommand.RequestSchema) {}
+export class DropConnectionsBodyDto extends createZodDto(
+    DropConnectionsCommand.RequestBodySchema,
+) {}
 
 export class DropConnectionsResponseDto extends createZodDto(
     DropConnectionsCommand.ResponseSchema,
 ) {}
 
-export class FetchUsersIpsRequestDto extends createZodDto(FetchUsersIpsCommand.RequestSchema) {}
+export class FetchUsersIpsParamDto extends createZodDto(FetchUsersIpsCommand.RequestParamSchema) {}
 
 export class FetchUsersIpsResponseDto extends createZodDto(FetchUsersIpsCommand.ResponseSchema) {}
 
-export class FetchUsersIpsResultRequestDto extends createZodDto(
-    FetchUsersIpsResultCommand.RequestSchema,
+export class FetchUsersIpsResultParamDto extends createZodDto(
+    FetchUsersIpsResultCommand.RequestParamSchema,
 ) {}
 
 export class FetchUsersIpsResultResponseDto extends createZodDto(

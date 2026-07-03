@@ -2,13 +2,7 @@ import { CONTROLLERS_INFO, NODES_CONTROLLER } from '@contract/api';
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiCreatedResponse,
-    ApiOkResponse,
-    ApiParam,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -23,11 +17,11 @@ import {
     DeleteNodeCommand,
     DisableNodeCommand,
     EnableNodeCommand,
-    GetAllNodesCommand,
-    GetAllNodesTagsCommand,
-    GetOneNodeCommand,
+    GetNodesCommand,
+    GetNodesTagsCommand,
+    GetNodeCommand,
     BulkNodesProfileModificationCommand,
-    ReorderNodeCommand,
+    ReorderNodesCommand,
     ResetNodeTrafficCommand,
     RestartAllNodesCommand,
     RestartNodeCommand,
@@ -37,36 +31,36 @@ import {
 } from '@libs/contracts/commands';
 
 import {
-    BulkNodesActionsRequestDto,
+    BulkNodesActionsBodyDto,
     BulkNodesActionsResponseDto,
-    BulkNodesUpdateRequestDto,
+    BulkNodesUpdateBodyDto,
     BulkNodesUpdateResponseDto,
-    CreateNodeRequestDto,
+    CreateNodeBodyDto,
     CreateNodeResponseDto,
-    DeleteNodeRequestParamDto,
+    DeleteNodeParamDto,
     DeleteNodeResponseDto,
-    DisableNodeRequestParamDto,
+    DisableNodeParamDto,
     DisableNodeResponseDto,
     EnableNodeResponseDto,
-    GetAllNodesResponseDto,
-    GetAllNodesTagsResponseDto,
-    GetOneNodeRequestParamDto,
-    GetOneNodeResponseDto,
-    ProfileModificationRequestDto,
+    GetNodesResponseDto,
+    GetNodesTagsResponseDto,
+    GetNodeParamDto,
+    GetNodeResponseDto,
+    ProfileModificationBodyDto,
     ProfileModificationResponseDto,
-    ReorderNodeRequestDto,
-    ReorderNodeResponseDto,
-    ResetNodeTrafficRequestDto,
+    ReorderNodesBodyDto,
+    ResetNodeTrafficParamDto,
     ResetNodeTrafficResponseDto,
-    RestartAllNodesRequestBodyDto,
     RestartAllNodesResponseDto,
-    RestartNodeRequestDto,
-    RestartNodeRequestBodyDto,
+    RestartNodeParamDto,
+    RestartNodeBodyDto,
     RestartNodeResponseDto,
-    UpdateNodeRequestDto,
     UpdateNodeResponseDto,
+    EnableNodeParamDto,
+    UpdateNodeBodyDto,
+    RestartAllNodesBodyDto,
+    ReorderNodesResponseDto,
 } from './dtos';
-import { EnableNodeRequestParamDto } from './dtos';
 import { GetAllNodesTagsResponseModel } from './models';
 import { NodesService } from './nodes.service';
 
@@ -81,14 +75,14 @@ export class NodesController {
     constructor(private readonly nodesService: NodesService) {}
 
     @ApiOkResponse({
-        type: GetAllNodesTagsResponseDto,
+        type: GetNodesTagsResponseDto,
         description: 'Nodes tags fetched',
     })
     @Endpoint({
-        command: GetAllNodesTagsCommand,
+        command: GetNodesTagsCommand,
         httpCode: HttpStatus.OK,
     })
-    async getAllNodesTags(): Promise<GetAllNodesTagsResponseDto> {
+    async getNodesTags(): Promise<GetNodesTagsResponseDto> {
         const res = await this.nodesService.getAllNodesTags();
         const data = errorHandler(res);
         return {
@@ -103,9 +97,8 @@ export class NodesController {
     @Endpoint({
         command: CreateNodeCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: CreateNodeRequestDto,
     })
-    async createNode(@Body() body: CreateNodeRequestDto): Promise<CreateNodeResponseDto> {
+    async createNode(@Body() body: CreateNodeBodyDto): Promise<CreateNodeResponseDto> {
         const result = await this.nodesService.createNode(body);
 
         const data = errorHandler(result);
@@ -115,14 +108,14 @@ export class NodesController {
     }
 
     @ApiOkResponse({
-        type: GetAllNodesResponseDto,
+        type: GetNodesResponseDto,
         description: 'Nodes fetched',
     })
     @Endpoint({
-        command: GetAllNodesCommand,
+        command: GetNodesCommand,
         httpCode: HttpStatus.OK,
     })
-    async getAllNodes(): Promise<GetAllNodesResponseDto> {
+    async getNodes(): Promise<GetNodesResponseDto> {
         const res = await this.nodesService.getAllNodes();
         const data = errorHandler(res);
         return {
@@ -131,15 +124,14 @@ export class NodesController {
     }
 
     @ApiOkResponse({
-        type: GetOneNodeResponseDto,
+        type: GetNodeResponseDto,
         description: 'Node fetched',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node UUID' })
     @Endpoint({
-        command: GetOneNodeCommand,
+        command: GetNodeCommand,
         httpCode: HttpStatus.OK,
     })
-    async getOneNode(@Param() uuid: GetOneNodeRequestParamDto): Promise<GetOneNodeResponseDto> {
+    async getNode(@Param() uuid: GetNodeParamDto): Promise<GetNodeResponseDto> {
         const res = await this.nodesService.getOneNode(uuid.uuid);
         const data = errorHandler(res);
         return {
@@ -151,13 +143,12 @@ export class NodesController {
         type: EnableNodeResponseDto,
         description: 'Node enabled',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node UUID' })
     @Endpoint({
         command: EnableNodeCommand,
         httpCode: HttpStatus.OK,
     })
-    async enableNode(@Param() uuid: EnableNodeRequestParamDto): Promise<EnableNodeResponseDto> {
-        const res = await this.nodesService.enableNode(uuid.uuid);
+    async enableNode(@Param() param: EnableNodeParamDto): Promise<EnableNodeResponseDto> {
+        const res = await this.nodesService.enableNode(param.uuid);
         const data = errorHandler(res);
         return {
             response: data,
@@ -168,13 +159,12 @@ export class NodesController {
         type: DisableNodeResponseDto,
         description: 'Node disabled',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node UUID' })
     @Endpoint({
         command: DisableNodeCommand,
         httpCode: HttpStatus.OK,
     })
-    async disableNode(@Param() uuid: DisableNodeRequestParamDto): Promise<DisableNodeResponseDto> {
-        const res = await this.nodesService.disableNode(uuid.uuid);
+    async disableNode(@Param() param: DisableNodeParamDto): Promise<DisableNodeResponseDto> {
+        const res = await this.nodesService.disableNode(param.uuid);
         const data = errorHandler(res);
         return {
             response: data,
@@ -185,13 +175,12 @@ export class NodesController {
         type: DeleteNodeResponseDto,
         description: 'Node deleted',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node UUID' })
     @Endpoint({
         command: DeleteNodeCommand,
         httpCode: HttpStatus.OK,
     })
-    async deleteNode(@Param() uuid: DeleteNodeRequestParamDto): Promise<DeleteNodeResponseDto> {
-        const res = await this.nodesService.deleteNode(uuid.uuid);
+    async deleteNode(@Param() param: DeleteNodeParamDto): Promise<DeleteNodeResponseDto> {
+        const res = await this.nodesService.deleteNode(param.uuid);
         const data = errorHandler(res);
         return {
             response: data,
@@ -205,9 +194,8 @@ export class NodesController {
     @Endpoint({
         command: UpdateNodeCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateNodeRequestDto,
     })
-    async updateNode(@Body() body: UpdateNodeRequestDto): Promise<UpdateNodeResponseDto> {
+    async updateNode(@Body() body: UpdateNodeBodyDto): Promise<UpdateNodeResponseDto> {
         const res = await this.nodesService.updateNode(body);
         const data = errorHandler(res);
         return {
@@ -219,16 +207,15 @@ export class NodesController {
         type: RestartNodeResponseDto,
         description: 'Node restarted',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node UUID' })
     @Endpoint({
         command: RestartNodeCommand,
         httpCode: HttpStatus.OK,
     })
     async restartNode(
-        @Param() uuid: RestartNodeRequestDto,
-        @Body() body: RestartNodeRequestBodyDto,
+        @Param() param: RestartNodeParamDto,
+        @Body() body: RestartNodeBodyDto,
     ): Promise<RestartNodeResponseDto> {
-        const res = await this.nodesService.restartNode(uuid.uuid, body.forceRestart);
+        const res = await this.nodesService.restartNode(param.uuid, body.forceRestart);
         const data = errorHandler(res);
         return {
             response: data,
@@ -239,15 +226,14 @@ export class NodesController {
         type: ResetNodeTrafficResponseDto,
         description: 'Event sent',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node UUID' })
     @Endpoint({
         command: ResetNodeTrafficCommand,
         httpCode: HttpStatus.OK,
     })
     async resetNodeTraffic(
-        @Param() uuid: ResetNodeTrafficRequestDto,
+        @Param() param: ResetNodeTrafficParamDto,
     ): Promise<ResetNodeTrafficResponseDto> {
-        const res = await this.nodesService.resetNodeTraffic(uuid.uuid);
+        const res = await this.nodesService.resetNodeTraffic(param.uuid);
         const data = errorHandler(res);
         return {
             response: data,
@@ -263,9 +249,9 @@ export class NodesController {
         httpCode: HttpStatus.OK,
     })
     async restartAllNodes(
-        @Body() { forceRestart }: RestartAllNodesRequestBodyDto,
+        @Body() body: RestartAllNodesBodyDto,
     ): Promise<RestartAllNodesResponseDto> {
-        const res = await this.nodesService.restartAllNodes(forceRestart);
+        const res = await this.nodesService.restartAllNodes(body.forceRestart);
         const data = errorHandler(res);
         return {
             response: data,
@@ -273,15 +259,14 @@ export class NodesController {
     }
 
     @ApiOkResponse({
-        type: ReorderNodeResponseDto,
+        type: ReorderNodesResponseDto,
         description: 'Nodes reordered successfully',
     })
     @Endpoint({
-        command: ReorderNodeCommand,
+        command: ReorderNodesCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ReorderNodeRequestDto,
     })
-    async reorderNodes(@Body() body: ReorderNodeRequestDto): Promise<ReorderNodeResponseDto> {
+    async reorderNodes(@Body() body: ReorderNodesBodyDto): Promise<ReorderNodesResponseDto> {
         const result = await this.nodesService.reorderNodes(body);
 
         const data = errorHandler(result);
@@ -297,10 +282,9 @@ export class NodesController {
     @Endpoint({
         command: BulkNodesProfileModificationCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ProfileModificationRequestDto,
     })
     async profileModification(
-        @Body() body: ProfileModificationRequestDto,
+        @Body() body: ProfileModificationBodyDto,
     ): Promise<ProfileModificationResponseDto> {
         const result = await this.nodesService.profileModification(body);
 
@@ -317,10 +301,9 @@ export class NodesController {
     @Endpoint({
         command: BulkNodesActionsCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkNodesActionsRequestDto,
     })
     async bulkNodesActions(
-        @Body() body: BulkNodesActionsRequestDto,
+        @Body() body: BulkNodesActionsBodyDto,
     ): Promise<BulkNodesActionsResponseDto> {
         const result = await this.nodesService.bulkNodesActions(body);
 
@@ -337,10 +320,9 @@ export class NodesController {
     @Endpoint({
         command: BulkNodesUpdateCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkNodesUpdateRequestDto,
     })
     async bulkNodesUpdate(
-        @Body() body: BulkNodesUpdateRequestDto,
+        @Body() body: BulkNodesUpdateBodyDto,
     ): Promise<BulkNodesUpdateResponseDto> {
         const result = await this.nodesService.bulkNodesUpdate(body);
 

@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, SUBSCRIPTION_TEMPLATE_CONTROLLER } from '@contract/ap
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -22,18 +22,18 @@ import {
 } from '@libs/contracts/commands';
 
 import {
-    CreateSubscriptionTemplateRequestDto,
+    CreateSubscriptionTemplateBodyDto,
     CreateSubscriptionTemplateResponseDto,
-    DeleteSubscriptionTemplateRequestDto,
+    DeleteSubscriptionTemplateParamDto,
     DeleteSubscriptionTemplateResponseDto,
-    GetTemplateRequestDto,
+    GetTemplateParamDto,
     GetTemplateResponseDto,
     GetTemplatesResponseDto,
-    ReorderSubscriptionTemplatesRequestDto,
+    ReorderSubscriptionTemplatesBodyDto,
     ReorderSubscriptionTemplatesResponseDto,
     UpdateTemplateResponseDto,
+    UpdateTemplateBodyDto,
 } from './dtos/subscription-templates.dtos';
-import { UpdateTemplateRequestDto } from './dtos/subscription-templates.dtos';
 import { SubscriptionTemplateService } from './subscription-template.service';
 
 @ApiBearerAuth('Authorization')
@@ -67,16 +67,12 @@ export class SubscriptionTemplateController {
         type: GetTemplateResponseDto,
         description: 'Template retrieved successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Template UUID' })
     @Endpoint({
         command: GetSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
     })
-    async getTemplateByUuid(
-        @Param() paramData: GetTemplateRequestDto,
-    ): Promise<GetTemplateResponseDto> {
-        const { uuid } = paramData;
-        const result = await this.subscriptionTemplateService.getTemplateByUuid(uuid);
+    async getTemplateByUuid(@Param() param: GetTemplateParamDto): Promise<GetTemplateResponseDto> {
+        const result = await this.subscriptionTemplateService.getTemplateByUuid(param.uuid);
         const data = errorHandler(result);
         return {
             response: data,
@@ -90,11 +86,8 @@ export class SubscriptionTemplateController {
     @Endpoint({
         command: UpdateSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateTemplateRequestDto,
     })
-    async updateTemplate(
-        @Body() body: UpdateTemplateRequestDto,
-    ): Promise<UpdateTemplateResponseDto> {
+    async updateTemplate(@Body() body: UpdateTemplateBodyDto): Promise<UpdateTemplateResponseDto> {
         const result = await this.subscriptionTemplateService.updateTemplate(
             body.uuid,
             body.name?.trim() ?? undefined,
@@ -112,15 +105,14 @@ export class SubscriptionTemplateController {
         type: DeleteSubscriptionTemplateResponseDto,
         description: 'Template deleted successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Template UUID' })
     @Endpoint({
         command: DeleteSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
     })
     async deleteTemplate(
-        @Param() paramData: DeleteSubscriptionTemplateRequestDto,
+        @Param() param: DeleteSubscriptionTemplateParamDto,
     ): Promise<DeleteSubscriptionTemplateResponseDto> {
-        const result = await this.subscriptionTemplateService.deleteTemplate(paramData.uuid);
+        const result = await this.subscriptionTemplateService.deleteTemplate(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -135,10 +127,9 @@ export class SubscriptionTemplateController {
     @Endpoint({
         command: CreateSubscriptionTemplateCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: CreateSubscriptionTemplateRequestDto,
     })
     async createTemplate(
-        @Body() body: CreateSubscriptionTemplateRequestDto,
+        @Body() body: CreateSubscriptionTemplateBodyDto,
     ): Promise<CreateSubscriptionTemplateResponseDto> {
         const result = await this.subscriptionTemplateService.createTemplate(
             body.name,
@@ -158,10 +149,9 @@ export class SubscriptionTemplateController {
     @Endpoint({
         command: ReorderSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ReorderSubscriptionTemplatesRequestDto,
     })
     async reorderSubscriptionTemplates(
-        @Body() body: ReorderSubscriptionTemplatesRequestDto,
+        @Body() body: ReorderSubscriptionTemplatesBodyDto,
     ): Promise<ReorderSubscriptionTemplatesResponseDto> {
         const result = await this.subscriptionTemplateService.reorderSubscriptionTemplates(body);
 

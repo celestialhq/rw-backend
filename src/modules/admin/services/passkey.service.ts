@@ -18,7 +18,7 @@ import { PasskeyEntity } from '@modules/admin/entities';
 import { IJWTAuthPayload } from '@modules/auth/interfaces';
 import { GetCachedRemnawaveSettingsQuery } from '@modules/remnawave-settings/queries/get-cached-remnawave-settings';
 
-import { UpdatePasskeyRequestDto, VerifyPasskeyRegistrationRequestDto } from '../dtos';
+import { UpdatePasskeyBodyDto, VerifyPasskeyRegistrationBodyDto } from '../dtos';
 import { GetActivePasskeysResponseModel } from '../models/get-active-passkeys.model';
 import { AdminRepository } from '../repositories/admin.repository';
 import { PasskeyRepository } from '../repositories/passkey.repository';
@@ -100,7 +100,7 @@ export class PasskeyService {
 
     public async verifyPasskeyRegistration(
         jwtPayload: IJWTAuthPayload,
-        dto: VerifyPasskeyRegistrationRequestDto,
+        dto: VerifyPasskeyRegistrationBodyDto,
     ): Promise<TResult<{ verified: boolean; message: string }>> {
         try {
             const response = dto.response as unknown as RegistrationResponseJSON;
@@ -243,7 +243,7 @@ export class PasskeyService {
 
     public async updatePasskey(
         jwtPayload: IJWTAuthPayload,
-        dto: UpdatePasskeyRequestDto,
+        dto: UpdatePasskeyBodyDto,
     ): Promise<TResult<GetActivePasskeysResponseModel>> {
         try {
             const { uuid } = jwtPayload;

@@ -14,11 +14,9 @@ export namespace FetchUsersIpsResultCommand {
         { scope: 'fetch-users-ips-result', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         jobId: z.string(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -50,5 +48,6 @@ export namespace FetchUsersIpsResultCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

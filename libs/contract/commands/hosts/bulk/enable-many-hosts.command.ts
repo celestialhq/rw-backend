@@ -15,15 +15,14 @@ export namespace BulkEnableHostsCommand {
         { scope: 'bulk-enable', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuids: z.array(z.string().uuid()),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.array(HostsSchema),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

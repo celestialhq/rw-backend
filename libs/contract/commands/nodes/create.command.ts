@@ -14,7 +14,7 @@ export namespace CreateNodeCommand {
         { scope: 'create', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         name: z.string().min(3, 'Minimum 3 characters!').max(30, 'Maximum 30 characters!'),
         address: z.string().min(2, 'Minimum 2 characters!'),
         port: z
@@ -92,11 +92,10 @@ export namespace CreateNodeCommand {
         note: z.optional(z.string().max(255, 'Note must be less than 255 characters')),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: NodesSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

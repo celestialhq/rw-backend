@@ -14,11 +14,9 @@ export namespace FetchUsersIpsCommand {
         { scope: 'fetch-users-ips', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
-        nodeUuid: z.string().uuid(),
+    export const RequestParamSchema = z.object({
+        nodeUuid: z.string().uuid().describe('Node UUID'),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -26,5 +24,6 @@ export namespace FetchUsersIpsCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

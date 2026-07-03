@@ -16,7 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
-import { patchNestJsSwagger, ZodValidationPipe } from 'nestjs-zod';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { createLogger } from 'winston';
 import * as winston from 'winston';
 
@@ -30,8 +30,6 @@ import { AppModule } from '../../app.module';
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
 dayjs.extend(timezone);
-
-patchNestJsSwagger();
 
 // const levels = {
 //     error: 0,

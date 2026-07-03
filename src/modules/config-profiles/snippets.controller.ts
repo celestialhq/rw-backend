@@ -26,12 +26,12 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    CreateSnippetRequestDto,
+    CreateSnippetBodyDto,
     CreateSnippetResponseDto,
-    DeleteSnippetRequestDto,
+    DeleteSnippetBodyDto,
     DeleteSnippetResponseDto,
     GetSnippetsResponseDto,
-    UpdateSnippetRequestDto,
+    UpdateSnippetBodyDto,
     UpdateSnippetResponseDto,
 } from './dtos';
 import { SnippetsService } from './snippets.service';
@@ -75,7 +75,7 @@ export class SnippetsController {
         httpCode: HttpStatus.OK,
     })
     async deleteSnippetByName(
-        @Body() deleteSnippetByNameDto: DeleteSnippetRequestDto,
+        @Body() deleteSnippetByNameDto: DeleteSnippetBodyDto,
     ): Promise<DeleteSnippetResponseDto> {
         const result = await this.snippetsService.deleteSnippetByName(deleteSnippetByNameDto.name);
 
@@ -97,7 +97,7 @@ export class SnippetsController {
         httpCode: HttpStatus.CREATED,
     })
     async createSnippet(
-        @Body() createSnippetDto: CreateSnippetRequestDto,
+        @Body() createSnippetDto: CreateSnippetBodyDto,
     ): Promise<CreateSnippetResponseDto> {
         const result = await this.snippetsService.createSnippet(
             createSnippetDto.name,
@@ -125,7 +125,7 @@ export class SnippetsController {
         httpCode: HttpStatus.OK,
     })
     async updateSnippet(
-        @Body() updateSnippetDto: UpdateSnippetRequestDto,
+        @Body() updateSnippetDto: UpdateSnippetBodyDto,
     ): Promise<UpdateSnippetResponseDto> {
         const result = await this.snippetsService.updateSnippet(
             updateSnippetDto.name,

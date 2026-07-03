@@ -12,39 +12,43 @@ import {
     BulkUpdateUsersSquadsCommand,
 } from '@libs/contracts/commands';
 
-export class BulkResetTrafficUsersRequestDto extends createZodDto(
-    BulkResetTrafficUsersCommand.RequestSchema,
+export class BulkResetTrafficUsersBodyDto extends createZodDto(
+    BulkResetTrafficUsersCommand.RequestBodySchema,
 ) {}
 export class BulkResetTrafficUsersResponseDto extends createZodDto(
     BulkResetTrafficUsersCommand.ResponseSchema,
 ) {}
 
-export class BulkRevokeUsersSubscriptionRequestDto extends createZodDto(
-    BulkRevokeUsersSubscriptionCommand.RequestSchema,
+export class BulkRevokeUsersSubscriptionBodyDto extends createZodDto(
+    BulkRevokeUsersSubscriptionCommand.RequestBodySchema,
 ) {}
 export class BulkRevokeUsersSubscriptionResponseDto extends createZodDto(
     BulkRevokeUsersSubscriptionCommand.ResponseSchema,
 ) {}
 
-export class BulkDeleteUsersRequestDto extends createZodDto(BulkDeleteUsersCommand.RequestSchema) {}
+export class BulkDeleteUsersBodyDto extends createZodDto(
+    BulkDeleteUsersCommand.RequestBodySchema,
+) {}
 export class BulkDeleteUsersResponseDto extends createZodDto(
     BulkDeleteUsersCommand.ResponseSchema,
 ) {}
 
-export class BulkUpdateUsersRequestDto extends createZodDto(BulkUpdateUsersCommand.RequestSchema) {}
+export class BulkUpdateUsersBodyDto extends createZodDto(
+    BulkUpdateUsersCommand.RequestBodySchema,
+) {}
 export class BulkUpdateUsersResponseDto extends createZodDto(
     BulkUpdateUsersCommand.ResponseSchema,
 ) {}
 
-export class BulkUpdateUsersSquadsRequestDto extends createZodDto(
-    BulkUpdateUsersSquadsCommand.RequestSchema,
+export class BulkUpdateUsersSquadsBodyDto extends createZodDto(
+    BulkUpdateUsersSquadsCommand.RequestBodySchema,
 ) {}
 export class BulkUpdateUsersSquadsResponseDto extends createZodDto(
     BulkUpdateUsersSquadsCommand.ResponseSchema,
 ) {}
 
-export class BulkAllUpdateUsersRequestDto extends createZodDto(
-    BulkAllUpdateUsersCommand.RequestSchema,
+export class BulkAllUpdateUsersBodyDto extends createZodDto(
+    BulkAllUpdateUsersCommand.RequestBodySchema,
 ) {}
 export class BulkAllUpdateUsersResponseDto extends createZodDto(
     BulkAllUpdateUsersCommand.ResponseSchema,
@@ -54,15 +58,15 @@ export class BulkAllResetTrafficUsersResponseDto extends createZodDto(
     BulkAllResetTrafficUsersCommand.ResponseSchema,
 ) {}
 
-export class BulkAllExtendExpirationDateRequestDto extends createZodDto(
-    BulkAllExtendExpirationDateCommand.RequestSchema,
+export class BulkAllExtendExpirationDateBodyDto extends createZodDto(
+    BulkAllExtendExpirationDateCommand.RequestBodySchema,
 ) {}
 export class BulkAllExtendExpirationDateResponseDto extends createZodDto(
     BulkAllExtendExpirationDateCommand.ResponseSchema,
 ) {}
 
-export class BulkExtendExpirationDateRequestDto extends createZodDto(
-    BulkExtendExpirationDateCommand.RequestSchema,
+export class BulkExtendExpirationDateBodyDto extends createZodDto(
+    BulkExtendExpirationDateCommand.RequestBodySchema,
 ) {}
 export class BulkExtendExpirationDateResponseDto extends createZodDto(
     BulkExtendExpirationDateCommand.ResponseSchema,

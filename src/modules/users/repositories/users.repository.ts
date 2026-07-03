@@ -11,12 +11,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { TxKyselyService } from '@common/database/tx-kysely.service';
 import { getKyselyUuid, paginateQuery } from '@common/helpers/kysely';
 import { formatExecutionTime, getTime } from '@common/utils/get-elapsed-time';
-import { GetAllUsersCommand, GetUsersStreamCommand } from '@libs/contracts/commands';
 
 import { ConfigProfileInboundEntity } from '@modules/config-profiles/entities';
 
 import { BulkDeleteByStatusBuilder, BulkUpdateUserUsedTrafficBuilder } from '../builders';
 import { TriggerThresholdNotificationsBuilder } from '../builders/trigger-threshold-notifications-builder';
+import { GetUsersQueryDto, GetUsersStreamQueryDto } from '../dtos';
 import {
     BaseUserEntity,
     UserForConfigEntity,
@@ -206,7 +206,7 @@ export class UsersRepository {
         filters,
         filterModes,
         sorting,
-    }: GetAllUsersCommand.RequestQuery): Promise<[UserEntity[], number]> {
+    }: GetUsersQueryDto): Promise<[UserEntity[], number]> {
         let qb = this.baseUsersQb.selectAll().select((eb) => this.includeActiveInternalSquads(eb));
 
         if (filters?.length) {
@@ -242,7 +242,7 @@ export class UsersRepository {
         return [rows.map((u) => new UserEntity(u)), count];
     }
 
-    public async getUsersStream({ cursor, size }: GetUsersStreamCommand.RequestQuery): Promise<{
+    public async getUsersStream({ cursor, size }: GetUsersStreamQueryDto): Promise<{
         users: UserEntity[];
         nextCursor: string | null;
         hasMore: boolean;
@@ -272,8 +272,8 @@ export class UsersRepository {
 
     private applyUsersFilters(
         qb: any,
-        filters: GetAllUsersCommand.RequestQuery['filters'],
-        filterModes?: GetAllUsersCommand.RequestQuery['filterModes'],
+        filters: GetUsersQueryDto['filters'],
+        filterModes?: GetUsersQueryDto['filterModes'],
     ) {
         for (const filter of filters ?? []) {
             if (!(filter.id in USERS_FILTER_COLUMN_MAP)) continue;
@@ -403,7 +403,10 @@ export class UsersRepository {
     public async getUsersWithPagination({
         start,
         size,
-    }: GetAllUsersCommand.RequestQuery): Promise<[UserEntity[], number]> {
+    }: {
+        start: number;
+        size: number;
+    }): Promise<[UserEntity[], number]> {
         const [users, total] = await Promise.all([
             this.qb.kysely
                 .selectFrom('users')

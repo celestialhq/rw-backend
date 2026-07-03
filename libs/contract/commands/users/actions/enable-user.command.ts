@@ -15,15 +15,14 @@ export namespace EnableUserCommand {
         { scope: 'enable', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         uuid: z.string().uuid(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: ExtendedUsersSchema,
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

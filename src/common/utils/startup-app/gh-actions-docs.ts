@@ -1,3 +1,4 @@
+import { cleanupOpenApiDoc } from 'nestjs-zod';
 import fs from 'node:fs';
 import { readPackageJSON } from 'pkg-types';
 
@@ -6,6 +7,7 @@ import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 
 import { CONTROLLERS_INFO } from '@libs/contracts/api/controllers-info';
+import { ERRORS } from '@libs/contracts/constants';
 
 import {
     RemnawaveWebhookCrmEventsDto,
@@ -52,7 +54,56 @@ export async function ghActionsDocs(app: INestApplication<unknown>) {
         )
         .setDescription(description)
         .setVersion(pkg.version!)
-        .setLicense('AGPL-3.0', 'https://github.com/remnawave/panel?tab=AGPL-3.0-1-ov-file');
+        .setLicense('AGPL-3.0', 'https://github.com/remnawave/panel?tab=AGPL-3.0-1-ov-file')
+        .addGlobalResponse({
+            status: 500,
+            description: ERRORS.INTERNAL_SERVER_ERROR.message,
+            schema: {
+                type: 'object',
+                properties: {
+                    timestamp: { type: 'string' },
+                    path: { type: 'string' },
+                    message: { type: 'string' },
+                    errorCode: { type: 'string' },
+                },
+            },
+        })
+        .addGlobalResponse({
+            status: 400,
+            description: 'Validation error',
+            schema: {
+                type: 'object',
+                properties: {
+                    message: { type: 'string' },
+                    statusCode: { type: 'number', example: 400 },
+                    errors: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                validation: { type: 'string', example: 'uuid' },
+                                code: { type: 'string', example: 'invalid_string' },
+                                message: { type: 'string', example: 'Invalid uuid' },
+                                path: {
+                                    type: 'array',
+                                    items: { type: 'string' },
+                                    example: ['uuid'],
+                                },
+                            },
+                            required: ['validation', 'code', 'message', 'path'],
+                        },
+                        example: [
+                            {
+                                validation: 'uuid',
+                                code: 'invalid_string',
+                                message: 'Invalid uuid',
+                                path: ['uuid'],
+                            },
+                        ],
+                    },
+                },
+            },
+        });
 
     Object.values(CONTROLLERS_INFO).reduce((builder, { tag, description }) => {
         return builder.addTag(tag, description);
@@ -75,5 +126,5 @@ export async function ghActionsDocs(app: INestApplication<unknown>) {
 
     const document = documentFactory();
 
-    fs.writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+    fs.writeFileSync('./openapi.json', JSON.stringify(cleanupOpenApiDoc(document), null, 2));
 }

@@ -41,8 +41,7 @@ import { GetUsersRecapQuery } from '@modules/users/queries/get-users-recap';
 import { GetSumByDtRangeQuery } from '../nodes-usage-history/queries/get-sum-by-dt-range';
 import { ShortUserStats } from '../users/interfaces/user-stats.interface';
 import { GetShortUserStatsQuery } from '../users/queries/get-short-user-stats';
-import { DebugSrrMatcherRequestDto } from './dtos';
-import { GetStatsRequestQueryDto } from './dtos/get-stats.dto';
+import { DebugSrrMatcherBodyDto, GetStatsQueryDto } from './dtos';
 import { InboundStats, Metric, NodeMetrics, OutboundStats } from './interfaces';
 import {
     GenerateX25519ResponseModel,
@@ -141,7 +140,7 @@ export class SystemService implements OnApplicationBootstrap {
     }
 
     public async getBandwidthStats(
-        query: GetStatsRequestQueryDto,
+        query: GetStatsQueryDto,
     ): Promise<TResult<GetBandwidthStatsResponseModel>> {
         try {
             let tz = 'UTC';
@@ -274,7 +273,7 @@ export class SystemService implements OnApplicationBootstrap {
     public async debugSrrMatcher(
         request: Request,
         response: Response,
-        body: DebugSrrMatcherRequestDto,
+        body: DebugSrrMatcherBodyDto,
     ): Promise<Response> {
         try {
             const parsedResponseRules = await this.srrParser.parseConfig(body.responseRules);

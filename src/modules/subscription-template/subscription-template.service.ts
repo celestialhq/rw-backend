@@ -15,7 +15,7 @@ import {
     DEFAULT_TEMPLATE_STASH,
     DEFAULT_TEMPLATE_XRAY_JSON,
 } from './constants';
-import { ReorderSubscriptionTemplatesRequestDto } from './dtos';
+import { ReorderSubscriptionTemplatesBodyDto } from './dtos';
 import { SubscriptionTemplateEntity } from './entities/subscription-template.entity';
 import { DeleteSubscriptionTemplateResponseModel } from './models';
 import { BaseTemplateResponseModel } from './models/base-template.response.model';
@@ -254,7 +254,7 @@ export class SubscriptionTemplateService {
     }
 
     public async reorderSubscriptionTemplates(
-        dto: ReorderSubscriptionTemplatesRequestDto,
+        dto: ReorderSubscriptionTemplatesBodyDto,
     ): Promise<TResult<GetSubscriptionTemplatesResponseModel>> {
         try {
             await this.subscriptionTemplateRepository.reorderMany(dto.items);

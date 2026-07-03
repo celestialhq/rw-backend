@@ -14,7 +14,7 @@ export namespace BulkExtendExpirationDateCommand {
         { scope: 'bulk-extend-expiration-date', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuids: z
             .array(z.string().uuid())
             .min(1, 'Must be at least 1 user UUID')
@@ -27,13 +27,12 @@ export namespace BulkExtendExpirationDateCommand {
             .max(9999, 'Maximum 9999 days'),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             affectedRows: z.number(),
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

@@ -9,7 +9,7 @@ import { ERRORS } from '@libs/contracts/constants/errors';
 import { NodesQueuesService } from '@queue/_nodes';
 import { SquadsQueueService } from '@queue/_squads';
 
-import { ReorderInternalSquadsRequestDto } from './dtos';
+import { ReorderInternalSquadsBodyDto } from './dtos';
 import { InternalSquadEntity } from './entities/internal-squad.entity';
 import { GetInternalSquadAccessibleNodesResponseModel } from './models';
 import { DeleteInternalSquadResponseModel } from './models/delete-internal-squad-by-uuid.response.model';
@@ -310,7 +310,7 @@ export class InternalSquadService {
     }
 
     public async reorderInternalSquads(
-        dto: ReorderInternalSquadsRequestDto,
+        dto: ReorderInternalSquadsBodyDto,
     ): Promise<TResult<GetInternalSquadsResponseModel>> {
         try {
             await this.internalSquadRepository.reorderMany(dto.items);

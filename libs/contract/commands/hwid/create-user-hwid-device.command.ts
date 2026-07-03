@@ -15,7 +15,7 @@ export namespace CreateUserHwidDeviceCommand {
         { scope: 'create', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         hwid: z.string(),
         userUuid: z.string().uuid(),
         platform: z.optional(z.string()),
@@ -25,8 +25,6 @@ export namespace CreateUserHwidDeviceCommand {
         requestIp: z.optional(z.string()),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             total: z.number(),
@@ -34,5 +32,6 @@ export namespace CreateUserHwidDeviceCommand {
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

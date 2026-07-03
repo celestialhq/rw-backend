@@ -32,8 +32,6 @@ export namespace GetUsersStreamCommand {
             .default(250),
     });
 
-    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             users: z.array(ExtendedUsersSchema),
@@ -45,5 +43,6 @@ export namespace GetUsersStreamCommand {
         }),
     });
 
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

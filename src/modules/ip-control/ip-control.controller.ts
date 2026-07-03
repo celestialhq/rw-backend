@@ -1,11 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiParam,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -26,15 +20,15 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    FetchIpsRequestDto,
+    FetchIpsBodyParamDto,
     FetchIpsResponseDto,
-    FetchIpsResultRequestDto,
+    FetchIpsResultParamDto,
     FetchIpsResultResponseDto,
-    DropConnectionsRequestDto,
+    DropConnectionsBodyDto,
     DropConnectionsResponseDto,
     FetchUsersIpsResponseDto,
-    FetchUsersIpsRequestDto,
-    FetchUsersIpsResultRequestDto,
+    FetchUsersIpsParamDto,
+    FetchUsersIpsResultParamDto,
     FetchUsersIpsResultResponseDto,
 } from './dtos';
 import { IpControlService } from './ip-control.service';
@@ -56,13 +50,12 @@ export class IpControlController {
         type: FetchIpsResponseDto,
         description: 'Return jobId for further processing',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: FetchIpsCommand,
         httpCode: HttpStatus.CREATED,
     })
-    async fetchUserIps(@Param() paramData: FetchIpsRequestDto): Promise<FetchIpsResponseDto> {
-        const result = await this.ipControlService.fetchUserIps(paramData.uuid);
+    async fetchUserIps(@Param() param: FetchIpsBodyParamDto): Promise<FetchIpsResponseDto> {
+        const result = await this.ipControlService.fetchUserIps(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -77,15 +70,14 @@ export class IpControlController {
         type: FetchIpsResultResponseDto,
         description: 'Return result or status of the job',
     })
-    @ApiParam({ name: 'jobId', type: String, description: 'Job ID', required: true })
     @Endpoint({
         command: FetchIpsResultCommand,
         httpCode: HttpStatus.OK,
     })
     async getFetchIpsResult(
-        @Param() paramData: FetchIpsResultRequestDto,
+        @Param() param: FetchIpsResultParamDto,
     ): Promise<FetchIpsResultResponseDto> {
-        const result = await this.ipControlService.getFetchIpsResult(paramData.jobId);
+        const result = await this.ipControlService.getFetchIpsResult(param.jobId);
 
         const data = errorHandler(result);
         return {
@@ -103,12 +95,11 @@ export class IpControlController {
     @Endpoint({
         command: DropConnectionsCommand,
         httpCode: HttpStatus.OK,
-        apiBody: DropConnectionsRequestDto,
     })
     async dropConnections(
-        @Body() bodyData: DropConnectionsRequestDto,
+        @Body() body: DropConnectionsBodyDto,
     ): Promise<DropConnectionsResponseDto> {
-        const result = await this.ipControlService.dropConnections(bodyData);
+        const result = await this.ipControlService.dropConnections(body);
 
         const data = errorHandler(result);
         return {
@@ -123,15 +114,12 @@ export class IpControlController {
         type: FetchUsersIpsResponseDto,
         description: 'Return jobId for further processing',
     })
-    @ApiParam({ name: 'nodeUuid', type: String, description: 'UUID of the node', required: true })
     @Endpoint({
         command: FetchUsersIpsCommand,
         httpCode: HttpStatus.CREATED,
     })
-    async fetchUsersIps(
-        @Param() paramData: FetchUsersIpsRequestDto,
-    ): Promise<FetchUsersIpsResponseDto> {
-        const result = await this.ipControlService.fetchUsersIps(paramData.nodeUuid);
+    async fetchUsersIps(@Param() param: FetchUsersIpsParamDto): Promise<FetchUsersIpsResponseDto> {
+        const result = await this.ipControlService.fetchUsersIps(param.nodeUuid);
 
         const data = errorHandler(result);
         return {
@@ -146,15 +134,14 @@ export class IpControlController {
         type: FetchUsersIpsResultResponseDto,
         description: 'Return result or status of the job',
     })
-    @ApiParam({ name: 'jobId', type: String, description: 'Job ID', required: true })
     @Endpoint({
         command: FetchUsersIpsResultCommand,
         httpCode: HttpStatus.OK,
     })
     async getFetchUsersIpsResult(
-        @Param() paramData: FetchUsersIpsResultRequestDto,
+        @Param() param: FetchUsersIpsResultParamDto,
     ): Promise<FetchUsersIpsResultResponseDto> {
-        const result = await this.ipControlService.getFetchUsersIpsResult(paramData.jobId);
+        const result = await this.ipControlService.getFetchUsersIpsResult(param.jobId);
 
         const data = errorHandler(result);
         return {

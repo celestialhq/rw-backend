@@ -21,7 +21,7 @@ export namespace CreateHostCommand {
         { scope: 'create', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         inbound: z.object({
             configProfileUuid: z.string().uuid(),
             configProfileInboundUuid: z.string().uuid(),
@@ -95,11 +95,10 @@ export namespace CreateHostCommand {
             .describe('Optional. Subscription types from which the host will be excluded from.'),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: HostsSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

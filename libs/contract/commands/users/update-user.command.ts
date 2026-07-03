@@ -15,7 +15,7 @@ export namespace UpdateUserCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z
+    export const RequestBodySchema = z
         .object({
             username: z.optional(z.string().describe('Username of the user')),
             uuid: z.optional(
@@ -94,11 +94,10 @@ export namespace UpdateUserCommand {
             message: 'Either uuid or username must be provided',
         });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: ExtendedUsersSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

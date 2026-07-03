@@ -14,19 +14,15 @@ export namespace GetStatsNodeUsersUsageCommand {
         { scope: 'node-users-usage', kind: 'read' },
     );
 
-    export const RequestQuerySchema = z.object({
-        start: z.string().date(),
-        end: z.string().date(),
-        topUsersLimit: z.coerce.number().min(1).default(100),
-    });
-
-    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
-
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         uuid: z.string().uuid(),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
+    export const RequestQuerySchema = z.object({
+        start: z.string().date().describe('Start date (YYYY-MM-DD)'),
+        end: z.string().date().describe('End date (YYYY-MM-DD)'),
+        topUsersLimit: z.coerce.number().min(1).default(100),
+    });
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -42,5 +38,7 @@ export namespace GetStatsNodeUsersUsageCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

@@ -15,7 +15,7 @@ export namespace UpdateInfraBillingNodeCommand {
         { scope: 'update-billing-node', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuids: z.array(z.string().uuid()),
         nextBillingAt: z
             .string({
@@ -24,8 +24,6 @@ export namespace UpdateInfraBillingNodeCommand {
             .datetime({ message: 'Invalid date format', offset: true, local: true })
             .transform((str) => new Date(str)),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -41,5 +39,6 @@ export namespace UpdateInfraBillingNodeCommand {
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

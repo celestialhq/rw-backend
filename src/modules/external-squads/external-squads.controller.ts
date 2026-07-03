@@ -30,16 +30,20 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
+    AddUsersToExternalSquadParamDto,
     AddUsersToExternalSquadResponseDto,
-    CreateExternalSquadRequestDto,
+    CreateExternalSquadBodyDto,
     CreateExternalSquadResponseDto,
+    DeleteExternalSquadParamDto,
     DeleteExternalSquadResponseDto,
+    GetExternalSquadByUuidParamDto,
     GetExternalSquadByUuidResponseDto,
     GetExternalSquadsResponseDto,
+    RemoveUsersFromExternalSquadParamDto,
     RemoveUsersFromExternalSquadResponseDto,
-    ReorderExternalSquadsRequestDto,
+    ReorderExternalSquadsBodyDto,
     ReorderExternalSquadsResponseDto,
-    UpdateExternalSquadRequestDto,
+    UpdateExternalSquadBodyDto,
     UpdateExternalSquadResponseDto,
 } from './dtos';
 import { ExternalSquadService } from './external-squads.service';
@@ -80,9 +84,9 @@ export class ExternalSquadController {
         httpCode: HttpStatus.OK,
     })
     async getExternalSquadByUuid(
-        @Param('uuid') uuid: string,
+        @Param() param: GetExternalSquadByUuidParamDto,
     ): Promise<GetExternalSquadByUuidResponseDto> {
-        const result = await this.externalSquadService.getExternalSquadByUuid(uuid);
+        const result = await this.externalSquadService.getExternalSquadByUuid(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -102,11 +106,9 @@ export class ExternalSquadController {
         httpCode: HttpStatus.CREATED,
     })
     async createExternalSquad(
-        @Body() createExternalSquadDto: CreateExternalSquadRequestDto,
+        @Body() body: CreateExternalSquadBodyDto,
     ): Promise<CreateExternalSquadResponseDto> {
-        const result = await this.externalSquadService.createExternalSquad(
-            createExternalSquadDto.name,
-        );
+        const result = await this.externalSquadService.createExternalSquad(body.name);
 
         const data = errorHandler(result);
         return {
@@ -129,9 +131,9 @@ export class ExternalSquadController {
         httpCode: HttpStatus.OK,
     })
     async updateExternalSquad(
-        @Body() updateExternalSquadDto: UpdateExternalSquadRequestDto,
+        @Body() body: UpdateExternalSquadBodyDto,
     ): Promise<UpdateExternalSquadResponseDto> {
-        const result = await this.externalSquadService.updateExternalSquad(updateExternalSquadDto);
+        const result = await this.externalSquadService.updateExternalSquad(body);
 
         const data = errorHandler(result);
         return {
@@ -151,9 +153,9 @@ export class ExternalSquadController {
         httpCode: HttpStatus.OK,
     })
     async deleteExternalSquad(
-        @Param('uuid') uuid: string,
+        @Param() param: DeleteExternalSquadParamDto,
     ): Promise<DeleteExternalSquadResponseDto> {
-        const result = await this.externalSquadService.deleteExternalSquad(uuid);
+        const result = await this.externalSquadService.deleteExternalSquad(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -173,9 +175,9 @@ export class ExternalSquadController {
         httpCode: HttpStatus.OK,
     })
     async addUsersToExternalSquad(
-        @Param('uuid') uuid: string,
+        @Param() param: AddUsersToExternalSquadParamDto,
     ): Promise<AddUsersToExternalSquadResponseDto> {
-        const result = await this.externalSquadService.addUsersToExternalSquad(uuid);
+        const result = await this.externalSquadService.addUsersToExternalSquad(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -195,9 +197,9 @@ export class ExternalSquadController {
         httpCode: HttpStatus.OK,
     })
     async removeUsersFromExternalSquad(
-        @Param('uuid') uuid: string,
+        @Param() param: RemoveUsersFromExternalSquadParamDto,
     ): Promise<RemoveUsersFromExternalSquadResponseDto> {
-        const result = await this.externalSquadService.removeUsersFromExternalSquad(uuid);
+        const result = await this.externalSquadService.removeUsersFromExternalSquad(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -212,10 +214,9 @@ export class ExternalSquadController {
     @Endpoint({
         command: ReorderExternalSquadCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ReorderExternalSquadsRequestDto,
     })
     async reorderExternalSquads(
-        @Body() body: ReorderExternalSquadsRequestDto,
+        @Body() body: ReorderExternalSquadsBodyDto,
     ): Promise<ReorderExternalSquadsResponseDto> {
         const result = await this.externalSquadService.reorderExternalSquads(body);
 

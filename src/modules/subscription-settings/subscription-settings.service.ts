@@ -6,7 +6,7 @@ import { CACHE_KEYS, ERRORS } from '@libs/contracts/constants';
 
 import { ResponseRulesParserService } from '@modules/subscription-response-rules/services/response-rules-parser.service';
 
-import { UpdateSubscriptionSettingsRequestDto } from './dtos';
+import { UpdateSubscriptionSettingsBodyDto } from './dtos';
 import { SubscriptionSettingsEntity } from './entities/subscription-settings.entity';
 import { SubscriptionSettingsRepository } from './repositories/subscription-settings.repository';
 
@@ -36,7 +36,7 @@ export class SubscriptionSettingsService {
     }
 
     public async updateSettings(
-        dto: UpdateSubscriptionSettingsRequestDto,
+        dto: UpdateSubscriptionSettingsBodyDto,
     ): Promise<TResult<SubscriptionSettingsEntity>> {
         try {
             const settings = await this.subscriptionSettingsRepository.findByUUID(dto.uuid);

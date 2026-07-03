@@ -13,7 +13,7 @@ import { ERRORS } from '@libs/contracts/constants/errors';
 
 import { NodesQueuesService } from '@queue/_nodes';
 
-import { ReorderConfigProfilesRequestDto } from './dtos';
+import { ReorderConfigProfilesBodyDto } from './dtos';
 import { ConfigProfileWithInboundsAndNodesEntity } from './entities';
 import { ConfigProfileInboundEntity } from './entities/config-profile-inbound.entity';
 import { ConfigProfileEntity } from './entities/config-profile.entity';
@@ -333,7 +333,7 @@ export class ConfigProfileService {
     }
 
     public async reorderConfigProfiles(
-        dto: ReorderConfigProfilesRequestDto,
+        dto: ReorderConfigProfilesBodyDto,
     ): Promise<TResult<GetConfigProfilesResponseModel>> {
         try {
             await this.configProfileRepository.reorderMany(dto.items);

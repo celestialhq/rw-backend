@@ -10,7 +10,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TypedConfigService } from '@common/config/app-config';
 import { fail, ok, TResult } from '@common/types';
 import { mapDefined, wrapBigInt, wrapBigIntNullable } from '@common/utils';
-import { GetAllUsersCommand, GetUsersStreamCommand } from '@libs/contracts/commands';
 import { ERRORS, USERS_STATUS, EVENTS } from '@libs/contracts/constants';
 
 import { UserEvent } from '@integration-modules/notifications/interfaces';
@@ -24,13 +23,14 @@ import { GetUserSubscriptionRequestHistoryQuery } from '@modules/user-subscripti
 import { UsersQueuesService } from '@queue/_users';
 
 import {
-    CreateUserRequestDto,
-    UpdateUserRequestDto,
-    BulkDeleteUsersByStatusRequestDto,
-    BulkUpdateUsersRequestDto,
-    BulkAllUpdateUsersRequestDto,
+    BulkAllUpdateUsersBodyDto,
+    BulkDeleteUsersByStatusBodyDto,
+    BulkUpdateUsersBodyDto,
+    CreateUserBodyDto,
+    GetUsersQueryDto,
+    ResolveUserBodyDto,
     RevokeUserSubscriptionBodyDto,
-    ResolveUserRequestBodyDto,
+    UpdateUserBodyDto,
 } from './dtos';
 import { BaseUserEntity, UserEntity } from './entities';
 import { IGetUserByUnique, IGetUsersByTelegramIdOrEmail, IUpdateUserDto } from './interfaces';
@@ -61,7 +61,7 @@ export class UsersService {
         this.shortUuidLength = this.configService.getOrThrow('SHORT_UUID_LENGTH');
     }
 
-    public async createUser(dto: CreateUserRequestDto): Promise<TResult<UserEntity>> {
+    public async createUser(dto: CreateUserBodyDto): Promise<TResult<UserEntity>> {
         try {
             const userEntity = new BaseUserEntity({
                 username: dto.username,
@@ -129,7 +129,7 @@ export class UsersService {
         }
     }
 
-    public async updateUser(dto: UpdateUserRequestDto): Promise<TResult<UserEntity>> {
+    public async updateUser(dto: UpdateUserBodyDto): Promise<TResult<UserEntity>> {
         try {
             const {
                 username,
@@ -249,7 +249,7 @@ export class UsersService {
         }
     }
 
-    public async getAllUsers(dto: GetAllUsersCommand.RequestQuery): Promise<
+    public async getAllUsers(dto: GetUsersQueryDto): Promise<
         TResult<{
             total: number;
             users: UserEntity[];
@@ -265,7 +265,7 @@ export class UsersService {
         }
     }
 
-    public async getUsersStream(dto: GetUsersStreamCommand.RequestQuery): Promise<
+    public async getUsersStream(dto: any): Promise<
         TResult<{
             users: UserEntity[];
             nextCursor: string | null;
@@ -530,7 +530,7 @@ export class UsersService {
     }
 
     public async bulkDeleteUsersByStatus(
-        dto: BulkDeleteUsersByStatusRequestDto,
+        dto: BulkDeleteUsersByStatusBodyDto,
     ): Promise<TResult<BulkDeleteByStatusResponseModel>> {
         try {
             const affectedUsers = await this.userRepository.countByStatus(dto.status);
@@ -594,7 +594,7 @@ export class UsersService {
     }
 
     public async bulkUpdateUsers(
-        dto: BulkUpdateUsersRequestDto,
+        dto: BulkUpdateUsersBodyDto,
     ): Promise<TResult<BulkOperationResponseModel>> {
         try {
             if (
@@ -638,7 +638,7 @@ export class UsersService {
     }
 
     public async bulkUpdateAllUsers(
-        dto: BulkAllUpdateUsersRequestDto,
+        dto: BulkAllUpdateUsersBodyDto,
     ): Promise<TResult<BulkAllResponseModel>> {
         try {
             if (dto.status === USERS_STATUS.EXPIRED || dto.status === USERS_STATUS.LIMITED) {
@@ -772,9 +772,7 @@ export class UsersService {
         }
     }
 
-    public async resolveUser(
-        dto: ResolveUserRequestBodyDto,
-    ): Promise<TResult<ResolveUserResponseModel>> {
+    public async resolveUser(dto: ResolveUserBodyDto): Promise<TResult<ResolveUserResponseModel>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
                 {

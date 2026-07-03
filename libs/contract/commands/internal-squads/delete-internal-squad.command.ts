@@ -14,11 +14,9 @@ export namespace DeleteInternalSquadCommand {
         { scope: 'delete', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         uuid: z.string().uuid(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -26,5 +24,6 @@ export namespace DeleteInternalSquadCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

@@ -15,11 +15,9 @@ export namespace RevokeUserSubscriptionCommand {
         { scope: 'revoke-subscription', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         uuid: z.string().uuid(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const RequestBodySchema = z.preprocess(
         (val) => val || {},
@@ -45,11 +43,11 @@ export namespace RevokeUserSubscriptionCommand {
         }),
     );
 
-    export type RequestBody = z.infer<typeof RequestBodySchema>;
-
     export const ResponseSchema = z.object({
         response: ExtendedUsersSchema,
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

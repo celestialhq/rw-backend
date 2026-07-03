@@ -22,7 +22,7 @@ export const UsersSchema = z.object({
         .datetime()
         .transform((str) => new Date(str)),
 
-    telegramId: z.nullable(z.number().int()),
+    telegramId: z.nullable(z.number()),
     email: z.nullable(z.string().email()),
     description: z.nullable(z.string()),
     tag: z.nullable(z.string()),

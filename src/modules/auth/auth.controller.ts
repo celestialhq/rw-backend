@@ -29,16 +29,16 @@ import { RemnawaveSettingsEntity } from '@modules/remnawave-settings/entities';
 import { AuthService } from './auth.service';
 import {
     GetStatusResponseDto,
-    LoginRequestDto,
+    LoginBodyDto,
     LoginResponseDto,
-    RegisterRequestDto,
+    RegisterBodyDto,
     RegisterResponseDto,
     OAuth2AuthorizeResponseDto,
     OAuth2CallbackResponseDto,
-    OAuth2CallbackRequestDto,
-    OAuth2AuthorizeRequestDto,
+    OAuth2CallbackBodyDto,
+    OAuth2AuthorizeBodyDto,
     GetPasskeyAuthenticationOptionsResponseDto,
-    VerifyPasskeyAuthenticationRequestDto,
+    VerifyPasskeyAuthenticationBodyDto,
     VerifyPasskeyAuthenticationResponseDto,
 } from './dtos';
 import { AuthResponseModel } from './model/auth-response.model';
@@ -65,10 +65,9 @@ export class AuthController {
     @Endpoint({
         command: LoginCommand,
         httpCode: HttpStatus.OK,
-        apiBody: LoginRequestDto,
     })
     async login(
-        @Body() body: LoginRequestDto,
+        @Body() body: LoginBodyDto,
         @IpAddress() ip: string,
         @UserAgent() userAgent: string,
     ): Promise<LoginResponseDto> {
@@ -95,9 +94,8 @@ export class AuthController {
     @Endpoint({
         command: RegisterCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: RegisterRequestDto,
     })
-    async register(@Body() body: RegisterRequestDto): Promise<RegisterResponseDto> {
+    async register(@Body() body: RegisterBodyDto): Promise<RegisterResponseDto> {
         const result = await this.authService.register(body);
 
         const data = errorHandler(result);
@@ -127,10 +125,9 @@ export class AuthController {
     @Endpoint({
         command: OAuth2AuthorizeCommand,
         httpCode: HttpStatus.OK,
-        apiBody: OAuth2AuthorizeRequestDto,
     })
     async oauth2Authorize(
-        @Body() body: OAuth2AuthorizeRequestDto,
+        @Body() body: OAuth2AuthorizeBodyDto,
     ): Promise<OAuth2AuthorizeResponseDto> {
         const result = await this.authService.oauth2Authorize(body.provider);
 
@@ -147,10 +144,9 @@ export class AuthController {
     @Endpoint({
         command: OAuth2CallbackCommand,
         httpCode: HttpStatus.OK,
-        apiBody: OAuth2CallbackRequestDto,
     })
     async oauth2Callback(
-        @Body() body: OAuth2CallbackRequestDto,
+        @Body() body: OAuth2CallbackBodyDto,
         @IpAddress() ip: string,
         @UserAgent() userAgent: string,
     ): Promise<OAuth2CallbackResponseDto> {
@@ -195,10 +191,9 @@ export class AuthController {
     @Endpoint({
         command: VerifyPasskeyAuthenticationCommand,
         httpCode: HttpStatus.OK,
-        apiBody: VerifyPasskeyAuthenticationRequestDto,
     })
     async passkeyAuthenticationVerify(
-        @Body() body: VerifyPasskeyAuthenticationRequestDto,
+        @Body() body: VerifyPasskeyAuthenticationBodyDto,
         @GetRemnawaveSettings() remnawaveSettings: RemnawaveSettingsEntity,
         @IpAddress() ip: string,
         @UserAgent() userAgent: string,

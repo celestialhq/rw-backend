@@ -1,11 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiParam,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -25,13 +19,13 @@ import {
 import { ERRORS, ROLE } from '@libs/contracts/constants';
 
 import {
-    GetNodeMetadataRequestParamDto,
+    GetNodeMetadataParamDto,
     GetNodeMetadataResponseDto,
-    GetUserMetadataRequestParamDto,
+    GetUserMetadataParamDto,
     GetUserMetadataResponseDto,
-    UpsertNodeMetadataRequestBodyDto,
+    UpsertNodeMetadataBodyDto,
     UpsertNodeMetadataResponseDto,
-    UpsertUserMetadataRequestBodyDto,
+    UpsertUserMetadataBodyDto,
     UpsertUserMetadataResponseDto,
 } from './dtos';
 import { MetadataService } from './metadata.service';
@@ -91,13 +85,12 @@ export class MetadataController {
         type: GetUserMetadataResponseDto,
         description: 'User Metadata retrieved successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: GetUserMetadataCommand,
         httpCode: HttpStatus.OK,
     })
     async getUserMetadata(
-        @Param() params: GetUserMetadataRequestParamDto,
+        @Param() params: GetUserMetadataParamDto,
     ): Promise<GetUserMetadataResponseDto> {
         const result = await this.metadataService.getUserMetadata(params.uuid);
 
@@ -131,15 +124,13 @@ export class MetadataController {
         type: UpsertUserMetadataResponseDto,
         description: 'User Metadata upserted successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: UpsertUserMetadataCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpsertUserMetadataRequestBodyDto,
     })
     async upsertUserMetadata(
-        @Param() params: GetUserMetadataRequestParamDto,
-        @Body() body: UpsertUserMetadataRequestBodyDto,
+        @Param() params: GetUserMetadataParamDto,
+        @Body() body: UpsertUserMetadataBodyDto,
     ): Promise<UpsertUserMetadataResponseDto> {
         const result = await this.metadataService.upsertUserMetadata(params.uuid, body.metadata);
 
@@ -194,13 +185,12 @@ export class MetadataController {
         type: GetNodeMetadataResponseDto,
         description: 'Node Metadata retrieved successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the node', required: true })
     @Endpoint({
         command: GetNodeMetadataCommand,
         httpCode: HttpStatus.OK,
     })
     async getNodeMetadata(
-        @Param() params: GetNodeMetadataRequestParamDto,
+        @Param() params: GetNodeMetadataParamDto,
     ): Promise<GetNodeMetadataResponseDto> {
         const result = await this.metadataService.getNodeMetadata(params.uuid);
 
@@ -234,15 +224,13 @@ export class MetadataController {
         type: UpsertNodeMetadataResponseDto,
         description: 'Node Metadata upserted successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the node', required: true })
     @Endpoint({
         command: UpsertNodeMetadataCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpsertNodeMetadataRequestBodyDto,
     })
     async upsertNodeMetadata(
-        @Param() params: GetNodeMetadataRequestParamDto,
-        @Body() body: UpsertNodeMetadataRequestBodyDto,
+        @Param() params: GetNodeMetadataParamDto,
+        @Body() body: UpsertNodeMetadataBodyDto,
     ): Promise<UpsertNodeMetadataResponseDto> {
         const result = await this.metadataService.upsertNodeMetadata(params.uuid, body.metadata);
 

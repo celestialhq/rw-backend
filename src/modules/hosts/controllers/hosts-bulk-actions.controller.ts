@@ -19,13 +19,13 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    BulkDeleteHostsRequestDto,
+    BulkDeleteHostsBodyDto,
     BulkDeleteHostsResponseDto,
-    BulkDisableHostsRequestDto,
+    BulkDisableHostsBodyDto,
     BulkDisableHostsResponseDto,
-    BulkEnableHostsRequestDto,
+    BulkEnableHostsBodyDto,
     BulkEnableHostsResponseDto,
-    UpdateManyHostsRequestDto,
+    UpdateManyHostsBodyDto,
     UpdateManyHostsResponseDto,
 } from '../dtos/bulk-operations.dto';
 import { HostsService } from '../hosts.service';
@@ -49,9 +49,7 @@ export class HostsBulkActionsController {
         command: BulkDeleteHostsCommand,
         httpCode: HttpStatus.OK,
     })
-    async deleteHosts(
-        @Body() body: BulkDeleteHostsRequestDto,
-    ): Promise<BulkDeleteHostsResponseDto> {
+    async deleteHosts(@Body() body: BulkDeleteHostsBodyDto): Promise<BulkDeleteHostsResponseDto> {
         const result = await this.hostsService.deleteHosts(body.uuids);
 
         const data = errorHandler(result);
@@ -69,7 +67,7 @@ export class HostsBulkActionsController {
         httpCode: HttpStatus.OK,
     })
     async disableHosts(
-        @Body() body: BulkDisableHostsRequestDto,
+        @Body() body: BulkDisableHostsBodyDto,
     ): Promise<BulkDisableHostsResponseDto> {
         const result = await this.hostsService.bulkDisableHosts(body.uuids);
 
@@ -87,9 +85,7 @@ export class HostsBulkActionsController {
         command: BulkEnableHostsCommand,
         httpCode: HttpStatus.OK,
     })
-    async enableHosts(
-        @Body() body: BulkEnableHostsRequestDto,
-    ): Promise<BulkEnableHostsResponseDto> {
+    async enableHosts(@Body() body: BulkEnableHostsBodyDto): Promise<BulkEnableHostsResponseDto> {
         const result = await this.hostsService.bulkEnableHosts(body.uuids);
 
         const data = errorHandler(result);
@@ -107,7 +103,7 @@ export class HostsBulkActionsController {
         httpCode: HttpStatus.OK,
     })
     async setPortToHosts(
-        @Body() body: UpdateManyHostsRequestDto,
+        @Body() body: UpdateManyHostsBodyDto,
     ): Promise<UpdateManyHostsResponseDto> {
         const result = await this.hostsService.updateManyHosts(body);
 

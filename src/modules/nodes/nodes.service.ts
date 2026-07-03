@@ -16,12 +16,12 @@ import { GetConfigProfileByUuidQuery } from '@modules/config-profiles/queries/ge
 import { NodesQueuesService } from '@queue/_nodes';
 
 import {
-    BulkNodesActionsRequestDto,
-    BulkNodesUpdateRequestDto,
-    CreateNodeRequestDto,
-    ProfileModificationRequestDto,
-    ReorderNodeRequestDto,
-    UpdateNodeRequestDto,
+    BulkNodesActionsBodyDto,
+    BulkNodesUpdateBodyDto,
+    CreateNodeBodyDto,
+    ProfileModificationBodyDto,
+    ReorderNodesBodyDto,
+    UpdateNodeBodyDto,
 } from './dtos';
 import { NodesEntity } from './entities';
 import {
@@ -46,7 +46,7 @@ export class NodesService {
         private readonly nodesSystemCacheService: NodesSystemCacheService,
     ) {}
 
-    public async createNode(body: CreateNodeRequestDto): Promise<TResult<NodeResponseModel>> {
+    public async createNode(body: CreateNodeBodyDto): Promise<TResult<NodeResponseModel>> {
         try {
             const { configProfile, ...nodeData } = body;
 
@@ -256,7 +256,7 @@ export class NodesService {
         }
     }
 
-    public async updateNode(body: UpdateNodeRequestDto): Promise<TResult<NodeResponseModel>> {
+    public async updateNode(body: UpdateNodeBodyDto): Promise<TResult<NodeResponseModel>> {
         try {
             const { configProfile, ...nodeData } = body;
 
@@ -451,7 +451,7 @@ export class NodesService {
         }
     }
 
-    public async reorderNodes(dto: ReorderNodeRequestDto): Promise<TResult<NodeResponseModel[]>> {
+    public async reorderNodes(dto: ReorderNodesBodyDto): Promise<TResult<NodeResponseModel[]>> {
         try {
             await this.nodesRepository.reorderMany(dto.nodes);
 
@@ -487,7 +487,7 @@ export class NodesService {
     }
 
     public async profileModification(
-        body: ProfileModificationRequestDto,
+        body: ProfileModificationBodyDto,
     ): Promise<TResult<BaseEventResponseModel>> {
         try {
             const { uuids, configProfile } = body;
@@ -532,7 +532,7 @@ export class NodesService {
     }
 
     public async bulkNodesActions(
-        body: BulkNodesActionsRequestDto,
+        body: BulkNodesActionsBodyDto,
     ): Promise<TResult<BaseEventResponseModel>> {
         try {
             const { uuids, action } = body;
@@ -562,7 +562,7 @@ export class NodesService {
     }
 
     public async bulkNodesUpdate(
-        body: BulkNodesUpdateRequestDto,
+        body: BulkNodesUpdateBodyDto,
     ): Promise<TResult<BaseEventResponseModel>> {
         try {
             const { uuids, fields } = body;
