@@ -1,17 +1,17 @@
 import { z } from 'zod';
 
-import { IP_CONTROL_ROUTES, REST_API } from '../../api';
+import { CONNECTIONS_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
 
 export namespace DropConnectionsCommand {
-    export const url = REST_API.IP_CONTROL.DROP_CONNECTIONS;
+    export const url = REST_API.CONNECTIONS.DROP_CONNECTIONS;
     export const TSQ_url = url;
 
     export const endpointDetails = getEndpointDetails(
-        IP_CONTROL_ROUTES.DROP_CONNECTIONS,
+        CONNECTIONS_ROUTES.DROP_CONNECTIONS,
         'post',
         'Drop Connections for Users or IPs',
-        { scope: 'drop-connections', kind: 'write' },
+        { scope: 'drop', kind: 'write' },
     );
 
     export const DropBySchema = z.discriminatedUnion('by', [

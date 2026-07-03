@@ -57,10 +57,10 @@ export const CONTROLLERS_INFO = {
         description: '',
         resource: 'bandwidth-stats',
     },
-    IP_CONTROL: {
-        tag: 'IP Management Controller',
-        description: 'Management of IP addresses and connections.',
-        resource: 'ip-control',
+    CONNECTIONS: {
+        tag: 'Connections Controller',
+        description: 'Management of connections by user and node.',
+        resource: 'connections',
     },
     CONFIG_PROFILES: {
         tag: 'Config Profiles Controller',

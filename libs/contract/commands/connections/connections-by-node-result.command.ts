@@ -1,17 +1,17 @@
 import { z } from 'zod';
 
-import { IP_CONTROL_ROUTES, REST_API } from '../../api';
+import { CONNECTIONS_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
 
-export namespace FetchUsersIpsResultCommand {
-    export const url = REST_API.IP_CONTROL.GET_FETCH_USERS_IPS_RESULT;
+export namespace ConnectionsByNodeResultCommand {
+    export const url = REST_API.CONNECTIONS.CONNECTIONS_BY_NODE_RESULT;
     export const TSQ_url = url(':jobId');
 
     export const endpointDetails = getEndpointDetails(
-        IP_CONTROL_ROUTES.GET_FETCH_USERS_IPS_RESULT(':jobId'),
+        CONNECTIONS_ROUTES.CONNECTIONS_BY_NODE_RESULT(':jobId'),
         'get',
-        'Get Users IPs List Result by Job ID',
-        { scope: 'fetch-users-ips-result', kind: 'read' },
+        'Get Connections for Node by Job ID',
+        { scope: 'by-node-result', kind: 'read' },
     );
 
     export const RequestParamSchema = z.object({
