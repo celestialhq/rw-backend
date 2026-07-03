@@ -242,15 +242,45 @@ export class UsersRepository {
         return [rows.map((u) => new UserEntity(u)), count];
     }
 
-    public async getUsersStream({ cursor, size }: GetUsersStreamQueryDto): Promise<{
+    public async getUsersStream(dto: GetUsersStreamQueryDto): Promise<{
         users: UserEntity[];
         nextCursor: string | null;
         hasMore: boolean;
     }> {
+        const {
+            cursor,
+            size,
+            status,
+            trafficLimitStrategy,
+            telegramId,
+            email,
+            tag,
+            externalSquadUuid,
+        } = dto;
+
         let qb = this.baseUsersQb.selectAll().select((eb) => this.includeActiveInternalSquads(eb));
 
         if (cursor) {
             qb = qb.where('users.tId', '>', BigInt(cursor));
+        }
+
+        if (status) {
+            qb = qb.where('users.status', '=', status);
+        }
+        if (trafficLimitStrategy) {
+            qb = qb.where('users.trafficLimitStrategy', '=', trafficLimitStrategy);
+        }
+        if (telegramId !== undefined) {
+            qb = qb.where('users.telegramId', '=', telegramId);
+        }
+        if (email) {
+            qb = qb.where('users.email', '=', email);
+        }
+        if (tag) {
+            qb = qb.where('users.tag', '=', tag);
+        }
+        if (externalSquadUuid) {
+            qb = qb.where('users.externalSquadUuid', '=', getKyselyUuid(externalSquadUuid));
         }
 
         const rows = await qb
@@ -491,36 +521,6 @@ export class UsersRepository {
         }
 
         return new UserEntity(result);
-    }
-
-    public async findByNonUniqueCriteria(
-        dto: Partial<Pick<BaseUserEntity, 'telegramId' | 'email' | 'tag'>>,
-        includeOptions: {
-            activeInternalSquads: boolean;
-        } = {
-            activeInternalSquads: true,
-        },
-    ): Promise<UserEntity[]> {
-        const user = await this.qb.kysely
-            .selectFrom('users')
-            .innerJoin('userTraffic', 'userTraffic.tId', 'users.tId')
-            .selectAll()
-            .$if(includeOptions.activeInternalSquads, (qb) =>
-                qb.select((eb) => this.includeActiveInternalSquads(eb)),
-            )
-            .where((eb) => {
-                const conditions = [];
-
-                if (dto.telegramId) conditions.push(eb('telegramId', '=', dto.telegramId));
-                if (dto.email) conditions.push(eb('email', '=', dto.email));
-                if (dto.tag) conditions.push(eb('tag', '=', dto.tag));
-
-                return eb.or(conditions);
-            })
-            .orderBy('users.tId', 'desc')
-            .execute();
-
-        return user.map((user) => new UserEntity(user));
     }
 
     public async findFirstByCriteria(dto: Partial<BaseUserEntity>): Promise<null | BaseUserEntity> {

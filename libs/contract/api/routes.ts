@@ -126,22 +126,6 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.USERNAME(
                     username,
                 )}`,
-            SUBSCRIPTION_UUID: (subscriptionUuid: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.SUBSCRIPTION_UUID(
-                    subscriptionUuid,
-                )}`,
-            TELEGRAM_ID: (telegramId: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.TELEGRAM_ID(
-                    telegramId,
-                )}`,
-            EMAIL: (email: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.EMAIL(
-                    email,
-                )}`,
-            TAG: (tag: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.TAG(
-                    tag,
-                )}`,
         },
         RESOLVE: `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.RESOLVE}`,
         BULK: {
