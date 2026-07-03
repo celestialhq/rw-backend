@@ -20,16 +20,11 @@ import { ROLE } from '@libs/contracts/constants';
 
 import {
     BulkDeleteHostsBodyDto,
-    BulkDeleteHostsResponseDto,
     BulkDisableHostsBodyDto,
-    BulkDisableHostsResponseDto,
     BulkEnableHostsBodyDto,
-    BulkEnableHostsResponseDto,
     UpdateManyHostsBodyDto,
-    UpdateManyHostsResponseDto,
 } from '../dtos/bulk-operations.dto';
 import { HostsService } from '../hosts.service';
-import { HostResponseModel } from '../models';
 
 @ApiBearerAuth('Authorization')
 @ApiScopeResource(CONTROLLERS_INFO.HOSTS_BULK_ACTIONS.resource)
@@ -43,61 +38,42 @@ export class HostsBulkActionsController {
 
     @Endpoint({
         command: BulkDeleteHostsCommand,
-        httpCode: HttpStatus.OK,
-        type: BulkDeleteHostsResponseDto,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteHosts(@Body() body: BulkDeleteHostsBodyDto): Promise<BulkDeleteHostsResponseDto> {
+    async deleteHosts(@Body() body: BulkDeleteHostsBodyDto) {
         const result = await this.hostsService.deleteHosts(body.uuids);
-
-        const data = errorHandler(result);
-        return {
-            response: data.map((host) => new HostResponseModel(host)),
-        };
+        errorHandler(result);
+        return;
     }
 
     @Endpoint({
         command: BulkDisableHostsCommand,
-        httpCode: HttpStatus.OK,
-        type: BulkDisableHostsResponseDto,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async disableHosts(
-        @Body() body: BulkDisableHostsBodyDto,
-    ): Promise<BulkDisableHostsResponseDto> {
+    async disableHosts(@Body() body: BulkDisableHostsBodyDto) {
         const result = await this.hostsService.bulkDisableHosts(body.uuids);
-
-        const data = errorHandler(result);
-        return {
-            response: data.map((host) => new HostResponseModel(host)),
-        };
+        errorHandler(result);
+        return;
     }
 
     @Endpoint({
         command: BulkEnableHostsCommand,
-        httpCode: HttpStatus.OK,
-        type: BulkEnableHostsResponseDto,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async enableHosts(@Body() body: BulkEnableHostsBodyDto): Promise<BulkEnableHostsResponseDto> {
+    async enableHosts(@Body() body: BulkEnableHostsBodyDto) {
         const result = await this.hostsService.bulkEnableHosts(body.uuids);
-
-        const data = errorHandler(result);
-        return {
-            response: data.map((host) => new HostResponseModel(host)),
-        };
+        errorHandler(result);
+        return;
     }
 
     @Endpoint({
         command: UpdateManyHostsCommand,
-        httpCode: HttpStatus.OK,
-        type: UpdateManyHostsResponseDto,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async setPortToHosts(
-        @Body() body: UpdateManyHostsBodyDto,
-    ): Promise<UpdateManyHostsResponseDto> {
+    async setPortToHosts(@Body() body: UpdateManyHostsBodyDto) {
         const result = await this.hostsService.updateManyHosts(body);
 
-        const data = errorHandler(result);
-        return {
-            response: data.map((host) => new HostResponseModel(host)),
-        };
+        errorHandler(result);
+        return;
     }
 }

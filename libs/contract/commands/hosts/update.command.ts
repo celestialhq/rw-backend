@@ -9,6 +9,7 @@ import {
     MIHOMO_IP_VERSION,
 } from '../../constants';
 import { HostsSchema } from '../../models';
+import { HostResponseSchema } from './host.response';
 
 export namespace UpdateHostCommand {
     export const url = REST_API.HOSTS.UPDATE;
@@ -30,25 +31,9 @@ export namespace UpdateHostCommand {
                 configProfileInboundUuid: z.string().uuid(),
             })
             .optional(),
-        remark: z
-            .string({
-                invalid_type_error: 'Remark must be a string',
-            })
-            .max(40, {
-                message: 'Remark must be less than 40 characters',
-            })
-            .optional(),
-        address: z
-            .string({
-                invalid_type_error: 'Address must be a string',
-            })
-            .optional(),
-        port: z
-            .number({
-                invalid_type_error: 'Port must be an integer',
-            })
-            .int()
-            .optional(),
+        remark: z.string().min(1).max(100).optional(),
+        address: z.string().optional(),
+        port: z.number().int().optional(),
         path: z.string().nullish(),
         sni: z.string().nullish(),
         host: z.string().nullish(),
@@ -98,9 +83,7 @@ export namespace UpdateHostCommand {
             .describe('Optional. Subscription types from which the host will be excluded from.'),
     });
 
-    export const ResponseSchema = z.object({
-        response: HostsSchema,
-    });
+    export const ResponseSchema = HostResponseSchema;
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;

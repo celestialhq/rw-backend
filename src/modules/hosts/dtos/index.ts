@@ -6,3 +6,4 @@ export * from './get-hosts.dto';
 export * from './get-host.dto';
 export * from './reorder-hosts.dto';
 export * from './update-host.dto';
+export * from './host.response.dto';

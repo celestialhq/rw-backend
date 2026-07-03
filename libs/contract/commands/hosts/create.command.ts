@@ -8,7 +8,7 @@ import {
     SUBSCRIPTION_TEMPLATE_TYPE,
     MIHOMO_IP_VERSION,
 } from '../../constants';
-import { HostsSchema } from '../../models';
+import { HostResponseSchema } from './host.response';
 
 export namespace CreateHostCommand {
     export const url = REST_API.HOSTS.CREATE;
@@ -26,25 +26,10 @@ export namespace CreateHostCommand {
             configProfileUuid: z.string().uuid(),
             configProfileInboundUuid: z.string().uuid(),
         }),
-        remark: z
-            .string({
-                invalid_type_error: 'Remark must be a string',
-            })
-            .min(1, {
-                message: 'Remark must be at least 1 character',
-            })
-            .max(40, {
-                message: 'Remark must be less than 40 characters',
-            }),
+        remark: z.string().min(1).max(100),
 
-        address: z.string({
-            invalid_type_error: 'Address must be a string',
-        }),
-        port: z
-            .number({
-                invalid_type_error: 'Port must be an integer',
-            })
-            .int(),
+        address: z.string(),
+        port: z.number().int(),
         path: z.string().nullish(),
         sni: z.string().nullish(),
         host: z.string().nullish(),
@@ -95,9 +80,7 @@ export namespace CreateHostCommand {
             .describe('Optional. Subscription types from which the host will be excluded from.'),
     });
 
-    export const ResponseSchema = z.object({
-        response: HostsSchema,
-    });
+    export const ResponseSchema = HostResponseSchema;
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
