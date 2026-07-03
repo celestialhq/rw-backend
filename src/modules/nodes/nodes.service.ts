@@ -12,8 +12,6 @@ import { toNano } from '@common/utils/nano';
 import { NodeEvent } from '@integration-modules/notifications/interfaces';
 
 import { GetConfigProfileByUuidQuery } from '@modules/config-profiles/queries/get-config-profile-by-uuid';
-import { CreateNodeTrafficUsageHistoryCommand } from '@modules/nodes-traffic-usage-history/commands/create-node-traffic-usage-history';
-import { NodesTrafficUsageHistoryEntity } from '@modules/nodes-traffic-usage-history/entities/nodes-traffic-usage-history.entity';
 
 import { NodesQueuesService } from '@queue/_nodes';
 
@@ -183,16 +181,6 @@ export class NodesService {
             if (!node) {
                 return fail(ERRORS.NODE_NOT_FOUND);
             }
-
-            await this.commandBus.execute(
-                new CreateNodeTrafficUsageHistoryCommand(
-                    new NodesTrafficUsageHistoryEntity({
-                        nodeUuid: node.uuid,
-                        trafficBytes: node.trafficUsedBytes || BigInt(0),
-                        resetAt: new Date(),
-                    }),
-                ),
-            );
 
             await this.nodesRepository.update({
                 uuid: node.uuid,
