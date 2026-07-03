@@ -296,51 +296,33 @@ export class HostsService {
         }
     }
 
-    public async deleteHosts(uuids: string[]): Promise<TResult<HostsEntity[]>> {
+    public async deleteHosts(uuids: string[]): Promise<TResult<boolean>> {
         try {
             await this.hostsRepository.deleteMany(uuids);
 
-            const result = await this.getHosts();
-
-            if (!result.isOk) {
-                return fail(ERRORS.DELETE_HOSTS_ERROR);
-            }
-
-            return ok(result.response);
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.DELETE_HOSTS_ERROR);
         }
     }
 
-    public async bulkEnableHosts(uuids: string[]): Promise<TResult<HostsEntity[]>> {
+    public async bulkEnableHosts(uuids: string[]): Promise<TResult<boolean>> {
         try {
             await this.hostsRepository.enableMany(uuids);
 
-            const result = await this.getHosts();
-
-            if (!result.isOk) {
-                return fail(ERRORS.BULK_ENABLE_HOSTS_ERROR);
-            }
-
-            return ok(result.response);
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_ENABLE_HOSTS_ERROR);
         }
     }
 
-    public async bulkDisableHosts(uuids: string[]): Promise<TResult<HostsEntity[]>> {
+    public async bulkDisableHosts(uuids: string[]): Promise<TResult<boolean>> {
         try {
             await this.hostsRepository.disableMany(uuids);
 
-            const result = await this.getHosts();
-
-            if (!result.isOk) {
-                return fail(ERRORS.BULK_DISABLE_HOSTS_ERROR);
-            }
-
-            return ok(result.response);
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_DISABLE_HOSTS_ERROR);
@@ -358,7 +340,7 @@ export class HostsService {
         }
     }
 
-    public async updateManyHosts(dto: UpdateManyHostsBodyDto): Promise<TResult<HostsEntity[]>> {
+    public async updateManyHosts(dto: UpdateManyHostsBodyDto): Promise<TResult<boolean>> {
         try {
             const {
                 uuids,
@@ -436,7 +418,7 @@ export class HostsService {
                 },
             });
 
-            return await this.getHosts();
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.UPDATE_HOSTS_ERROR);

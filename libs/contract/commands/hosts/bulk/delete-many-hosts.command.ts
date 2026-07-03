@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { HOSTS_ROUTES, REST_API } from '../../../api';
 import { getEndpointDetails } from '../../../constants';
-import { HostsSchema } from '../../../models';
 
 export namespace BulkDeleteHostsCommand {
     export const url = REST_API.HOSTS.BULK.DELETE_HOSTS;
@@ -19,10 +18,5 @@ export namespace BulkDeleteHostsCommand {
         uuids: z.array(z.string().uuid()),
     });
 
-    export const ResponseSchema = z.object({
-        response: z.array(HostsSchema),
-    });
-
     export type RequestBody = z.infer<typeof RequestBodySchema>;
-    export type Response = z.infer<typeof ResponseSchema>;
 }

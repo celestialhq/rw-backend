@@ -25,13 +25,11 @@ import {
     ReorderHostsBodyDto,
     ReorderHostsResponseDto,
     GetHostsTagsResponseDto,
-    CreateHostResponseDto,
+    HostResponseDto,
     CreateHostBodyDto,
     DeleteHostParamDto,
     GetHostsResponseDto,
-    UpdateHostResponseDto,
     UpdateHostBodyDto,
-    GetHostResponseDto,
     GetHostParamDto,
 } from '../dtos';
 import { HostsService } from '../hosts.service';
@@ -64,9 +62,9 @@ export class HostsController {
     @Endpoint({
         command: CreateHostCommand,
         httpCode: HttpStatus.CREATED,
-        type: CreateHostResponseDto,
+        type: HostResponseDto,
     })
-    async createHost(@Body() body: CreateHostBodyDto): Promise<CreateHostResponseDto> {
+    async createHost(@Body() body: CreateHostBodyDto): Promise<HostResponseDto> {
         const result = await this.hostsService.createHost(body);
 
         const data = errorHandler(result);
@@ -78,9 +76,9 @@ export class HostsController {
     @Endpoint({
         command: UpdateHostCommand,
         httpCode: HttpStatus.OK,
-        type: UpdateHostResponseDto,
+        type: HostResponseDto,
     })
-    async updateHost(@Body() body: UpdateHostBodyDto): Promise<UpdateHostResponseDto> {
+    async updateHost(@Body() body: UpdateHostBodyDto): Promise<HostResponseDto> {
         const result = await this.hostsService.updateHost(body);
 
         const data = errorHandler(result);
@@ -106,9 +104,9 @@ export class HostsController {
     @Endpoint({
         command: GetHostCommand,
         httpCode: HttpStatus.OK,
-        type: GetHostResponseDto,
+        type: HostResponseDto,
     })
-    async getOneHost(@Param() params: GetHostParamDto): Promise<GetHostResponseDto> {
+    async getOneHost(@Param() params: GetHostParamDto): Promise<HostResponseDto> {
         const result = await this.hostsService.getHost(params.uuid);
 
         const data = errorHandler(result);
