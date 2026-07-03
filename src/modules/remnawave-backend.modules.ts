@@ -16,7 +16,6 @@ import { IpControlModule } from './ip-control/ip-control.module';
 import { KeygenModule } from './keygen/keygen.module';
 import { MetadataModule } from './metadata/metadata.module';
 import { NodePluginModule } from './node-plugins';
-import { NodesTrafficUsageHistoryModule } from './nodes-traffic-usage-history/nodes-traffic-usage-history.module';
 import { NodesUsageHistoryModule } from './nodes-usage-history/nodes-usage-history.module';
 import { NodesUserUsageHistoryModule } from './nodes-user-usage-history/nodes-user-usage-history.module';
 import { NodesModule } from './nodes/nodes.module';
@@ -47,7 +46,6 @@ import { UsersModule } from './users/users.module';
         KeygenModule,
         NodesModule,
         NodePluginModule,
-        NodesTrafficUsageHistoryModule,
         HostsModule,
         NodesUserUsageHistoryModule,
         HwidUserDevicesModule,

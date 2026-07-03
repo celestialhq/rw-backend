@@ -201,7 +201,6 @@ model Nodes {
   createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
   updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
 
-  nodesTrafficUsageHistory     NodesTrafficUsageHistory[]
   nodesUserUsageHistory        NodesUserUsageHistory[]
   nodesUsageHistory            NodesUsageHistory[]
   configProfileInboundsToNodes ConfigProfileInboundsToNodes[]
@@ -217,17 +216,6 @@ model Nodes {
 
   @@index([id])
   @@map("nodes")
-}
-
-model NodesTrafficUsageHistory {
-  id           BigInt   @id @default(autoincrement())
-  nodeUuid     String   @map("node_uuid") @db.Uuid
-  trafficBytes BigInt   @map("traffic_bytes")
-  resetAt      DateTime @default(dbgenerated("now()")) @map("reset_at")
-
-  node Nodes @relation(fields: [nodeUuid], references: [uuid], onDelete: Cascade)
-
-  @@map("nodes_traffic_usage_history")
 }
 
 model NodesUserUsageHistory {
