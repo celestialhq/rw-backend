@@ -34,10 +34,6 @@ export class DeleteSubpageConfigParamDto extends createZodDto(
     DeleteSubpageConfigCommand.RequestParamSchema,
 ) {} // DELETE
 
-export class DeleteSubpageConfigResponseDto extends createZodDto(
-    DeleteSubpageConfigCommand.ResponseSchema,
-) {} // DELETE
-
 export class CreateSubpageConfigBodyDto extends createZodDto(
     CreateSubpageConfigCommand.RequestBodySchema,
 ) {} // CREATE

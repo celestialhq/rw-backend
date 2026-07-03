@@ -1,12 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiConflictResponse,
-    ApiCreatedResponse,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConflictResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -35,7 +28,6 @@ import {
     CreateConfigProfileBodyDto,
     CreateConfigProfileResponseDto,
     DeleteConfigProfileParamDto,
-    DeleteConfigProfileResponseDto,
     GetAllInboundsResponseDto,
     GetComputedConfigProfileByUuidParamDto,
     GetComputedConfigProfileByUuidResponseDto,
@@ -60,13 +52,10 @@ import {
 export class ConfigProfileController {
     constructor(private readonly configProfileService: ConfigProfileService) {}
 
-    @ApiOkResponse({
-        type: GetConfigProfilesResponseDto,
-        description: 'Config profiles retrieved successfully',
-    })
     @Endpoint({
         command: GetConfigProfilesCommand,
         httpCode: HttpStatus.OK,
+        type: GetConfigProfilesResponseDto,
     })
     async getConfigProfiles(): Promise<GetConfigProfilesResponseDto> {
         const result = await this.configProfileService.getConfigProfiles();
@@ -77,13 +66,10 @@ export class ConfigProfileController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetAllInboundsResponseDto,
-        description: 'Inbounds retrieved successfully',
-    })
     @Endpoint({
         command: GetAllInboundsCommand,
         httpCode: HttpStatus.OK,
+        type: GetAllInboundsResponseDto,
     })
     async getAllInbounds(): Promise<GetAllInboundsResponseDto> {
         const result = await this.configProfileService.getAllInbounds();
@@ -94,16 +80,10 @@ export class ConfigProfileController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Config profile not found',
-    })
-    @ApiOkResponse({
-        type: GetInboundsByProfileUuidResponseDto,
-        description: 'Inbounds retrieved successfully',
-    })
     @Endpoint({
         command: GetInboundsByProfileUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetInboundsByProfileUuidResponseDto,
     })
     async getInboundsByProfileUuid(
         @Param() param: GetInboundsByProfileUuidParamDto,
@@ -116,16 +96,10 @@ export class ConfigProfileController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Config profile not found',
-    })
-    @ApiOkResponse({
-        type: GetConfigProfileByUuidResponseDto,
-        description: 'Config profile retrieved successfully',
-    })
     @Endpoint({
         command: GetConfigProfileByUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetConfigProfileByUuidResponseDto,
     })
     async getConfigProfileByUuid(
         @Param() param: GetConfigProfileByUuidParamDto,
@@ -138,16 +112,10 @@ export class ConfigProfileController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Config profile not found',
-    })
-    @ApiOkResponse({
-        type: GetComputedConfigProfileByUuidResponseDto,
-        description: 'Computed config profile retrieved successfully',
-    })
     @Endpoint({
         command: GetComputedConfigProfileByUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetComputedConfigProfileByUuidResponseDto,
     })
     async getComputedConfigProfileByUuid(
         @Param() param: GetComputedConfigProfileByUuidParamDto,
@@ -160,39 +128,25 @@ export class ConfigProfileController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Config profile not found',
-    })
-    @ApiOkResponse({
-        type: DeleteConfigProfileResponseDto,
-        description: 'Config profile deleted successfully',
-    })
     @Endpoint({
         command: DeleteConfigProfileCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteConfigProfileByUuid(
-        @Param() param: DeleteConfigProfileParamDto,
-    ): Promise<DeleteConfigProfileResponseDto> {
+    async deleteConfigProfileByUuid(@Param() param: DeleteConfigProfileParamDto) {
         const result = await this.configProfileService.deleteConfigProfileByUUID(param.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
     @ApiConflictResponse({
         description:
             'Config profile name already exists or inbound tags are not unique. Inbound tags must be unique in global scope.',
     })
-    @ApiCreatedResponse({
-        type: CreateConfigProfileResponseDto,
-        description: 'Config profile created successfully',
-    })
     @Endpoint({
         command: CreateConfigProfileCommand,
         httpCode: HttpStatus.CREATED,
+        type: CreateConfigProfileResponseDto,
     })
     async createConfigProfile(
         @Body() body: CreateConfigProfileBodyDto,
@@ -209,16 +163,10 @@ export class ConfigProfileController {
         description:
             'Config profile name already exists or inbound tags are not unique. Inbound tags must be unique in global scope.',
     })
-    @ApiNotFoundResponse({
-        description: 'Config profile not found',
-    })
-    @ApiOkResponse({
-        type: UpdateConfigProfileResponseDto,
-        description: 'Config profile updated successfully',
-    })
     @Endpoint({
         command: UpdateConfigProfileCommand,
         httpCode: HttpStatus.OK,
+        type: UpdateConfigProfileResponseDto,
     })
     async updateConfigProfile(
         @Body() body: UpdateConfigProfileBodyDto,
@@ -235,13 +183,10 @@ export class ConfigProfileController {
         };
     }
 
-    @ApiOkResponse({
-        type: ReorderConfigProfilesResponseDto,
-        description: 'Config profiles reordered successfully',
-    })
     @Endpoint({
         command: ReorderConfigProfileCommand,
         httpCode: HttpStatus.OK,
+        type: ReorderConfigProfilesResponseDto,
     })
     async reorderConfigProfiles(
         @Body() body: ReorderConfigProfilesBodyDto,

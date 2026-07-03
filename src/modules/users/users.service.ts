@@ -36,10 +36,6 @@ import {
 import { BaseUserEntity, UserEntity } from './entities';
 import { IGetUserByUnique, IUpdateUserDto } from './interfaces';
 import {
-    DeleteUserResponseModel,
-    BulkDeleteByStatusResponseModel,
-    BulkOperationResponseModel,
-    BulkAllResponseModel,
     GetUserAccessibleNodesResponseModel,
     GetUserSubscriptionRequestHistoryResponseModel,
     ResolveUserResponseModel,
@@ -356,7 +352,7 @@ export class UsersService {
         }
     }
 
-    public async deleteUser(userUuid: string): Promise<TResult<DeleteUserResponseModel>> {
+    public async deleteUser(userUuid: string): Promise<TResult<boolean>> {
         try {
             const user = await this.userRepository.findUniqueByCriteria(
                 { uuid: userUuid },
@@ -367,7 +363,7 @@ export class UsersService {
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
-            const result = await this.userRepository.deleteByUUID(user.uuid);
+            await this.userRepository.deleteByUUID(user.uuid);
 
             this.eventBus.publish(new RemoveUserFromNodeEvent(user.tId, user.vlessUuid));
 
@@ -378,7 +374,7 @@ export class UsersService {
                     event: EVENTS.USER.DELETED,
                 }),
             );
-            return ok(new DeleteUserResponseModel(result));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.DELETE_USER_ERROR);
@@ -515,71 +511,61 @@ export class UsersService {
 
     public async bulkDeleteUsersByStatus(
         dto: BulkDeleteUsersByStatusBodyDto,
-    ): Promise<TResult<BulkDeleteByStatusResponseModel>> {
+    ): Promise<TResult<boolean>> {
         try {
-            const affectedUsers = await this.userRepository.countByStatus(dto.status);
-
             await this.usersQueuesService.bulkDeleteByStatus(dto.status);
 
-            return ok(new BulkDeleteByStatusResponseModel(affectedUsers));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_DELETE_USERS_BY_STATUS_ERROR);
         }
     }
 
-    public async bulkDeleteUsersByUuid(
-        uuids: string[],
-    ): Promise<TResult<BulkDeleteByStatusResponseModel>> {
+    public async bulkDeleteUsersByUuid(uuids: string[]): Promise<TResult<boolean>> {
         try {
             if (uuids.length === 0) {
-                return ok(new BulkOperationResponseModel(0));
+                return ok(true);
             }
 
             const usersIdsAndHashes = await this.userRepository.getIdsAndHashesByUserUuids(uuids);
 
-            const result = await this.userRepository.deleteManyByUuid(uuids);
+            await this.userRepository.deleteManyByUuid(uuids);
 
             await this.eventBus.publish(new RemoveUsersFromNodeEvent(usersIdsAndHashes));
 
-            return ok(new BulkOperationResponseModel(result));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_DELETE_USERS_BY_UUID_ERROR);
         }
     }
 
-    public async bulkRevokeUsersSubscription(
-        uuids: string[],
-    ): Promise<TResult<BulkOperationResponseModel>> {
+    public async bulkRevokeUsersSubscription(uuids: string[]): Promise<TResult<boolean>> {
         try {
             // handled one by one
             await this.usersQueuesService.revokeUsersSubscriptionBulk(uuids);
 
-            return ok(new BulkOperationResponseModel(uuids.length));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_REVOKE_USERS_SUBSCRIPTION_ERROR);
         }
     }
 
-    public async bulkResetUserTraffic(
-        uuids: string[],
-    ): Promise<TResult<BulkOperationResponseModel>> {
+    public async bulkResetUserTraffic(uuids: string[]): Promise<TResult<boolean>> {
         try {
             // handled one by one
             await this.usersQueuesService.resetUserTrafficBulk(uuids);
 
-            return ok(new BulkOperationResponseModel(uuids.length));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_RESET_USER_TRAFFIC_ERROR);
         }
     }
 
-    public async bulkUpdateUsers(
-        dto: BulkUpdateUsersBodyDto,
-    ): Promise<TResult<BulkOperationResponseModel>> {
+    public async bulkUpdateUsers(dto: BulkUpdateUsersBodyDto): Promise<TResult<boolean>> {
         try {
             if (
                 dto.fields.status === USERS_STATUS.EXPIRED ||
@@ -594,7 +580,7 @@ export class UsersService {
                 fields: dto.fields,
             });
 
-            return ok(new BulkOperationResponseModel(dto.uuids.length));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_UPDATE_USERS_ERROR);
@@ -604,7 +590,7 @@ export class UsersService {
     public async bulkUpdateUsersInternalSquads(
         usersUuids: string[],
         internalSquadsUuids: string[],
-    ): Promise<TResult<BulkOperationResponseModel>> {
+    ): Promise<TResult<boolean>> {
         try {
             const userIds = await this.userRepository.getUserIdsByUuids(usersUuids);
 
@@ -614,16 +600,14 @@ export class UsersService {
 
             await this.eventBus.publish(new AddUsersToNodeEvent(userIds));
 
-            return ok(new BulkOperationResponseModel(userIds.length));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_ADD_INBOUNDS_TO_USERS_ERROR);
         }
     }
 
-    public async bulkUpdateAllUsers(
-        dto: BulkAllUpdateUsersBodyDto,
-    ): Promise<TResult<BulkAllResponseModel>> {
+    public async bulkUpdateAllUsers(dto: BulkAllUpdateUsersBodyDto): Promise<TResult<boolean>> {
         try {
             if (dto.status === USERS_STATUS.EXPIRED || dto.status === USERS_STATUS.LIMITED) {
                 return fail(ERRORS.INVALID_USER_STATUS_ERROR);
@@ -631,18 +615,18 @@ export class UsersService {
 
             await this.usersQueuesService.bulkUpdateAllUsers(dto);
 
-            return ok(new BulkAllResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_UPDATE_ALL_USERS_ERROR);
         }
     }
 
-    public async bulkAllResetUserTraffic(): Promise<TResult<BulkAllResponseModel>> {
+    public async bulkAllResetUserTraffic(): Promise<TResult<boolean>> {
         try {
             await this.usersQueuesService.resetAllUserTraffic();
 
-            return ok(new BulkAllResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_RESET_USER_TRAFFIC_ERROR);
@@ -719,7 +703,7 @@ export class UsersService {
     public async bulkExtendExpirationDate(dto: {
         uuids: string[];
         extendDays: number;
-    }): Promise<TResult<BulkOperationResponseModel>> {
+    }): Promise<TResult<boolean>> {
         try {
             const affectedRows = await this.userRepository.bulkExtendExpirationDateByUuids(
                 dto.uuids,
@@ -727,7 +711,7 @@ export class UsersService {
             );
 
             if (affectedRows === 0) {
-                return ok(new BulkOperationResponseModel(0));
+                return ok(true);
             }
 
             const uuids = await this.userRepository.bulkSyncExpiredUsersByUuids(dto.uuids);
@@ -736,20 +720,18 @@ export class UsersService {
                 this.eventBus.publish(new AddUserToNodeEvent(uuid));
             }
 
-            return ok(new BulkOperationResponseModel(affectedRows));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_EXTEND_EXPIRATION_DATE_ERROR);
         }
     }
 
-    public async bulkAllExtendExpirationDate(
-        extendDays: number,
-    ): Promise<TResult<BulkAllResponseModel>> {
+    public async bulkAllExtendExpirationDate(extendDays: number): Promise<TResult<boolean>> {
         try {
             await this.usersQueuesService.bulkAllExtendExpirationDate(extendDays);
 
-            return ok(new BulkAllResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.BULK_EXTEND_EXPIRATION_DATE_ERROR);

@@ -1,12 +1,5 @@
 import { Body, Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiConflictResponse,
-    ApiCreatedResponse,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConflictResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -29,7 +22,6 @@ import {
     CreateSnippetBodyDto,
     CreateSnippetResponseDto,
     DeleteSnippetBodyDto,
-    DeleteSnippetResponseDto,
     GetSnippetsResponseDto,
     UpdateSnippetBodyDto,
     UpdateSnippetResponseDto,
@@ -46,13 +38,10 @@ import { SnippetsService } from './snippets.service';
 export class SnippetsController {
     constructor(private readonly snippetsService: SnippetsService) {}
 
-    @ApiOkResponse({
-        type: GetSnippetsResponseDto,
-        description: 'Snippets retrieved successfully',
-    })
     @Endpoint({
         command: GetSnippetsCommand,
         httpCode: HttpStatus.OK,
+        type: GetSnippetsResponseDto,
     })
     async getSnippets(): Promise<GetSnippetsResponseDto> {
         const result = await this.snippetsService.getSnippets();
@@ -63,38 +52,24 @@ export class SnippetsController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Snippet not found',
-    })
-    @ApiOkResponse({
-        type: DeleteSnippetResponseDto,
-        description: 'Snippet deleted successfully',
-    })
     @Endpoint({
         command: DeleteSnippetCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteSnippetByName(
-        @Body() deleteSnippetByNameDto: DeleteSnippetBodyDto,
-    ): Promise<DeleteSnippetResponseDto> {
+    async deleteSnippetByName(@Body() deleteSnippetByNameDto: DeleteSnippetBodyDto) {
         const result = await this.snippetsService.deleteSnippetByName(deleteSnippetByNameDto.name);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
     @ApiConflictResponse({
         description: 'Snippet name already exists.',
     })
-    @ApiCreatedResponse({
-        type: CreateSnippetResponseDto,
-        description: 'Snippet created successfully',
-    })
     @Endpoint({
         command: CreateSnippetCommand,
         httpCode: HttpStatus.CREATED,
+        type: CreateSnippetResponseDto,
     })
     async createSnippet(
         @Body() createSnippetDto: CreateSnippetBodyDto,
@@ -113,16 +88,10 @@ export class SnippetsController {
     @ApiConflictResponse({
         description: 'Snippet name already exists.',
     })
-    @ApiNotFoundResponse({
-        description: 'Snippet not found',
-    })
-    @ApiOkResponse({
-        type: UpdateSnippetResponseDto,
-        description: 'Snippet updated successfully',
-    })
     @Endpoint({
         command: UpdateSnippetCommand,
         httpCode: HttpStatus.OK,
+        type: UpdateSnippetResponseDto,
     })
     async updateSnippet(
         @Body() updateSnippetDto: UpdateSnippetBodyDto,

@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -21,7 +21,6 @@ import {
     CreateApiTokenBodyDto,
     CreateApiTokenResponseDto,
     DeleteApiTokenParamDto,
-    DeleteApiTokenResponseDto,
     GetApiTokensResponseDto,
     GetApiTokenScopesResponseDto,
 } from './dtos';
@@ -35,14 +34,10 @@ import {
 export class ApiTokensController {
     constructor(private readonly apiTokensService: ApiTokensService) {}
 
-    @ApiResponse({
-        status: 201,
-        description: 'Token created successfully',
-        type: CreateApiTokenResponseDto,
-    })
     @Endpoint({
         command: CreateApiTokenCommand,
         httpCode: HttpStatus.CREATED,
+        type: CreateApiTokenResponseDto,
     })
     async create(@Body() body: CreateApiTokenBodyDto): Promise<CreateApiTokenResponseDto> {
         const result = await this.apiTokensService.create(body);
@@ -53,31 +48,20 @@ export class ApiTokensController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Token deleted successfully',
-        type: DeleteApiTokenResponseDto,
-    })
     @Endpoint({
         command: DeleteApiTokenCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async delete(@Param() paramData: DeleteApiTokenParamDto): Promise<DeleteApiTokenResponseDto> {
-        const result = await this.apiTokensService.delete(paramData.uuid);
-        const data = errorHandler(result);
-        return {
-            response: data.result,
-        };
+    async delete(@Param() paramData: DeleteApiTokenParamDto) {
+        errorHandler(await this.apiTokensService.delete(paramData.uuid));
+
+        return;
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Available API token scopes fetched successfully',
-        type: GetApiTokenScopesResponseDto,
-    })
     @Endpoint({
         command: GetApiTokenScopesCommand,
         httpCode: HttpStatus.OK,
+        type: GetApiTokenScopesResponseDto,
     })
     async getScopes(): Promise<GetApiTokenScopesResponseDto> {
         const result = this.apiTokensService.getAvailableScopes();
@@ -87,14 +71,10 @@ export class ApiTokensController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Tokens fetched successfully',
-        type: GetApiTokensResponseDto,
-    })
     @Endpoint({
         command: GetApiTokensCommand,
         httpCode: HttpStatus.OK,
+        type: GetApiTokensResponseDto,
     })
     async getApiTokens(): Promise<GetApiTokensResponseDto> {
         const result = await this.apiTokensService.get();

@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -49,13 +49,10 @@ import { BaseUserHwidDevicesResponseModel, GetAllHwidDevicesResponseModel } from
 export class HwidUserDevicesController {
     constructor(private readonly hwidUserDevicesService: HwidUserDevicesService) {}
 
-    @ApiOkResponse({
-        type: GetHwidDevicesQueryResponseDto,
-        description: 'Hwid devices fetched successfully',
-    })
     @Endpoint({
         command: GetHwidDevicesCommand,
         httpCode: HttpStatus.OK,
+        type: GetHwidDevicesQueryResponseDto,
     })
     async getAllUsers(
         @Query() query: GetHwidDevicesQueryDto,
@@ -79,16 +76,10 @@ export class HwidUserDevicesController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'One of requested resources not found',
-    })
-    @ApiOkResponse({
-        type: CreateUserHwidDeviceResponseDto,
-        description: 'User HWID device created successfully',
-    })
     @Endpoint({
         command: CreateUserHwidDeviceCommand,
         httpCode: HttpStatus.OK,
+        type: CreateUserHwidDeviceResponseDto,
     })
     async createUserHwidDevice(
         @Body() body: CreateUserHwidDeviceBodyDto,
@@ -104,16 +95,10 @@ export class HwidUserDevicesController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'One of requested resources not found',
-    })
-    @ApiOkResponse({
-        type: DeleteUserHwidDeviceResponseDto,
-        description: 'User HWID device deleted successfully',
-    })
     @Endpoint({
         command: DeleteUserHwidDeviceCommand,
         httpCode: HttpStatus.OK,
+        type: DeleteUserHwidDeviceResponseDto,
     })
     async deleteUserHwidDevice(
         @Body() body: DeleteUserHwidDeviceBodyDto,
@@ -132,16 +117,10 @@ export class HwidUserDevicesController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'One of requested resources not found',
-    })
-    @ApiOkResponse({
-        type: DeleteAllUserHwidDevicesResponseDto,
-        description: 'User HWID devices deleted successfully',
-    })
     @Endpoint({
         command: DeleteAllUserHwidDevicesCommand,
         httpCode: HttpStatus.OK,
+        type: DeleteAllUserHwidDevicesResponseDto,
     })
     async deleteAllUserHwidDevices(
         @Body() body: DeleteAllUserHwidDevicesBodyDto,
@@ -157,13 +136,10 @@ export class HwidUserDevicesController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetHwidDevicesStatsResponseDto,
-        description: 'Hwid devices stats fetched successfully',
-    })
     @Endpoint({
         command: GetHwidDevicesStatsCommand,
         httpCode: HttpStatus.OK,
+        type: GetHwidDevicesStatsResponseDto,
     })
     async getHwidDevicesStats(): Promise<GetHwidDevicesStatsResponseDto> {
         const result = await this.hwidUserDevicesService.getHwidDevicesStats();
@@ -174,13 +150,10 @@ export class HwidUserDevicesController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetTopUsersByHwidDevicesResponseDto,
-        description: 'Top users by HWID devices fetched successfully',
-    })
     @Endpoint({
         command: GetTopUsersByHwidDevicesCommand,
         httpCode: HttpStatus.OK,
+        type: GetTopUsersByHwidDevicesResponseDto,
     })
     async getTopUsersByHwidDevices(
         @Query() query: GetTopUsersByHwidDevicesQueryDto,
@@ -197,16 +170,10 @@ export class HwidUserDevicesController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'One of requested resources not found',
-    })
-    @ApiOkResponse({
-        type: GetUserHwidDevicesResponseDto,
-        description: 'User HWID devices fetched successfully',
-    })
     @Endpoint({
         command: GetUserHwidDevicesCommand,
         httpCode: HttpStatus.OK,
+        type: GetUserHwidDevicesResponseDto,
     })
     async getUserHwidDevices(
         @Param() params: GetUserHwidDevicesParamDto,

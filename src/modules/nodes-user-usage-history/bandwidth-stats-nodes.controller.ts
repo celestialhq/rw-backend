@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -41,13 +41,10 @@ import { NodesUserUsageHistoryService } from './nodes-user-usage-history.service
 export class BandwidthStatsNodesController {
     constructor(private readonly nodesUserUsageHistoryService: NodesUserUsageHistoryService) {}
 
-    @ApiOkResponse({
-        type: GetLegacyStatsNodesUsersUsageResponseDto,
-        description: 'Nodes users usage by range (legacy) fetched successfully',
-    })
     @Endpoint({
         command: GetLegacyStatsNodeUserUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetLegacyStatsNodesUsersUsageResponseDto,
     })
     async getNodeUserUsage(
         @Query() query: GetLegacyStatsNodesUsersUsageQueryDto,
@@ -65,13 +62,10 @@ export class BandwidthStatsNodesController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetStatsNodeUsersUsageResponseDto,
-        description: 'Stats node users usage fetched successfully',
-    })
     @Endpoint({
         command: GetStatsNodeUsersUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatsNodeUsersUsageResponseDto,
     })
     async getStatsNodeUsersUsage(
         @Query() query: GetStatsNodeUsersUsageQueryDto,
@@ -89,13 +83,10 @@ export class BandwidthStatsNodesController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetStatsNodesUsersUsageResponseDto,
-        description: 'Stats node users usage fetched successfully',
-    })
     @Endpoint({
         command: GetStatsNodesUsersUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatsNodesUsersUsageResponseDto,
     })
     async getStatsNodesUsersUsage(
         @Query() query: GetStatsNodesUsersUsageQueryDto,

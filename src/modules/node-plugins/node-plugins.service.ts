@@ -20,10 +20,8 @@ import { PluginExecutorBodyDto } from './dtos';
 import { ExtendedTorrentBlockerReportEntity } from './entities';
 import { NodePluginEntity } from './entities/node-plugin.entity';
 import {
-    DeleteNodePluginResponseModel,
     BaseNodePluginResponseModel,
     GetNodePluginsResponseModel,
-    BaseEventResponseModel,
     TorrentBlockerReportsStatsResponseModel,
 } from './models';
 import {} from './models/base-node-plugin.response.model';
@@ -125,7 +123,7 @@ export class NodePluginService {
         }
     }
 
-    public async deleteConfig(uuid: string): Promise<TResult<DeleteNodePluginResponseModel>> {
+    public async deleteConfig(uuid: string): Promise<TResult<boolean>> {
         try {
             const nodePlugin = await this.nodePluginRepository.findByUUID(uuid);
 
@@ -137,7 +135,7 @@ export class NodePluginService {
                 new GetNodesByPluginUuidQuery(nodePlugin.uuid),
             );
 
-            const deletedConfig = await this.nodePluginRepository.deleteByUUID(uuid);
+            await this.nodePluginRepository.deleteByUUID(uuid);
 
             if (nodeUuids.isOk && nodeUuids.response.length > 0) {
                 await this.nodeQueuesService.syncNodePluginsBulk(
@@ -145,7 +143,7 @@ export class NodePluginService {
                 );
             }
 
-            return ok(new DeleteNodePluginResponseModel(deletedConfig));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);
@@ -233,9 +231,7 @@ export class NodePluginService {
         return;
     }
 
-    public async executePluginCommand(
-        dto: PluginExecutorBodyDto,
-    ): Promise<TResult<BaseEventResponseModel>> {
+    public async executePluginCommand(dto: PluginExecutorBodyDto): Promise<TResult<boolean>> {
         try {
             const findResult = await this.queryBus.execute(
                 new FindNodesByCriteriaQuery({
@@ -307,7 +303,7 @@ export class NodePluginService {
                     return fail(ERRORS.INTERNAL_SERVER_ERROR);
             }
 
-            return ok(new BaseEventResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);
@@ -335,18 +331,10 @@ export class NodePluginService {
         }
     }
 
-    public async truncateTorrentBlockerReports(): Promise<
-        TResult<{
-            total: number;
-            records: ExtendedTorrentBlockerReportEntity[];
-        }>
-    > {
+    public async truncateTorrentBlockerReports(): Promise<TResult<boolean>> {
         try {
             await this.torrentBlockerReportsRepository.truncateReports();
-            return ok({
-                total: 0,
-                records: [],
-            });
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);

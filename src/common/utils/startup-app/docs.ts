@@ -5,12 +5,11 @@ import { SwaggerThemeNameEnum } from 'swagger-themes';
 import { SwaggerTheme } from 'swagger-themes';
 
 import { INestApplication } from '@nestjs/common';
-import { DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, getSchemaPath } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 
 import { TypedConfigService } from '@common/config/app-config';
 import { CONTROLLERS_INFO } from '@libs/contracts/api';
-import { ERRORS } from '@libs/contracts/constants';
 
 import {
     RemnawaveWebhookCrmEventsDto,
@@ -20,6 +19,10 @@ import {
     RemnawaveWebhookUserEventsDto,
     RemnawaveWebhookUserHwidDevicesEventsDto,
     RemnawaveWebhookTorrentBlockerEventsDto,
+    RemnawaveNotFoundErrorDto,
+    RemnawaveBadRequestErrorDto,
+    RemnawaveInternalServerErrorDto,
+    RemnawaveValidationErrorDto,
 } from './extra-models';
 
 const description = `
@@ -62,51 +65,37 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
             .setVersion(pkg.version!)
             .setLicense('AGPL-3.0', 'https://github.com/remnawave/panel?tab=AGPL-3.0-1-ov-file')
             .addGlobalResponse({
-                status: 500,
-                description: ERRORS.INTERNAL_SERVER_ERROR.message,
-                schema: {
-                    type: 'object',
-                    properties: {
-                        timestamp: { type: 'string' },
-                        path: { type: 'string' },
-                        message: { type: 'string' },
-                        errorCode: { type: 'string' },
+                status: 404,
+                description: 'Resource not found',
+
+                content: {
+                    'application/json': {
+                        schema: { $ref: getSchemaPath(RemnawaveNotFoundErrorDto) },
                     },
                 },
             })
             .addGlobalResponse({
                 status: 400,
-                description: 'Validation error',
-                schema: {
-                    type: 'object',
-                    properties: {
-                        message: { type: 'string' },
-                        statusCode: { type: 'number', example: 400 },
-                        errors: {
-                            type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    validation: { type: 'string', example: 'uuid' },
-                                    code: { type: 'string', example: 'invalid_string' },
-                                    message: { type: 'string', example: 'Invalid uuid' },
-                                    path: {
-                                        type: 'array',
-                                        items: { type: 'string' },
-                                        example: ['uuid'],
-                                    },
-                                },
-                                required: ['validation', 'code', 'message', 'path'],
-                            },
-                            example: [
-                                {
-                                    validation: 'uuid',
-                                    code: 'invalid_string',
-                                    message: 'Invalid uuid',
-                                    path: ['uuid'],
-                                },
+                description: 'Bad request / Validation error',
+
+                content: {
+                    'application/json': {
+                        schema: {
+                            oneOf: [
+                                { $ref: getSchemaPath(RemnawaveBadRequestErrorDto) },
+                                { $ref: getSchemaPath(RemnawaveValidationErrorDto) },
                             ],
                         },
+                    },
+                },
+            })
+            .addGlobalResponse({
+                status: 500,
+                description: 'Internal server error',
+
+                content: {
+                    'application/json': {
+                        schema: { $ref: getSchemaPath(RemnawaveInternalServerErrorDto) },
                     },
                 },
             });
@@ -127,8 +116,14 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
                     RemnawaveWebhookErrorsEventsDto,
                     RemnawaveWebhookCrmEventsDto,
                     RemnawaveWebhookTorrentBlockerEventsDto,
+                    RemnawaveNotFoundErrorDto,
+                    RemnawaveBadRequestErrorDto,
+                    RemnawaveInternalServerErrorDto,
+                    RemnawaveValidationErrorDto,
                 ],
             });
+
+        const document = documentFactory();
 
         const theme = new SwaggerTheme();
         const options = {
@@ -143,7 +138,7 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
         SwaggerModule.setup(
             config.getOrThrow('SWAGGER_PATH'),
             app,
-            cleanupOpenApiDoc(documentFactory()),
+            cleanupOpenApiDoc(document),
             options,
         );
 
@@ -188,7 +183,7 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
                 },
                 telemetry: false,
 
-                content: () => cleanupOpenApiDoc(documentFactory()),
+                content: () => cleanupOpenApiDoc(document),
             }),
         );
     }

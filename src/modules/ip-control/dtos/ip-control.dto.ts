@@ -21,10 +21,6 @@ export class DropConnectionsBodyDto extends createZodDto(
     DropConnectionsCommand.RequestBodySchema,
 ) {}
 
-export class DropConnectionsResponseDto extends createZodDto(
-    DropConnectionsCommand.ResponseSchema,
-) {}
-
 export class FetchUsersIpsParamDto extends createZodDto(FetchUsersIpsCommand.RequestParamSchema) {}
 
 export class FetchUsersIpsResponseDto extends createZodDto(FetchUsersIpsCommand.ResponseSchema) {}

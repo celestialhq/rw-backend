@@ -1,11 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiCreatedResponse,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -34,7 +28,6 @@ import {
     CreateHostResponseDto,
     CreateHostBodyDto,
     DeleteHostParamDto,
-    DeleteHostResponseDto,
     GetHostsResponseDto,
     UpdateHostResponseDto,
     UpdateHostBodyDto,
@@ -54,13 +47,10 @@ import { GetAllHostTagsResponseModel, HostResponseModel } from '../models';
 export class HostsController {
     constructor(private readonly hostsService: HostsService) {}
 
-    @ApiOkResponse({
-        type: GetHostsTagsResponseDto,
-        description: 'Host tags fetched successfully',
-    })
     @Endpoint({
         command: GetHostsTagsCommand,
         httpCode: HttpStatus.OK,
+        type: GetHostsTagsResponseDto,
     })
     async getHostsTags(): Promise<GetHostsTagsResponseDto> {
         const result = await this.hostsService.getHostsTags();
@@ -71,13 +61,10 @@ export class HostsController {
         };
     }
 
-    @ApiCreatedResponse({
-        type: CreateHostResponseDto,
-        description: 'Host created successfully',
-    })
     @Endpoint({
         command: CreateHostCommand,
         httpCode: HttpStatus.CREATED,
+        type: CreateHostResponseDto,
     })
     async createHost(@Body() body: CreateHostBodyDto): Promise<CreateHostResponseDto> {
         const result = await this.hostsService.createHost(body);
@@ -88,13 +75,10 @@ export class HostsController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateHostResponseDto,
-        description: 'Host updated successfully',
-    })
     @Endpoint({
         command: UpdateHostCommand,
         httpCode: HttpStatus.OK,
+        type: UpdateHostResponseDto,
     })
     async updateHost(@Body() body: UpdateHostBodyDto): Promise<UpdateHostResponseDto> {
         const result = await this.hostsService.updateHost(body);
@@ -105,13 +89,10 @@ export class HostsController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetHostsResponseDto,
-        description: 'Hosts fetched successfully',
-    })
     @Endpoint({
         command: GetHostsCommand,
         httpCode: HttpStatus.OK,
+        type: GetHostsResponseDto,
     })
     async getHosts(): Promise<GetHostsResponseDto> {
         const result = await this.hostsService.getHosts();
@@ -122,13 +103,10 @@ export class HostsController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetHostResponseDto,
-        description: 'Host fetched successfully',
-    })
     @Endpoint({
         command: GetHostCommand,
         httpCode: HttpStatus.OK,
+        type: GetHostResponseDto,
     })
     async getOneHost(@Param() params: GetHostParamDto): Promise<GetHostResponseDto> {
         const result = await this.hostsService.getHost(params.uuid);
@@ -139,13 +117,10 @@ export class HostsController {
         };
     }
 
-    @ApiOkResponse({
-        type: ReorderHostsResponseDto,
-        description: 'Hosts reordered successfully',
-    })
     @Endpoint({
         command: ReorderHostsCommand,
         httpCode: HttpStatus.OK,
+        type: ReorderHostsResponseDto,
     })
     async reorderHosts(@Body() body: ReorderHostsBodyDto): Promise<ReorderHostsResponseDto> {
         const result = await this.hostsService.reorderHosts(body);
@@ -158,23 +133,14 @@ export class HostsController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Host not found',
-    })
-    @ApiOkResponse({
-        type: DeleteHostResponseDto,
-        description: 'Host deleted successfully',
-    })
     @Endpoint({
         command: DeleteHostCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteHost(@Param() params: DeleteHostParamDto): Promise<DeleteHostResponseDto> {
+    async deleteHost(@Param() params: DeleteHostParamDto) {
         const result = await this.hostsService.deleteHost(params.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 }

@@ -15,7 +15,6 @@ import {
     UpdateManyHostsBodyDto,
 } from './dtos';
 import { HostsEntity } from './entities/hosts.entity';
-import { DeleteHostResponseModel } from './models/delete-host.response.model';
 import { HostsRepository } from './repositories/hosts.repository';
 
 @Injectable()
@@ -240,15 +239,15 @@ export class HostsService {
         }
     }
 
-    public async deleteHost(hostUuid: string): Promise<TResult<DeleteHostResponseModel>> {
+    public async deleteHost(hostUuid: string): Promise<TResult<boolean>> {
         try {
             const host = await this.hostsRepository.findByUUID(hostUuid);
             if (!host) {
                 return fail(ERRORS.HOST_NOT_FOUND);
             }
-            const result = await this.hostsRepository.deleteByUUID(host.uuid);
+            await this.hostsRepository.deleteByUUID(host.uuid);
 
-            return ok(new DeleteHostResponseModel({ isDeleted: result }));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             this.logger.error(JSON.stringify(error));

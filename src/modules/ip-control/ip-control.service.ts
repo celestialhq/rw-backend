@@ -13,11 +13,7 @@ import { GetUserIdsByUserUuidsQuery } from '@modules/users/queries/get-user-ids-
 import { NodesQueuesService } from '@queue/_nodes';
 
 import { DropConnectionsBodyDto } from './dtos';
-import {
-    BaseEventResponseModel,
-    FetchUsersIpsResponseModel,
-    FetchUsersIpsResultResponseModel,
-} from './models';
+import { FetchUsersIpsResponseModel, FetchUsersIpsResultResponseModel } from './models';
 import {
     FetchIpsResponseModel,
     FetchIpsResultResponseModel,
@@ -70,9 +66,7 @@ export class IpControlService {
         }
     }
 
-    public async dropConnections(
-        dto: DropConnectionsBodyDto,
-    ): Promise<TResult<BaseEventResponseModel>> {
+    public async dropConnections(dto: DropConnectionsBodyDto): Promise<TResult<boolean>> {
         try {
             const findResult = await this.queryBus.execute(
                 new FindNodesByCriteriaQuery({
@@ -138,7 +132,7 @@ export class IpControlService {
                     break;
             }
 
-            return ok(new BaseEventResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);

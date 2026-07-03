@@ -219,10 +219,7 @@ export class PasskeyService {
         }
     }
 
-    public async deletePasskey(
-        payload: IJWTAuthPayload,
-        id: string,
-    ): Promise<TResult<GetActivePasskeysResponseModel>> {
+    public async deletePasskey(payload: IJWTAuthPayload, id: string): Promise<TResult<boolean>> {
         try {
             const { uuid } = payload;
 
@@ -234,7 +231,7 @@ export class PasskeyService {
 
             await this.passkeyRepository.deleteByUUID(id);
 
-            return await this.getActivePasskeys(payload);
+            return ok(true);
         } catch (error) {
             this.logger.error(`Delete passkey error: ${error}`);
             return fail(ERRORS.DELETE_PASSKEY_ERROR);

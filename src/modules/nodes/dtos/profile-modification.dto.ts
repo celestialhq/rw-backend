@@ -4,7 +4,3 @@ import { createZodDto } from 'nestjs-zod';
 export class ProfileModificationBodyDto extends createZodDto(
     BulkNodesProfileModificationCommand.RequestBodySchema,
 ) {}
-
-export class ProfileModificationResponseDto extends createZodDto(
-    BulkNodesProfileModificationCommand.ResponseSchema,
-) {}

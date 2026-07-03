@@ -10,10 +10,7 @@ import {
     CloneNodePluginCommand,
     PluginExecutorCommand,
 } from '@libs/contracts/commands';
-import {
-    GetTorrentBlockerReportsCommand,
-    TruncateTorrentBlockerReportsCommand,
-} from '@libs/contracts/commands/node-plugins/torrent-blocker';
+import { GetTorrentBlockerReportsCommand } from '@libs/contracts/commands/node-plugins/torrent-blocker';
 import { GetTorrentBlockerReportsStatsCommand } from '@libs/contracts/commands/node-plugins/torrent-blocker/get-torrent-blocker-reports-stats.command';
 
 export class GetNodePluginsResponseDto extends createZodDto(GetNodePluginsCommand.ResponseSchema) {} // GET_ALL
@@ -32,10 +29,6 @@ export class GetNodePluginParamDto extends createZodDto(GetNodePluginCommand.Req
 
 export class DeleteNodePluginParamDto extends createZodDto(
     DeleteNodePluginCommand.RequestParamSchema,
-) {} // DELETE
-
-export class DeleteNodePluginResponseDto extends createZodDto(
-    DeleteNodePluginCommand.ResponseSchema,
 ) {} // DELETE
 
 export class CreateNodePluginBodyDto extends createZodDto(
@@ -61,17 +54,12 @@ export class CloneNodePluginResponseDto extends createZodDto(
 ) {} // CLONE
 
 export class PluginExecutorBodyDto extends createZodDto(PluginExecutorCommand.RequestBodySchema) {} // EXECUTOR
-export class PluginExecutorResponseDto extends createZodDto(PluginExecutorCommand.ResponseSchema) {} // EXECUTOR
 
 export class GetTorrentBlockerReportsQueryDto extends createZodDto(
     GetTorrentBlockerReportsCommand.RequestQuerySchema,
 ) {} // TORRENT_BLOCKER_REPORT
 export class GetTorrentBlockerReportsResponseDto extends createZodDto(
     GetTorrentBlockerReportsCommand.ResponseSchema,
-) {} // TORRENT_BLOCKER_REPORT
-
-export class TruncateTorrentBlockerReportsResponseDto extends createZodDto(
-    TruncateTorrentBlockerReportsCommand.ResponseSchema,
 ) {} // TORRENT_BLOCKER_REPORT
 
 export class GetTorrentBlockerReportsStatsResponseDto extends createZodDto(

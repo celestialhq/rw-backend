@@ -1,5 +1,5 @@
 import { Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -27,13 +27,10 @@ import { KeygenResponseModel } from './model';
 export class KeygenController {
     constructor(private readonly keygenService: KeygenService) {}
 
-    @ApiOkResponse({
-        type: GetNodeSecretKeyResponseDto,
-        description: 'Get SECRET_KEY for Remnawave Node',
-    })
     @Endpoint({
         command: GetNodeSecretKeyCommand,
         httpCode: HttpStatus.OK,
+        type: GetNodeSecretKeyResponseDto,
     })
     async generateKey(): Promise<GetNodeSecretKeyResponseDto> {
         const result = await this.keygenService.generateKey();

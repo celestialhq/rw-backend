@@ -20,10 +20,4 @@ export namespace DeleteApiTokenCommand {
     });
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;
-
-    export const ResponseSchema = z.object({
-        response: z.boolean(),
-    });
-
-    export type Response = z.infer<typeof ResponseSchema>;
 }

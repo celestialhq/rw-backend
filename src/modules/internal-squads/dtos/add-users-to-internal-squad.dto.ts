@@ -5,7 +5,3 @@ import { AddUsersToInternalSquadCommand } from '@libs/contracts/commands';
 export class AddUsersToInternalSquadParamDto extends createZodDto(
     AddUsersToInternalSquadCommand.RequestParamSchema,
 ) {}
-
-export class AddUsersToInternalSquadResponseDto extends createZodDto(
-    AddUsersToInternalSquadCommand.ResponseSchema,
-) {}

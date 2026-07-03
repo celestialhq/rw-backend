@@ -5,7 +5,3 @@ import { DeleteInfraBillingRecordCommand } from '@libs/contracts/commands';
 export class DeleteInfraBillingRecordParamDto extends createZodDto(
     DeleteInfraBillingRecordCommand.RequestParamSchema,
 ) {}
-
-export class DeleteInfraBillingRecordResponseDto extends createZodDto(
-    DeleteInfraBillingRecordCommand.ResponseSchema,
-) {}

@@ -10,7 +10,7 @@ import {
     UseFilters,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -59,14 +59,10 @@ import { SystemService } from './system.service';
 export class SystemController {
     constructor(private readonly systemService: SystemService) {}
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns system metadata',
-        type: GetMetadataResponseDto,
-    })
     @Endpoint({
         command: GetMetadataCommand,
         httpCode: HttpStatus.OK,
+        type: GetMetadataResponseDto,
     })
     async getMetadata(): Promise<GetMetadataResponseDto> {
         const result = await this.systemService.getMetadata();
@@ -77,14 +73,10 @@ export class SystemController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns system statistics',
-        type: GetStatsResponseDto,
-    })
     @Endpoint({
         command: GetStatsCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatsResponseDto,
     })
     async getStats(): Promise<GetStatsResponseDto> {
         const result = await this.systemService.getStats();
@@ -95,14 +87,10 @@ export class SystemController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns bandwidth statistics',
-        type: GetBandwidthStatsResponseDto,
-    })
     @Endpoint({
         command: GetBandwidthStatsCommand,
         httpCode: HttpStatus.OK,
+        type: GetBandwidthStatsResponseDto,
     })
     async getBandwidthStats(
         @Query() query: GetBandwidthStatsQueryDto,
@@ -115,14 +103,10 @@ export class SystemController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns nodes statistics',
-        type: GetNodesStatisticsResponseDto,
-    })
     @Endpoint({
         command: GetNodesStatisticsCommand,
         httpCode: HttpStatus.OK,
+        type: GetNodesStatisticsResponseDto,
     })
     async getNodesStatistics(): Promise<GetNodesStatisticsResponseDto> {
         const result = await this.systemService.getNodesStatistics();
@@ -133,14 +117,10 @@ export class SystemController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns Remnawave health',
-        type: GetRemnawaveHealthResponseDto,
-    })
     @Endpoint({
         command: GetRemnawaveHealthCommand,
         httpCode: HttpStatus.OK,
+        type: GetRemnawaveHealthResponseDto,
     })
     async getRemnawaveHealth(): Promise<GetRemnawaveHealthResponseDto> {
         const result = await this.systemService.getRemnawaveHealth();
@@ -151,14 +131,10 @@ export class SystemController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns nodes metrics from Prometheus metrics endpoint',
-        type: GetNodesMetricsResponseDto,
-    })
     @Endpoint({
         command: GetNodesMetricsCommand,
         httpCode: HttpStatus.OK,
+        type: GetNodesMetricsResponseDto,
     })
     async getNodesMetrics(): Promise<GetNodesMetricsResponseDto> {
         const result = await this.systemService.getNodesMetrics();
@@ -169,14 +145,10 @@ export class SystemController {
         };
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns x25519 keypairs',
-        type: GenerateX25519ResponseDto,
-    })
     @Endpoint({
         command: GenerateX25519Command,
         httpCode: HttpStatus.OK,
+        type: GenerateX25519ResponseDto,
     })
     async getX25519Keypairs(): Promise<GenerateX25519ResponseDto> {
         const result = await this.systemService.getX25519Keypairs();
@@ -187,13 +159,10 @@ export class SystemController {
         };
     }
 
-    @ApiCreatedResponse({
-        type: DebugSrrMatcherResponseDto,
-        description: 'Debug SRR matcher information',
-    })
     @Endpoint({
         command: TestSrrMatcherCommand,
         httpCode: HttpStatus.OK,
+        type: DebugSrrMatcherResponseDto,
     })
     async debugSrrMatcher(
         @Res() response: Response,
@@ -203,14 +172,10 @@ export class SystemController {
         return await this.systemService.debugSrrMatcher(request, response, body);
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Returns system recap',
-        type: GetRecapResponseDto,
-    })
     @Endpoint({
         command: GetRecapCommand,
         httpCode: HttpStatus.OK,
+        type: GetRecapResponseDto,
     })
     async getRecap(): Promise<GetRecapResponseDto> {
         const result = await this.systemService.getRecap();

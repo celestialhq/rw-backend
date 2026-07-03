@@ -1,5 +1,5 @@
 import { Controller, HttpStatus, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -39,13 +39,10 @@ export class UserSubscriptionRequestHistoryController {
         private readonly userSubscriptionRequestHistoryService: UserSubscriptionRequestHistoryService,
     ) {}
 
-    @ApiOkResponse({
-        type: GetSubscriptionRequestHistoryResponseDto,
-        description: 'Subscription request history fetched successfully',
-    })
     @Endpoint({
         command: GetSubscriptionRequestHistoryCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionRequestHistoryResponseDto,
     })
     async getSubscriptionRequestHistory(
         @Query() query: GetSubscriptionRequestHistoryQueryDto,
@@ -72,13 +69,10 @@ export class UserSubscriptionRequestHistoryController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetSubscriptionRequestHistoryStatsResponseDto,
-        description: 'User subscription request history stats fetched successfully',
-    })
     @Endpoint({
         command: GetSubscriptionRequestHistoryStatsCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionRequestHistoryStatsResponseDto,
     })
     async getSubscriptionRequestHistoryStats(): Promise<GetSubscriptionRequestHistoryStatsResponseDto> {
         const result =

@@ -1,11 +1,5 @@
 import { Body, Controller, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiCreatedResponse,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -39,9 +33,6 @@ import {
     CreateInfraBillingNodeResponseDto,
     CreateInfraProviderBodyDto,
     CreateInfraProviderResponseDto,
-    DeleteInfraBillingRecordResponseDto,
-    DeleteInfraBillingNodeResponseDto,
-    DeleteInfraProviderResponseDto,
     GetInfraBillingRecordsQueryDto,
     GetInfraBillingRecordsResponseDto,
     GetInfraBillingNodesResponseDto,
@@ -68,11 +59,8 @@ import { InfraBillingService } from './infra-billing.service';
 export class InfraBillingController {
     constructor(private readonly infraBillingService: InfraBillingService) {}
 
-    @ApiOkResponse({
-        type: GetInfraProvidersResponseDto,
-        description: 'Infra providers retrieved successfully',
-    })
     @Endpoint({
+        type: GetInfraProvidersResponseDto,
         command: GetInfraProvidersCommand,
         httpCode: HttpStatus.OK,
     })
@@ -85,14 +73,8 @@ export class InfraBillingController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Infra provider not found',
-    })
-    @ApiOkResponse({
-        type: GetInfraProviderResponseDto,
-        description: 'Infra provider retrieved successfully',
-    })
     @Endpoint({
+        type: GetInfraProviderResponseDto,
         command: GetInfraProviderCommand,
         httpCode: HttpStatus.OK,
     })
@@ -107,30 +89,19 @@ export class InfraBillingController {
         };
     }
 
-    @ApiOkResponse({
-        type: DeleteInfraProviderResponseDto,
-        description: 'Infra provider deleted successfully',
-    })
     @Endpoint({
         command: DeleteInfraProviderCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async delteInfraProvider(
-        @Param() param: DeleteInfraProviderParamDto,
-    ): Promise<DeleteInfraProviderResponseDto> {
+    async delteInfraProvider(@Param() param: DeleteInfraProviderParamDto) {
         const result = await this.infraBillingService.deleteInfraProviderByUuid(param.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiCreatedResponse({
-        type: CreateInfraProviderResponseDto,
-        description: 'Infra provider created successfully',
-    })
     @Endpoint({
+        type: CreateInfraProviderResponseDto,
         command: CreateInfraProviderCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -145,11 +116,8 @@ export class InfraBillingController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateInfraProviderResponseDto,
-        description: 'Infra provider updated successfully',
-    })
     @Endpoint({
+        type: UpdateInfraProviderResponseDto,
         command: UpdateInfraProviderCommand,
         httpCode: HttpStatus.OK,
     })
@@ -164,11 +132,8 @@ export class InfraBillingController {
         };
     }
 
-    @ApiCreatedResponse({
-        type: CreateInfraBillingRecordResponseDto,
-        description: 'Infra billing history record created successfully',
-    })
     @Endpoint({
+        type: CreateInfraBillingRecordResponseDto,
         command: CreateInfraBillingRecordCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -183,11 +148,8 @@ export class InfraBillingController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetInfraBillingRecordsResponseDto,
-        description: 'Infra billing history records retrieved successfully',
-    })
     @Endpoint({
+        type: GetInfraBillingRecordsResponseDto,
         command: GetInfraBillingRecordsCommand,
         httpCode: HttpStatus.OK,
     })
@@ -202,32 +164,21 @@ export class InfraBillingController {
         };
     }
 
-    @ApiOkResponse({
-        type: DeleteInfraBillingRecordResponseDto,
-        description: 'Infra billing history record deleted successfully',
-    })
     @Endpoint({
         command: DeleteInfraBillingRecordCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteInfraBillingRecord(
-        @Param() param: DeleteInfraBillingRecordParamDto,
-    ): Promise<DeleteInfraBillingRecordResponseDto> {
+    async deleteInfraBillingRecord(@Param() param: DeleteInfraBillingRecordParamDto) {
         const result = await this.infraBillingService.deleteInfraBillingHistoryRecordByUuid(
             param.uuid,
         );
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiOkResponse({
-        type: GetInfraBillingNodesResponseDto,
-        description: 'Infra billing nodes retrieved successfully',
-    })
     @Endpoint({
+        type: GetInfraBillingNodesResponseDto,
         command: GetInfraBillingNodesCommand,
         httpCode: HttpStatus.OK,
     })
@@ -240,11 +191,8 @@ export class InfraBillingController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateInfraBillingNodeResponseDto,
-        description: 'Infra billing node updated successfully',
-    })
     @Endpoint({
+        type: UpdateInfraBillingNodeResponseDto,
         command: UpdateInfraBillingNodeCommand,
         httpCode: HttpStatus.OK,
     })
@@ -259,11 +207,8 @@ export class InfraBillingController {
         };
     }
 
-    @ApiCreatedResponse({
-        type: CreateInfraBillingNodeResponseDto,
-        description: 'Infra billing node created successfully',
-    })
     @Endpoint({
+        type: CreateInfraBillingNodeResponseDto,
         command: CreateInfraBillingNodeCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -278,22 +223,14 @@ export class InfraBillingController {
         };
     }
 
-    @ApiOkResponse({
-        type: DeleteInfraBillingNodeResponseDto,
-        description: 'Infra billing node deleted successfully',
-    })
     @Endpoint({
         command: DeleteInfraBillingNodeCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteInfraBillingNode(
-        @Param() param: DeleteInfraBillingNodeParamDto,
-    ): Promise<DeleteInfraBillingNodeResponseDto> {
+    async deleteInfraBillingNode(@Param() param: DeleteInfraBillingNodeParamDto) {
         const result = await this.infraBillingService.deleteInfraBillingNodeByUuid(param.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 }

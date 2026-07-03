@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { NODES_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
-import { NodesSchema } from '../../models';
+import { NodeResponseSchema } from './node.response';
 
 export namespace GetNodeCommand {
     export const url = REST_API.NODES.GET_BY_UUID;
@@ -19,9 +19,7 @@ export namespace GetNodeCommand {
         uuid: z.string().uuid(),
     });
 
-    export const ResponseSchema = z.object({
-        response: NodesSchema,
-    });
+    export const ResponseSchema = NodeResponseSchema;
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;

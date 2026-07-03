@@ -13,7 +13,6 @@ import {
 } from './dtos';
 import { InfraBillingHistoryEntity, InfraBillingNodeEntity, InfraProviderEntity } from './entities';
 import {
-    DeleteByUuidResponseModel,
     GetBillingNodesResponseModel,
     GetInfraBillingHistoryRecordsResponseModel,
     GetInfraProvidersResponseModel,
@@ -63,13 +62,11 @@ export class InfraBillingService {
         }
     }
 
-    public async deleteInfraProviderByUuid(
-        uuid: string,
-    ): Promise<TResult<DeleteByUuidResponseModel>> {
+    public async deleteInfraProviderByUuid(uuid: string): Promise<TResult<boolean>> {
         try {
             await this.infraProviderRepository.deleteByUUID(uuid);
 
-            return ok(new DeleteByUuidResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.DELETE_INFRA_PROVIDER_BY_UUID_ERROR);
@@ -141,16 +138,11 @@ export class InfraBillingService {
         }
     }
 
-    public async deleteInfraBillingHistoryRecordByUuid(
-        uuid: string,
-    ): Promise<TResult<GetInfraBillingHistoryRecordsResponseModel>> {
+    public async deleteInfraBillingHistoryRecordByUuid(uuid: string): Promise<TResult<boolean>> {
         try {
             await this.infraBillingHistoryRepository.deleteByUUID(uuid);
 
-            return await this.getInfraBillingHistoryRecords({
-                start: 0,
-                size: 50,
-            });
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.DELETE_INFRA_BILLING_HISTORY_RECORD_BY_UUID_ERROR);

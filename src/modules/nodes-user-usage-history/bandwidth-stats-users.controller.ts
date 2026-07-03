@@ -1,5 +1,5 @@
 import { Controller, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -36,16 +36,10 @@ import { NodesUserUsageHistoryService } from './nodes-user-usage-history.service
 export class BandwidthStatsUsersController {
     constructor(private readonly nodesUserUsageHistoryService: NodesUserUsageHistoryService) {}
 
-    @ApiNotFoundResponse({
-        description: 'User not found',
-    })
-    @ApiOkResponse({
-        type: GetLegacyStatsUserUsageResponseDto,
-        description: 'User usage by range (legacy) fetched successfully',
-    })
     @Endpoint({
         command: GetLegacyStatsUserUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetLegacyStatsUserUsageResponseDto,
     })
     async getUserUsageByRange(
         @Query() query: GetLegacyStatsUserUsageQueryDto,
@@ -63,13 +57,10 @@ export class BandwidthStatsUsersController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetStatsUserUsageResponseDto,
-        description: 'Stats user usage fetched successfully',
-    })
     @Endpoint({
         command: GetStatsUserUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatsUserUsageResponseDto,
     })
     async getStatsNodesUsage(
         @Query() query: GetStatsUserUsageQueryDto,

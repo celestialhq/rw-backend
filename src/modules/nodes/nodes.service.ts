@@ -24,12 +24,7 @@ import {
     UpdateNodeBodyDto,
 } from './dtos';
 import { NodesEntity } from './entities';
-import {
-    BaseEventResponseModel,
-    DeleteNodeResponseModel,
-    NodeResponseModel,
-    RestartNodeResponseModel,
-} from './models';
+import { NodeResponseModel } from './models';
 import { NodesSystemCacheService } from './nodes-system-cache.service';
 import { NodesRepository } from './repositories/nodes.repository';
 
@@ -149,10 +144,7 @@ export class NodesService {
         }
     }
 
-    public async restartNode(
-        uuid: string,
-        force: boolean,
-    ): Promise<TResult<RestartNodeResponseModel>> {
+    public async restartNode(uuid: string, force: boolean): Promise<TResult<boolean>> {
         try {
             const node = await this.nodesRepository.findByUUID(uuid);
             if (!node) {
@@ -168,14 +160,14 @@ export class NodesService {
                 force,
             });
 
-            return ok(new RestartNodeResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(JSON.stringify(error));
             return fail(ERRORS.RESTART_NODE_ERROR);
         }
     }
 
-    public async resetNodeTraffic(uuid: string): Promise<TResult<BaseEventResponseModel>> {
+    public async resetNodeTraffic(uuid: string): Promise<TResult<boolean>> {
         try {
             const node = await this.nodesRepository.findByUUID(uuid);
             if (!node) {
@@ -187,16 +179,14 @@ export class NodesService {
                 trafficUsedBytes: BigInt(0),
             });
 
-            return ok(new BaseEventResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(JSON.stringify(error));
             return fail(ERRORS.RESET_NODE_TRAFFIC_ERROR);
         }
     }
 
-    public async restartAllNodes(
-        forceRestart: boolean,
-    ): Promise<TResult<RestartNodeResponseModel>> {
+    public async restartAllNodes(forceRestart: boolean): Promise<TResult<boolean>> {
         try {
             const nodes = await this.nodesRepository.findByCriteria({
                 isDisabled: false,
@@ -210,7 +200,7 @@ export class NodesService {
                 force: forceRestart,
             });
 
-            return ok(new RestartNodeResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(JSON.stringify(error));
             return fail(ERRORS.RESTART_NODE_ERROR);
@@ -233,7 +223,7 @@ export class NodesService {
         }
     }
 
-    public async deleteNode(uuid: string): Promise<TResult<DeleteNodeResponseModel>> {
+    public async deleteNode(uuid: string): Promise<TResult<boolean>> {
         try {
             const node = await this.nodesRepository.findByUUID(uuid);
             if (!node) {
@@ -249,7 +239,7 @@ export class NodesService {
 
             await this.nodesSystemCacheService.delete(node.uuid);
 
-            return ok(new DeleteNodeResponseModel({ isDeleted: true }));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.DELETE_NODE_ERROR);
@@ -486,9 +476,7 @@ export class NodesService {
         }
     }
 
-    public async profileModification(
-        body: ProfileModificationBodyDto,
-    ): Promise<TResult<BaseEventResponseModel>> {
+    public async profileModification(body: ProfileModificationBodyDto): Promise<TResult<boolean>> {
         try {
             const { uuids, configProfile } = body;
 
@@ -524,16 +512,14 @@ export class NodesService {
                 emitter: 'bulkProfileModification',
             }); // no need to restart all nodes
 
-            return ok(new BaseEventResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async bulkNodesActions(
-        body: BulkNodesActionsBodyDto,
-    ): Promise<TResult<BaseEventResponseModel>> {
+    public async bulkNodesActions(body: BulkNodesActionsBodyDto): Promise<TResult<boolean>> {
         try {
             const { uuids, action } = body;
 
@@ -554,16 +540,14 @@ export class NodesService {
                 await handler(uuid);
             }
 
-            return ok(new BaseEventResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async bulkNodesUpdate(
-        body: BulkNodesUpdateBodyDto,
-    ): Promise<TResult<BaseEventResponseModel>> {
+    public async bulkNodesUpdate(body: BulkNodesUpdateBodyDto): Promise<TResult<boolean>> {
         try {
             const { uuids, fields } = body;
 
@@ -585,7 +569,7 @@ export class NodesService {
                 );
             }
 
-            return ok(new BaseEventResponseModel(true));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.INTERNAL_SERVER_ERROR);
