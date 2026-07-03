@@ -63,9 +63,9 @@ async function bootstrap(): Promise<void> {
         }),
     });
 
-    ghActionsDocs(app);
-
     app.setGlobalPrefix(ROOT);
+
+    ghActionsDocs(app);
 
     app.useGlobalPipes(new ZodValidationPipe());
 

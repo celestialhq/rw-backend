@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { json } from 'express';
+import { json, NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
@@ -77,25 +77,28 @@ async function bootstrap(): Promise<void> {
 
     const config = app.get(TypedConfigService);
 
-    await getDocs(app, config);
+    const helmetMiddleware = helmet({
+        contentSecurityPolicy: {
+            useDefaults: true,
+            directives: {
+                'script-src': ["'self'", "'wasm-unsafe-eval'"],
+                'img-src': ["'self'", 'data:', 'https:'],
+                'connect-src': ["'self'", 'https://raw.githubusercontent.com', 'https://ungh.cc'],
+            },
+        },
+    });
+
+    const docsPaths: string[] = config.getOrThrow('IS_DOCS_ENABLED')
+        ? [config.getOrThrow('SWAGGER_PATH'), config.getOrThrow('SCALAR_PATH')]
+        : [];
 
     if (!isDevelopment()) {
-        app.use(
-            helmet({
-                contentSecurityPolicy: {
-                    useDefaults: true,
-                    directives: {
-                        'script-src': ["'self'", "'wasm-unsafe-eval'"],
-                        'img-src': ["'self'", 'data:', 'https:'],
-                        'connect-src': [
-                            "'self'",
-                            'https://raw.githubusercontent.com',
-                            'https://ungh.cc',
-                        ],
-                    },
-                },
-            }),
-        );
+        app.use((req: Request, res: Response, next: NextFunction) => {
+            if (docsPaths.some((path) => req.path === path || req.path.startsWith(`${path}/`))) {
+                return next();
+            }
+            return helmetMiddleware(req, res, next);
+        });
     }
 
     app.use(compression());
@@ -119,6 +122,8 @@ async function bootstrap(): Promise<void> {
     app.use(noRobotsMiddleware, proxyCheckMiddleware);
 
     app.setGlobalPrefix(ROOT);
+
+    await getDocs(app, config);
 
     app.enableCors({
         origin: isDevelopment() ? '*' : config.getOrThrow('FRONT_END_DOMAIN'),
