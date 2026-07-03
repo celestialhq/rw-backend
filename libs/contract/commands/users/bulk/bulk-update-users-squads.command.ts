@@ -24,12 +24,5 @@ export namespace BulkUpdateUsersSquadsCommand {
         }),
     });
 
-    export const ResponseSchema = z.object({
-        response: z.object({
-            affectedRows: z.number(),
-        }),
-    });
-
     export type RequestBody = z.infer<typeof RequestBodySchema>;
-    export type Response = z.infer<typeof ResponseSchema>;
 }

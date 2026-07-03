@@ -18,12 +18,5 @@ export namespace RestartAllNodesCommand {
         forceRestart: z.boolean(),
     });
 
-    export const ResponseSchema = z.object({
-        response: z.object({
-            eventSent: z.boolean(),
-        }),
-    });
-
     export type RequestBody = z.infer<typeof RequestBodySchema>;
-    export type Response = z.infer<typeof ResponseSchema>;
 }

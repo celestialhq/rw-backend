@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, REMNAAWAVE_SETTINGS_CONTROLLER } from '@contract/api'
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -32,13 +32,10 @@ import { RemnawaveSettingsService } from './remnawave-settings.service';
 export class RemnawaveSettingsController {
     constructor(private readonly remnawaveSettingsService: RemnawaveSettingsService) {}
 
-    @ApiOkResponse({
-        type: GetRemnawaveSettingsResponseDto,
-        description: 'Remnawave settings retrieved successfully',
-    })
     @Endpoint({
         command: GetRemnawaveSettingsCommand,
         httpCode: HttpStatus.OK,
+        type: GetRemnawaveSettingsResponseDto,
     })
     async getSettings(): Promise<GetRemnawaveSettingsResponseDto> {
         const result = await this.remnawaveSettingsService.getSettingsFromController();
@@ -49,13 +46,10 @@ export class RemnawaveSettingsController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateRemnawaveSettingsResponseDto,
-        description: 'Subscription settings updated successfully',
-    })
     @Endpoint({
         command: UpdateRemnawaveSettingsCommand,
         httpCode: HttpStatus.OK,
+        type: UpdateRemnawaveSettingsResponseDto,
     })
     async updateSettings(
         @Body() body: UpdateRemnawaveSettingsBodyDto,

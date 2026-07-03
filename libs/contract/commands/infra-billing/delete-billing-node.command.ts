@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { INFRA_BILLING_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
-import { InfraBillingAvailableNodeSchema, InfraBillingNodeSchema } from '../../models';
 
 export namespace DeleteInfraBillingNodeCommand {
     export const url = REST_API.INFRA_BILLING.DELETE_BILLING_NODE;
@@ -19,20 +18,5 @@ export namespace DeleteInfraBillingNodeCommand {
         uuid: z.string().uuid(),
     });
 
-    export const ResponseSchema = z.object({
-        response: z.object({
-            totalBillingNodes: z.number(),
-            billingNodes: z.array(InfraBillingNodeSchema),
-            availableBillingNodes: z.array(InfraBillingAvailableNodeSchema),
-            totalAvailableBillingNodes: z.number(),
-            stats: z.object({
-                upcomingNodesCount: z.number(),
-                currentMonthPayments: z.number(),
-                totalSpent: z.number(),
-            }),
-        }),
-    });
-
     export type RequestParam = z.infer<typeof RequestParamSchema>;
-    export type Response = z.infer<typeof ResponseSchema>;
 }

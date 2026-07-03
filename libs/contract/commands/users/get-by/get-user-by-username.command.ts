@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { REST_API, USERS_ROUTES } from '../../../api';
 import { getEndpointDetails } from '../../../constants';
-import { ExtendedUsersSchema } from '../../../models';
+import { UserResponseSchema } from '../user.response';
 
 export namespace GetUserByUsernameCommand {
     export const url = REST_API.USERS.GET_BY.USERNAME;
@@ -19,9 +19,7 @@ export namespace GetUserByUsernameCommand {
         username: z.string(),
     });
 
-    export const ResponseSchema = z.object({
-        response: ExtendedUsersSchema,
-    });
+    export const ResponseSchema = UserResponseSchema;
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;

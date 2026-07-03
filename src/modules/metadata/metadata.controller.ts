@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -16,7 +16,7 @@ import {
     UpsertNodeMetadataCommand,
     UpsertUserMetadataCommand,
 } from '@libs/contracts/commands';
-import { ERRORS, ROLE } from '@libs/contracts/constants';
+import { ROLE } from '@libs/contracts/constants';
 
 import {
     GetNodeMetadataParamDto,
@@ -40,54 +40,10 @@ import { MetadataService } from './metadata.service';
 export class MetadataController {
     constructor(private readonly metadataService: MetadataService) {}
 
-    @ApiNotFoundResponse({
-        description: 'User or Metadata not found (see errorCode for more details)',
-        schema: {
-            oneOf: [
-                {
-                    example: {
-                        timestamp: 'omitted',
-                        path: 'omitted',
-                        message: ERRORS.USER_NOT_FOUND.message,
-                        errorCode: ERRORS.USER_NOT_FOUND.code,
-                    },
-                    properties: {
-                        timestamp: { type: 'string' },
-                        path: { type: 'string' },
-                        message: { type: 'string' },
-                        errorCode: {
-                            type: 'string',
-                            enum: [ERRORS.USER_NOT_FOUND.code] as const,
-                        },
-                    },
-                },
-                {
-                    example: {
-                        timestamp: 'omitted',
-                        path: 'omitted',
-                        message: ERRORS.METADATA_NOT_FOUND.message,
-                        errorCode: ERRORS.METADATA_NOT_FOUND.code,
-                    },
-                    properties: {
-                        timestamp: { type: 'string' },
-                        path: { type: 'string' },
-                        message: { type: 'string' },
-                        errorCode: {
-                            type: 'string',
-                            enum: [ERRORS.METADATA_NOT_FOUND.code] as const,
-                        },
-                    },
-                },
-            ],
-        },
-    })
-    @ApiOkResponse({
-        type: GetUserMetadataResponseDto,
-        description: 'User Metadata retrieved successfully',
-    })
     @Endpoint({
         command: GetUserMetadataCommand,
         httpCode: HttpStatus.OK,
+        type: GetUserMetadataResponseDto,
     })
     async getUserMetadata(
         @Param() params: GetUserMetadataParamDto,
@@ -100,33 +56,10 @@ export class MetadataController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'User not found (see errorCode for more details)',
-        schema: {
-            example: {
-                timestamp: 'omitted',
-                path: 'omitted',
-                message: ERRORS.USER_NOT_FOUND.message,
-                errorCode: ERRORS.USER_NOT_FOUND.code,
-            },
-            properties: {
-                timestamp: { type: 'string' },
-                path: { type: 'string' },
-                message: { type: 'string' },
-                errorCode: {
-                    type: 'string',
-                    enum: [ERRORS.USER_NOT_FOUND.code] as const,
-                },
-            },
-        },
-    })
-    @ApiOkResponse({
-        type: UpsertUserMetadataResponseDto,
-        description: 'User Metadata upserted successfully',
-    })
     @Endpoint({
         command: UpsertUserMetadataCommand,
         httpCode: HttpStatus.OK,
+        type: UpsertUserMetadataResponseDto,
     })
     async upsertUserMetadata(
         @Param() params: GetUserMetadataParamDto,
@@ -140,54 +73,10 @@ export class MetadataController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Node or Metadata not found (see errorCode for more details)',
-        schema: {
-            oneOf: [
-                {
-                    example: {
-                        timestamp: 'omitted',
-                        path: 'omitted',
-                        message: ERRORS.NODE_NOT_FOUND.message,
-                        errorCode: ERRORS.NODE_NOT_FOUND.code,
-                    },
-                    properties: {
-                        timestamp: { type: 'string' },
-                        path: { type: 'string' },
-                        message: { type: 'string' },
-                        errorCode: {
-                            type: 'string',
-                            enum: [ERRORS.NODE_NOT_FOUND.code] as const,
-                        },
-                    },
-                },
-                {
-                    example: {
-                        timestamp: 'omitted',
-                        path: 'omitted',
-                        message: ERRORS.METADATA_NOT_FOUND.message,
-                        errorCode: ERRORS.METADATA_NOT_FOUND.code,
-                    },
-                    properties: {
-                        timestamp: { type: 'string' },
-                        path: { type: 'string' },
-                        message: { type: 'string' },
-                        errorCode: {
-                            type: 'string',
-                            enum: [ERRORS.METADATA_NOT_FOUND.code] as const,
-                        },
-                    },
-                },
-            ],
-        },
-    })
-    @ApiOkResponse({
-        type: GetNodeMetadataResponseDto,
-        description: 'Node Metadata retrieved successfully',
-    })
     @Endpoint({
         command: GetNodeMetadataCommand,
         httpCode: HttpStatus.OK,
+        type: GetNodeMetadataResponseDto,
     })
     async getNodeMetadata(
         @Param() params: GetNodeMetadataParamDto,
@@ -200,33 +89,10 @@ export class MetadataController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Node not found (see errorCode for more details)',
-        schema: {
-            example: {
-                timestamp: 'omitted',
-                path: 'omitted',
-                message: ERRORS.NODE_NOT_FOUND.message,
-                errorCode: ERRORS.NODE_NOT_FOUND.code,
-            },
-            properties: {
-                timestamp: { type: 'string' },
-                path: { type: 'string' },
-                message: { type: 'string' },
-                errorCode: {
-                    type: 'string',
-                    enum: [ERRORS.NODE_NOT_FOUND.code] as const,
-                },
-            },
-        },
-    })
-    @ApiOkResponse({
-        type: UpsertNodeMetadataResponseDto,
-        description: 'Node Metadata upserted successfully',
-    })
     @Endpoint({
         command: UpsertNodeMetadataCommand,
         httpCode: HttpStatus.OK,
+        type: UpsertNodeMetadataResponseDto,
     })
     async upsertNodeMetadata(
         @Param() params: GetNodeMetadataParamDto,

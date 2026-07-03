@@ -18,12 +18,5 @@ export namespace DeleteUserCommand {
         uuid: z.string().uuid(),
     });
 
-    export const ResponseSchema = z.object({
-        response: z.object({
-            isDeleted: z.boolean(),
-        }),
-    });
-
     export type RequestParam = z.infer<typeof RequestParamSchema>;
-    export type Response = z.infer<typeof ResponseSchema>;
 }

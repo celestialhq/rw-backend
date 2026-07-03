@@ -5,6 +5,3 @@ import { GetUserByUsernameCommand } from '@libs/contracts/commands';
 export class GetUserByUsernameParamDto extends createZodDto(
     GetUserByUsernameCommand.RequestParamSchema,
 ) {}
-export class GetUserByUsernameResponseDto extends createZodDto(
-    GetUserByUsernameCommand.ResponseSchema,
-) {}

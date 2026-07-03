@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -41,13 +41,10 @@ import { HostResponseModel } from '../models';
 export class HostsBulkActionsController {
     constructor(private readonly hostsService: HostsService) {}
 
-    @ApiOkResponse({
-        type: BulkDeleteHostsResponseDto,
-        description: 'Hosts deleted successfully',
-    })
     @Endpoint({
         command: BulkDeleteHostsCommand,
         httpCode: HttpStatus.OK,
+        type: BulkDeleteHostsResponseDto,
     })
     async deleteHosts(@Body() body: BulkDeleteHostsBodyDto): Promise<BulkDeleteHostsResponseDto> {
         const result = await this.hostsService.deleteHosts(body.uuids);
@@ -58,13 +55,10 @@ export class HostsBulkActionsController {
         };
     }
 
-    @ApiOkResponse({
-        type: BulkDisableHostsResponseDto,
-        description: 'Hosts disabled successfully',
-    })
     @Endpoint({
         command: BulkDisableHostsCommand,
         httpCode: HttpStatus.OK,
+        type: BulkDisableHostsResponseDto,
     })
     async disableHosts(
         @Body() body: BulkDisableHostsBodyDto,
@@ -77,13 +71,10 @@ export class HostsBulkActionsController {
         };
     }
 
-    @ApiOkResponse({
-        type: BulkEnableHostsResponseDto,
-        description: 'Hosts enabled successfully',
-    })
     @Endpoint({
         command: BulkEnableHostsCommand,
         httpCode: HttpStatus.OK,
+        type: BulkEnableHostsResponseDto,
     })
     async enableHosts(@Body() body: BulkEnableHostsBodyDto): Promise<BulkEnableHostsResponseDto> {
         const result = await this.hostsService.bulkEnableHosts(body.uuids);
@@ -94,13 +85,10 @@ export class HostsBulkActionsController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateManyHostsResponseDto,
-        description: 'Hosts updated successfully',
-    })
     @Endpoint({
         command: UpdateManyHostsCommand,
         httpCode: HttpStatus.OK,
+        type: UpdateManyHostsResponseDto,
     })
     async setPortToHosts(
         @Body() body: UpdateManyHostsBodyDto,

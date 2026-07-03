@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, SUBSCRIPTION_TEMPLATE_CONTROLLER } from '@contract/ap
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -25,7 +25,6 @@ import {
     CreateSubscriptionTemplateBodyDto,
     CreateSubscriptionTemplateResponseDto,
     DeleteSubscriptionTemplateParamDto,
-    DeleteSubscriptionTemplateResponseDto,
     GetTemplateParamDto,
     GetTemplateResponseDto,
     GetTemplatesResponseDto,
@@ -46,13 +45,10 @@ import { SubscriptionTemplateService } from './subscription-template.service';
 export class SubscriptionTemplateController {
     constructor(private readonly subscriptionTemplateService: SubscriptionTemplateService) {}
 
-    @ApiOkResponse({
-        type: GetTemplatesResponseDto,
-        description: 'Templates retrieved successfully',
-    })
     @Endpoint({
         command: GetSubscriptionTemplatesCommand,
         httpCode: HttpStatus.OK,
+        type: GetTemplatesResponseDto,
     })
     async getAllTemplates(): Promise<GetTemplatesResponseDto> {
         const result = await this.subscriptionTemplateService.getAllTemplates();
@@ -63,13 +59,10 @@ export class SubscriptionTemplateController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetTemplateResponseDto,
-        description: 'Template retrieved successfully',
-    })
     @Endpoint({
         command: GetSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
+        type: GetTemplateResponseDto,
     })
     async getTemplateByUuid(@Param() param: GetTemplateParamDto): Promise<GetTemplateResponseDto> {
         const result = await this.subscriptionTemplateService.getTemplateByUuid(param.uuid);
@@ -79,11 +72,8 @@ export class SubscriptionTemplateController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateTemplateResponseDto,
-        description: 'Template updated successfully',
-    })
     @Endpoint({
+        type: UpdateTemplateResponseDto,
         command: UpdateSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
     })
@@ -101,32 +91,21 @@ export class SubscriptionTemplateController {
         };
     }
 
-    @ApiOkResponse({
-        type: DeleteSubscriptionTemplateResponseDto,
-        description: 'Template deleted successfully',
-    })
     @Endpoint({
         command: DeleteSubscriptionTemplateCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteTemplate(
-        @Param() param: DeleteSubscriptionTemplateParamDto,
-    ): Promise<DeleteSubscriptionTemplateResponseDto> {
+    async deleteTemplate(@Param() param: DeleteSubscriptionTemplateParamDto) {
         const result = await this.subscriptionTemplateService.deleteTemplate(param.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiOkResponse({
-        type: CreateSubscriptionTemplateResponseDto,
-        description: 'Template created successfully',
-    })
     @Endpoint({
         command: CreateSubscriptionTemplateCommand,
         httpCode: HttpStatus.CREATED,
+        type: CreateSubscriptionTemplateResponseDto,
     })
     async createTemplate(
         @Body() body: CreateSubscriptionTemplateBodyDto,
@@ -142,13 +121,10 @@ export class SubscriptionTemplateController {
         };
     }
 
-    @ApiOkResponse({
-        type: ReorderSubscriptionTemplatesResponseDto,
-        description: 'Subscription templates reordered successfully',
-    })
     @Endpoint({
         command: ReorderSubscriptionTemplateCommand,
         httpCode: HttpStatus.OK,
+        type: ReorderSubscriptionTemplatesResponseDto,
     })
     async reorderSubscriptionTemplates(
         @Body() body: ReorderSubscriptionTemplatesBodyDto,

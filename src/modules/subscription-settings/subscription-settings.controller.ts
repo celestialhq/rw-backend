@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, SUBSCRIPTION_SETTINGS_CONTROLLER } from '@contract/ap
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -35,13 +35,10 @@ import { SubscriptionSettingsService } from './subscription-settings.service';
 export class SubscriptionSettingsController {
     constructor(private readonly subscriptionSettingsService: SubscriptionSettingsService) {}
 
-    @ApiOkResponse({
-        type: GetSubscriptionSettingsResponseDto,
-        description: 'Subscription settings retrieved successfully',
-    })
     @Endpoint({
         command: GetSubscriptionSettingsCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionSettingsResponseDto,
     })
     async getSettings(): Promise<GetSubscriptionSettingsResponseDto> {
         const result = await this.subscriptionSettingsService.getSubscriptionSettings();
@@ -52,13 +49,10 @@ export class SubscriptionSettingsController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateSubscriptionSettingsResponseDto,
-        description: 'Subscription settings updated successfully',
-    })
     @Endpoint({
         command: UpdateSubscriptionSettingsCommand,
         httpCode: HttpStatus.OK,
+        type: UpdateSubscriptionSettingsResponseDto,
     })
     async updateSettings(
         @Body() body: UpdateSubscriptionSettingsBodyDto,

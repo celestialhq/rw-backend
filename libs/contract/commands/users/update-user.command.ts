@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import { REST_API, USERS_ROUTES } from '../../api';
 import { getEndpointDetails, RESET_PERIODS, USERS_STATUS } from '../../constants';
-import { ExtendedUsersSchema, UsersSchema } from '../../models';
-
+import { UsersSchema } from '../../models';
+import { UserResponseSchema } from './user.response';
 export namespace UpdateUserCommand {
     export const url = REST_API.USERS.UPDATE;
     export const TSQ_url = url;
@@ -94,9 +94,7 @@ export namespace UpdateUserCommand {
             message: 'Either uuid or username must be provided',
         });
 
-    export const ResponseSchema = z.object({
-        response: ExtendedUsersSchema,
-    });
+    export const ResponseSchema = UserResponseSchema;
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;

@@ -17,6 +17,4 @@ export class UpdateSnippetResponseDto extends createZodDto(UpdateSnippetCommand.
 
 export class DeleteSnippetBodyDto extends createZodDto(DeleteSnippetCommand.RequestBodySchema) {}
 
-export class DeleteSnippetResponseDto extends createZodDto(DeleteSnippetCommand.ResponseSchema) {}
-
 export class GetSnippetsResponseDto extends createZodDto(GetSnippetsCommand.ResponseSchema) {}

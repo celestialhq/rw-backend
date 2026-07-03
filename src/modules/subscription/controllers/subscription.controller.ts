@@ -1,7 +1,7 @@
 import { Response } from 'express';
 
 import { Controller, Get, HttpStatus, Param, Res, UseFilters } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { GetSrrContext } from '@common/decorators/get-srr-context';
@@ -61,14 +61,10 @@ export class SubscriptionController {
         return response.type(contentType).send(body);
     }
 
-    @ApiResponse({
-        status: 200,
-        description: 'Subscription info fetched successfully',
-        type: GetSubscriptionInfoResponseDto,
-    })
     @Endpoint({
         command: GetSubscriptionInfoByShortUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionInfoResponseDto,
     })
     async getSubscriptionInfoByShortUuid(
         @Param() param: GetSubscriptionInfoParamDto,

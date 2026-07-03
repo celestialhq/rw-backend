@@ -5,6 +5,3 @@ import { BulkDeleteUsersByStatusCommand } from '@libs/contracts/commands';
 export class BulkDeleteUsersByStatusBodyDto extends createZodDto(
     BulkDeleteUsersByStatusCommand.RequestBodySchema,
 ) {}
-export class BulkDeleteUsersByStatusResponseDto extends createZodDto(
-    BulkDeleteUsersByStatusCommand.ResponseSchema,
-) {}

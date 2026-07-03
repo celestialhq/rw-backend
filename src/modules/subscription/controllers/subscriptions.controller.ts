@@ -10,7 +10,7 @@ import {
     UseFilters,
     UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { IpAddress } from '@common/decorators/get-ip';
@@ -67,13 +67,10 @@ import { SubscriptionService } from '../subscription.service';
 export class SubscriptionsController {
     constructor(private readonly subscriptionService: SubscriptionService) {}
 
-    @ApiOkResponse({
-        type: GetSubscriptionsResponseDto,
-        description: 'Users fetched successfully',
-    })
     @Endpoint({
         command: GetSubscriptionsCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionsResponseDto,
     })
     async getAllSubscriptions(
         @Query() query: GetSubscriptionsQueryDto,
@@ -93,25 +90,10 @@ export class SubscriptionsController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'User not found',
-        schema: {
-            type: 'object',
-            properties: {
-                timestamp: { type: 'string', format: 'date-time' },
-                path: { type: 'string' },
-                message: { type: 'string' },
-                errorCode: { type: 'string' },
-            },
-        },
-    })
-    @ApiOkResponse({
-        type: GetSubscriptionByUsernameResponseDto,
-        description: 'Subscription fetched successfully',
-    })
     @Endpoint({
         command: GetSubscriptionByUsernameCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionByUsernameResponseDto,
     })
     async getSubscriptionByUsername(
         @Param() param: GetSubscriptionByUsernameParamDto,
@@ -132,25 +114,10 @@ export class SubscriptionsController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'User not found',
-        schema: {
-            type: 'object',
-            properties: {
-                timestamp: { type: 'string', format: 'date-time' },
-                path: { type: 'string' },
-                message: { type: 'string' },
-                errorCode: { type: 'string' },
-            },
-        },
-    })
-    @ApiOkResponse({
-        type: GetSubscriptionByShortUuidProtectedResponseDto,
-        description: 'Subscription fetched successfully',
-    })
     @Endpoint({
         command: GetSubscriptionByShortUuidProtectedCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionByShortUuidProtectedResponseDto,
     })
     async getSubscriptionByShortUuidProtected(
         @Param() param: GetSubscriptionByShortUuidProtectedParamDto,
@@ -171,25 +138,10 @@ export class SubscriptionsController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'User not found',
-        schema: {
-            type: 'object',
-            properties: {
-                timestamp: { type: 'string', format: 'date-time' },
-                path: { type: 'string' },
-                message: { type: 'string' },
-                errorCode: { type: 'string' },
-            },
-        },
-    })
-    @ApiOkResponse({
-        type: GetSubscriptionByUuidResponseDto,
-        description: 'Subscription fetched successfully',
-    })
     @Endpoint({
         command: GetSubscriptionByUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubscriptionByUuidResponseDto,
     })
     async getSubscriptionByUuid(
         @Param() param: GetSubscriptionByUuidParamDto,
@@ -210,13 +162,10 @@ export class SubscriptionsController {
         };
     }
 
-    @ApiOkResponse({
-        description: 'Raw subscription fetched successfully',
-        type: GetRawSubscriptionByShortUuidResponseDto,
-    })
     @Endpoint({
         command: GetRawSubscriptionByShortUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetRawSubscriptionByShortUuidResponseDto,
     })
     async getRawSubscriptionByShortUuid(
         @IpAddress() ip: string,
@@ -239,13 +188,10 @@ export class SubscriptionsController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetSubpageConfigByShortUuidResponseDto,
-        description: 'Subpage config fetched successfully',
-    })
     @Endpoint({
         command: GetSubpageConfigByShortUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetSubpageConfigByShortUuidResponseDto,
     })
     async getSubpageConfigByShortUuid(
         @Param() param: GetSubpageConfigByShortUuidParamDto,
@@ -262,13 +208,10 @@ export class SubscriptionsController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetConnectionKeysByUuidResponseDto,
-        description: 'Connection keys fetched successfully',
-    })
     @Endpoint({
         command: GetConnectionKeysByUuidCommand,
         httpCode: HttpStatus.OK,
+        type: GetConnectionKeysByUuidResponseDto,
     })
     async getConnectionKeysByUuid(
         @Param() param: GetConnectionKeysByUuidParamDto,

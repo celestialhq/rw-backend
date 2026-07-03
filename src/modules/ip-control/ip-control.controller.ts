@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -25,7 +25,6 @@ import {
     FetchIpsResultParamDto,
     FetchIpsResultResponseDto,
     DropConnectionsBodyDto,
-    DropConnectionsResponseDto,
     FetchUsersIpsResponseDto,
     FetchUsersIpsParamDto,
     FetchUsersIpsResultParamDto,
@@ -43,14 +42,8 @@ import { IpControlService } from './ip-control.service';
 export class IpControlController {
     constructor(private readonly ipControlService: IpControlService) {}
 
-    @ApiNotFoundResponse({
-        description: 'User not found',
-    })
-    @ApiOkResponse({
-        type: FetchIpsResponseDto,
-        description: 'Return jobId for further processing',
-    })
     @Endpoint({
+        type: FetchIpsResponseDto,
         command: FetchIpsCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -63,14 +56,8 @@ export class IpControlController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Job not found',
-    })
-    @ApiOkResponse({
-        type: FetchIpsResultResponseDto,
-        description: 'Return result or status of the job',
-    })
     @Endpoint({
+        type: FetchIpsResultResponseDto,
         command: FetchIpsResultCommand,
         httpCode: HttpStatus.OK,
     })
@@ -85,36 +72,19 @@ export class IpControlController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'User not found // Connected nodes not found',
-    })
-    @ApiOkResponse({
-        type: DropConnectionsResponseDto,
-        description: 'Event sent to background executor',
-    })
     @Endpoint({
         command: DropConnectionsCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.ACCEPTED,
     })
-    async dropConnections(
-        @Body() body: DropConnectionsBodyDto,
-    ): Promise<DropConnectionsResponseDto> {
+    async dropConnections(@Body() body: DropConnectionsBodyDto) {
         const result = await this.ipControlService.dropConnections(body);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiNotFoundResponse({
-        description: 'Node not found',
-    })
-    @ApiOkResponse({
-        type: FetchUsersIpsResponseDto,
-        description: 'Return jobId for further processing',
-    })
     @Endpoint({
+        type: FetchUsersIpsResponseDto,
         command: FetchUsersIpsCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -127,14 +97,8 @@ export class IpControlController {
         };
     }
 
-    @ApiNotFoundResponse({
-        description: 'Job not found',
-    })
-    @ApiOkResponse({
-        type: FetchUsersIpsResultResponseDto,
-        description: 'Return result or status of the job',
-    })
     @Endpoint({
+        type: FetchUsersIpsResultResponseDto,
         command: FetchUsersIpsResultCommand,
         httpCode: HttpStatus.OK,
     })

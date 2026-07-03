@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, SUBSCRIPTION_PAGE_CONFIGS_CONTROLLER } from '@contrac
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -30,7 +30,6 @@ import {
     UpdateSubpageConfigBodyDto,
     UpdateSubpageConfigResponseDto,
     DeleteSubpageConfigParamDto,
-    DeleteSubpageConfigResponseDto,
     CreateSubpageConfigBodyDto,
     CreateSubpageConfigResponseDto,
     GetSubpageConfigParamDto,
@@ -49,11 +48,8 @@ import { SubscriptionPageConfigService } from './subpage-configs.service';
 export class SubscriptionPageConfigController {
     constructor(private readonly subscriptionPageConfigService: SubscriptionPageConfigService) {}
 
-    @ApiOkResponse({
-        type: GetSubpageConfigsResponseDto,
-        description: 'Subscription page configs retrieved successfully',
-    })
     @Endpoint({
+        type: GetSubpageConfigsResponseDto,
         command: GetSubpageConfigsCommand,
         httpCode: HttpStatus.OK,
     })
@@ -66,11 +62,8 @@ export class SubscriptionPageConfigController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetSubpageConfigResponseDto,
-        description: 'Subscription page config retrieved successfully',
-    })
     @Endpoint({
+        type: GetSubpageConfigResponseDto,
         command: GetSubpageConfigCommand,
         httpCode: HttpStatus.OK,
     })
@@ -88,11 +81,8 @@ export class SubscriptionPageConfigController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateSubpageConfigResponseDto,
-        description: 'Subscription page config updated successfully',
-    })
     @Endpoint({
+        type: UpdateSubpageConfigResponseDto,
         command: UpdateSubpageConfigCommand,
         httpCode: HttpStatus.OK,
     })
@@ -114,30 +104,19 @@ export class SubscriptionPageConfigController {
         };
     }
 
-    @ApiOkResponse({
-        type: DeleteSubpageConfigResponseDto,
-        description: 'Subscription page config deleted successfully',
-    })
     @Endpoint({
         command: DeleteSubpageConfigCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteConfig(
-        @Param() param: DeleteSubpageConfigParamDto,
-    ): Promise<DeleteSubpageConfigResponseDto> {
+    async deleteConfig(@Param() param: DeleteSubpageConfigParamDto) {
         const result = await this.subscriptionPageConfigService.deleteConfig(param.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiOkResponse({
-        type: CreateSubpageConfigResponseDto,
-        description: 'Subscription page config created successfully',
-    })
     @Endpoint({
+        type: CreateSubpageConfigResponseDto,
         command: CreateSubpageConfigCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -152,11 +131,8 @@ export class SubscriptionPageConfigController {
         };
     }
 
-    @ApiOkResponse({
-        type: ReorderSubpageConfigsResponseDto,
-        description: 'Subscription page configs reordered successfully',
-    })
     @Endpoint({
+        type: ReorderSubpageConfigsResponseDto,
         command: ReorderSubpageConfigsCommand,
         httpCode: HttpStatus.OK,
     })
@@ -173,11 +149,8 @@ export class SubscriptionPageConfigController {
         };
     }
 
-    @ApiOkResponse({
-        type: CloneSubpageConfigResponseDto,
-        description: 'Subscription page config cloned successfully',
-    })
     @Endpoint({
+        type: CloneSubpageConfigResponseDto,
         command: CloneSubpageConfigCommand,
         httpCode: HttpStatus.OK,
     })

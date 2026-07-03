@@ -16,3 +16,4 @@ export * from './resolve-user.dto';
 export * from './revoke-user-subscription.dto';
 export * from './tags';
 export * from './update-user.dto';
+export * from './user-response.dto';

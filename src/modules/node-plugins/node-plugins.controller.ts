@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, NODE_PLUGINS_CONTROLLER } from '@contract/api';
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -31,12 +31,10 @@ import {
     UpdateNodePluginBodyDto,
     UpdateNodePluginResponseDto,
     DeleteNodePluginParamDto,
-    DeleteNodePluginResponseDto,
     CreateNodePluginBodyDto,
     CreateNodePluginResponseDto,
     CloneNodePluginResponseDto,
     CloneNodePluginBodyDto,
-    PluginExecutorResponseDto,
     PluginExecutorBodyDto,
     GetNodePluginParamDto,
 } from './dtos/node-plugins.dtos';
@@ -52,11 +50,8 @@ import { NodePluginService } from './node-plugins.service';
 export class NodePluginController {
     constructor(private readonly nodePluginService: NodePluginService) {}
 
-    @ApiOkResponse({
-        type: GetNodePluginsResponseDto,
-        description: 'Node plugins retrieved successfully',
-    })
     @Endpoint({
+        type: GetNodePluginsResponseDto,
         command: GetNodePluginsCommand,
         httpCode: HttpStatus.OK,
     })
@@ -69,11 +64,8 @@ export class NodePluginController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetNodePluginResponseDto,
-        description: 'Node plugin retrieved successfully',
-    })
     @Endpoint({
+        type: GetNodePluginResponseDto,
         command: GetNodePluginCommand,
         httpCode: HttpStatus.OK,
     })
@@ -91,11 +83,8 @@ export class NodePluginController {
         };
     }
 
-    @ApiOkResponse({
-        type: UpdateNodePluginResponseDto,
-        description: 'Node plugin updated successfully',
-    })
     @Endpoint({
+        type: UpdateNodePluginResponseDto,
         command: UpdateNodePluginCommand,
         httpCode: HttpStatus.OK,
     })
@@ -117,30 +106,19 @@ export class NodePluginController {
         };
     }
 
-    @ApiOkResponse({
-        type: DeleteNodePluginResponseDto,
-        description: 'Node plugin deleted successfully',
-    })
     @Endpoint({
         command: DeleteNodePluginCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async deleteConfig(
-        @Param() param: DeleteNodePluginParamDto,
-    ): Promise<DeleteNodePluginResponseDto> {
+    async deleteConfig(@Param() param: DeleteNodePluginParamDto) {
         const result = await this.nodePluginService.deleteConfig(param.uuid);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiOkResponse({
-        type: CreateNodePluginResponseDto,
-        description: 'Node plugin created successfully',
-    })
     @Endpoint({
+        type: CreateNodePluginResponseDto,
         command: CreateNodePluginCommand,
         httpCode: HttpStatus.CREATED,
     })
@@ -155,11 +133,8 @@ export class NodePluginController {
         };
     }
 
-    @ApiOkResponse({
-        type: ReorderNodePluginsResponseDto,
-        description: 'Node plugins reordered successfully',
-    })
     @Endpoint({
+        type: ReorderNodePluginsResponseDto,
         command: ReorderNodePluginCommand,
         httpCode: HttpStatus.OK,
     })
@@ -174,11 +149,8 @@ export class NodePluginController {
         };
     }
 
-    @ApiOkResponse({
-        type: CloneNodePluginResponseDto,
-        description: 'Node plugin cloned successfully',
-    })
     @Endpoint({
+        type: CloneNodePluginResponseDto,
         command: CloneNodePluginCommand,
         httpCode: HttpStatus.OK,
     })
@@ -193,20 +165,14 @@ export class NodePluginController {
         };
     }
 
-    @ApiOkResponse({
-        type: PluginExecutorResponseDto,
-        description: 'Node plugin cloned successfully',
-    })
     @Endpoint({
         command: PluginExecutorCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.ACCEPTED,
     })
-    async pluginExecutor(@Body() body: PluginExecutorBodyDto): Promise<PluginExecutorResponseDto> {
+    async pluginExecutor(@Body() body: PluginExecutorBodyDto) {
         const result = await this.nodePluginService.executePluginCommand(body);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 }

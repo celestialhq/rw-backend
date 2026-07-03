@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { REST_API, SNIPPETS_ROUTES } from '../../api';
 import { getEndpointDetails } from '../../constants';
-import { SnippetsSchema } from '../../models';
 
 export namespace DeleteSnippetCommand {
     export const url = REST_API.SNIPPETS.DELETE;
@@ -26,13 +25,5 @@ export namespace DeleteSnippetCommand {
             ),
     });
 
-    export const ResponseSchema = z.object({
-        response: z.object({
-            total: z.number(),
-            snippets: z.array(SnippetsSchema),
-        }),
-    });
-
     export type RequestBody = z.infer<typeof RequestBodySchema>;
-    export type Response = z.infer<typeof ResponseSchema>;
 }

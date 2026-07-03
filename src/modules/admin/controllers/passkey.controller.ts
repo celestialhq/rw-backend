@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { GetJWTPayload } from '@common/decorators/get-jwt-payload';
@@ -22,7 +22,6 @@ import { IJWTAuthPayload } from '@modules/auth/interfaces';
 
 import {
     DeletePasskeyBodyDto,
-    DeletePasskeyResponseDto,
     GetPasskeyRegistrationOptionsResponseDto,
     GetPasskeysResponseDto,
     UpdatePasskeyBodyDto,
@@ -41,13 +40,10 @@ import { PasskeyService } from '../services/passkey.service';
 export class PasskeyController {
     constructor(private readonly passkeyService: PasskeyService) {}
 
-    @ApiResponse({
-        type: GetPasskeyRegistrationOptionsResponseDto,
-        description: 'Get passkey registration options',
-    })
     @Endpoint({
         command: GetPasskeyRegistrationOptionsCommand,
         httpCode: HttpStatus.OK,
+        type: GetPasskeyRegistrationOptionsResponseDto,
     })
     async passkeyRegistrationOptions(
         @GetJWTPayload() payload: IJWTAuthPayload,
@@ -60,13 +56,10 @@ export class PasskeyController {
         };
     }
 
-    @ApiResponse({
-        type: VerifyPasskeyRegistrationResponseDto,
-        description: 'Verify passkey registration result',
-    })
     @Endpoint({
         command: VerifyPasskeyRegistrationCommand,
         httpCode: HttpStatus.OK,
+        type: VerifyPasskeyRegistrationResponseDto,
     })
     async passkeyRegistrationVerify(
         @Body() body: VerifyPasskeyRegistrationBodyDto,
@@ -80,13 +73,10 @@ export class PasskeyController {
         };
     }
 
-    @ApiResponse({
-        type: GetPasskeysResponseDto,
-        description: 'Get all passkeys',
-    })
     @Endpoint({
         command: GetPasskeysCommand,
         httpCode: HttpStatus.OK,
+        type: GetPasskeysResponseDto,
     })
     async getActivePasskeys(
         @GetJWTPayload() payload: IJWTAuthPayload,
@@ -99,33 +89,24 @@ export class PasskeyController {
         };
     }
 
-    @ApiResponse({
-        type: DeletePasskeyResponseDto,
-        description: 'Delete passkey result',
-    })
     @Endpoint({
         command: DeletePasskeyCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
     async deletePasskey(
         @Body() body: DeletePasskeyBodyDto,
         @GetJWTPayload() payload: IJWTAuthPayload,
-    ): Promise<DeletePasskeyResponseDto> {
+    ) {
         const result = await this.passkeyService.deletePasskey(payload, body.id);
 
-        const data = errorHandler(result);
-        return {
-            response: data,
-        };
+        errorHandler(result);
+        return;
     }
 
-    @ApiResponse({
-        type: UpdatePasskeyResponseDto,
-        description: 'Update passkey',
-    })
     @Endpoint({
         command: UpdatePasskeyCommand,
         httpCode: HttpStatus.OK,
+        type: UpdatePasskeyResponseDto,
     })
     async updatePasskey(
         @Body() body: UpdatePasskeyBodyDto,

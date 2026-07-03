@@ -17,7 +17,6 @@ import {
 } from './constants';
 import { ReorderSubscriptionTemplatesBodyDto } from './dtos';
 import { SubscriptionTemplateEntity } from './entities/subscription-template.entity';
-import { DeleteSubscriptionTemplateResponseModel } from './models';
 import { BaseTemplateResponseModel } from './models/base-template.response.model';
 import { GetSubscriptionTemplatesResponseModel } from './models/get-templates.response.model';
 import { SubscriptionTemplateRepository } from './repositories/subscription-template.repository';
@@ -166,9 +165,7 @@ export class SubscriptionTemplateService {
         }
     }
 
-    public async deleteTemplate(
-        uuid: string,
-    ): Promise<TResult<DeleteSubscriptionTemplateResponseModel>> {
+    public async deleteTemplate(uuid: string): Promise<TResult<boolean>> {
         try {
             const template = await this.subscriptionTemplateRepository.findByUUID(uuid);
 
@@ -182,9 +179,9 @@ export class SubscriptionTemplateService {
 
             await this.removeCachedTemplate(template.uuid, template.templateType, template.name);
 
-            const deletedTemplate = await this.subscriptionTemplateRepository.deleteByUUID(uuid);
+            await this.subscriptionTemplateRepository.deleteByUUID(uuid);
 
-            return ok(new DeleteSubscriptionTemplateResponseModel(deletedTemplate));
+            return ok(true);
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.DELETE_SUBSCRIPTION_TEMPLATE_ERROR);

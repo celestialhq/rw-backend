@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, NODE_PLUGINS_CONTROLLER } from '@contract/api';
 import { ROLE } from '@contract/constants';
 
 import { Controller, HttpStatus, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -22,7 +22,6 @@ import {
     GetTorrentBlockerReportsResponseDto,
     GetTorrentBlockerReportsQueryDto,
     GetTorrentBlockerReportsStatsResponseDto,
-    TruncateTorrentBlockerReportsResponseDto,
 } from './dtos/node-plugins.dtos';
 import { GetTorrentBlockerReportsResponseModel, TorrentBlockerReportResponseModel } from './models';
 import { NodePluginService } from './node-plugins.service';
@@ -37,11 +36,8 @@ import { NodePluginService } from './node-plugins.service';
 export class TorrentBlockerReportsController {
     constructor(private readonly nodePluginService: NodePluginService) {}
 
-    @ApiOkResponse({
-        type: GetTorrentBlockerReportsResponseDto,
-        description: 'Torrent blocker reports fetched successfully',
-    })
     @Endpoint({
+        type: GetTorrentBlockerReportsResponseDto,
         command: GetTorrentBlockerReportsCommand,
         httpCode: HttpStatus.OK,
     })
@@ -67,11 +63,8 @@ export class TorrentBlockerReportsController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetTorrentBlockerReportsStatsResponseDto,
-        description: 'Torrent blocker reports stats fetched successfully',
-    })
     @Endpoint({
+        type: GetTorrentBlockerReportsStatsResponseDto,
         command: GetTorrentBlockerReportsStatsCommand,
         httpCode: HttpStatus.OK,
     })
@@ -84,23 +77,14 @@ export class TorrentBlockerReportsController {
         };
     }
 
-    @ApiOkResponse({
-        type: TruncateTorrentBlockerReportsResponseDto,
-        description: 'Torrent blocker reports truncated successfully',
-    })
     @Endpoint({
         command: TruncateTorrentBlockerReportsCommand,
-        httpCode: HttpStatus.OK,
+        httpCode: HttpStatus.NO_CONTENT,
     })
-    async truncateTorrentBlockerReports(): Promise<TruncateTorrentBlockerReportsResponseDto> {
+    async truncateTorrentBlockerReports() {
         const result = await this.nodePluginService.truncateTorrentBlockerReports();
 
-        const data = errorHandler(result);
-        return {
-            response: new GetTorrentBlockerReportsResponseModel({
-                total: data.total,
-                records: data.records.map((item) => new TorrentBlockerReportResponseModel(item)),
-            }),
-        };
+        errorHandler(result);
+        return;
     }
 }

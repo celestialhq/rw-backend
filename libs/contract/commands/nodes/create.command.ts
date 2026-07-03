@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { NODES_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
-import { NodesSchema } from '../../models';
+import { NodeResponseSchema } from './node.response';
 export namespace CreateNodeCommand {
     export const url = REST_API.NODES.CREATE;
     export const TSQ_url = url;
@@ -92,9 +92,7 @@ export namespace CreateNodeCommand {
         note: z.optional(z.string().max(255, 'Note must be less than 255 characters')),
     });
 
-    export const ResponseSchema = z.object({
-        response: NodesSchema,
-    });
+    export const ResponseSchema = NodeResponseSchema;
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;

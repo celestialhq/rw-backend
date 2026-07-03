@@ -33,10 +33,6 @@ export class DeleteSubscriptionTemplateParamDto extends createZodDto(
     DeleteSubscriptionTemplateCommand.RequestParamSchema,
 ) {} // DELETE
 
-export class DeleteSubscriptionTemplateResponseDto extends createZodDto(
-    DeleteSubscriptionTemplateCommand.ResponseSchema,
-) {} // DELETE
-
 export class CreateSubscriptionTemplateBodyDto extends createZodDto(
     CreateSubscriptionTemplateCommand.RequestBodySchema,
 ) {} // CREATE

@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 import { REST_API, USERS_ROUTES } from '../../api';
 import { getEndpointDetails, RESET_PERIODS, USERS_STATUS } from '../../constants';
-import { ExtendedUsersSchema, UsersSchema } from '../../models';
+import { UsersSchema } from '../../models';
+import { UserResponseSchema } from './user.response';
 
 export namespace CreateUserCommand {
     export const url = REST_API.USERS.CREATE;
@@ -163,9 +164,7 @@ export namespace CreateUserCommand {
             .describe('Optional. External squad UUID.'),
     });
 
-    export const ResponseSchema = z.object({
-        response: ExtendedUsersSchema,
-    });
+    export const ResponseSchema = UserResponseSchema;
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;

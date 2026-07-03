@@ -1,5 +1,5 @@
 import { Controller, HttpStatus, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -26,13 +26,10 @@ import { NodesUsageHistoryService } from './nodes-usage-history.service';
 export class NodesUsageHistoryController {
     constructor(private readonly nodesUsageHistoryService: NodesUsageHistoryService) {}
 
-    @ApiOkResponse({
-        type: GetStatsNodesUsageResponseDto,
-        description: 'Stats nodes usage fetched successfully',
-    })
     @Endpoint({
         command: GetStatsNodesUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatsNodesUsageResponseDto,
     })
     async getStatsNodesUsage(
         @Query() query: GetStatsNodesUsageQueryDto,
