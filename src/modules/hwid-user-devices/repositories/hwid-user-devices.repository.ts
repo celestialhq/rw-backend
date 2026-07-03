@@ -7,8 +7,8 @@ import { Injectable } from '@nestjs/common';
 import { TxKyselyService } from '@common/database';
 import { paginateQuery } from '@common/helpers';
 import { ICrudWithStringId } from '@common/types/crud-port';
-import { GetAllHwidDevicesCommand } from '@libs/contracts/commands';
 
+import { GetHwidDevicesQueryDto } from '../dtos';
 import { HwidUserDeviceEntity } from '../entities/hwid-user-device.entity';
 import { HwidUserDevicesConverter } from '../hwid-user-devices.converter';
 
@@ -126,7 +126,7 @@ export class HwidUserDevicesRepository implements Omit<
         filters,
         filterModes,
         sorting,
-    }: GetAllHwidDevicesCommand.RequestQuery): Promise<[HwidUserDeviceEntity[], number]> {
+    }: GetHwidDevicesQueryDto): Promise<[HwidUserDeviceEntity[], number]> {
         let qb = this.qb.kysely.selectFrom('hwidUserDevices').selectAll();
 
         if (filters?.length) {
@@ -150,8 +150,8 @@ export class HwidUserDevicesRepository implements Omit<
 
     private applyHwidFilters(
         qb: any,
-        filters: GetAllHwidDevicesCommand.RequestQuery['filters'],
-        filterModes?: GetAllHwidDevicesCommand.RequestQuery['filterModes'],
+        filters: GetHwidDevicesQueryDto['filters'],
+        filterModes?: GetHwidDevicesQueryDto['filterModes'],
     ) {
         for (const filter of filters ?? []) {
             if (!(filter.id in HWID_FILTER_COLUMN_MAP)) continue;

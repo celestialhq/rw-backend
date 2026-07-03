@@ -19,8 +19,6 @@ export namespace GetStatsCommand {
         tz: z.string().optional(),
     });
 
-    export type Request = z.infer<typeof RequestQuerySchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             cpu: z.object({
@@ -53,5 +51,6 @@ export namespace GetStatsCommand {
         }),
     });
 
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

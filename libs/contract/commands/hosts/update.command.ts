@@ -21,7 +21,7 @@ export namespace UpdateHostCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = HostsSchema.pick({
+    export const RequestBodySchema = HostsSchema.pick({
         uuid: true,
     }).extend({
         inbound: z
@@ -97,11 +97,11 @@ export namespace UpdateHostCommand {
             .optional(z.array(z.nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE)))
             .describe('Optional. Subscription types from which the host will be excluded from.'),
     });
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: HostsSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

@@ -15,7 +15,7 @@ export namespace CreateInfraBillingNodeCommand {
         { scope: 'create-billing-node', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         providerUuid: z.string().uuid(),
         nodeUuid: z.string().uuid().nullable(),
         name: z.string().min(1).max(255).nullable(),
@@ -27,8 +27,6 @@ export namespace CreateInfraBillingNodeCommand {
             .transform((str) => new Date(str))
             .describe('Next billing date. Format: 2025-01-17T15:38:45.065Z'),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -44,5 +42,6 @@ export namespace CreateInfraBillingNodeCommand {
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

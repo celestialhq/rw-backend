@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, NODE_PLUGINS_CONTROLLER } from '@contract/api';
 import { ROLE } from '@contract/constants';
 
 import { Controller, HttpStatus, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -20,7 +20,7 @@ import { GetTorrentBlockerReportsStatsCommand } from '@libs/contracts/commands/n
 
 import {
     GetTorrentBlockerReportsResponseDto,
-    GetTorrentBlockerReportsRequestDto,
+    GetTorrentBlockerReportsQueryDto,
     GetTorrentBlockerReportsStatsResponseDto,
     TruncateTorrentBlockerReportsResponseDto,
 } from './dtos/node-plugins.dtos';
@@ -41,24 +41,12 @@ export class TorrentBlockerReportsController {
         type: GetTorrentBlockerReportsResponseDto,
         description: 'Torrent blocker reports fetched successfully',
     })
-    @ApiQuery({
-        name: 'start',
-        type: 'number',
-        required: false,
-        description: 'Offset for pagination',
-    })
-    @ApiQuery({
-        name: 'size',
-        type: 'number',
-        required: false,
-        description: 'Page size for pagination',
-    })
     @Endpoint({
         command: GetTorrentBlockerReportsCommand,
         httpCode: HttpStatus.OK,
     })
     async getTorrentBlockerReports(
-        @Query() query: GetTorrentBlockerReportsRequestDto,
+        @Query() query: GetTorrentBlockerReportsQueryDto,
     ): Promise<GetTorrentBlockerReportsResponseDto> {
         const { start, size, filters, filterModes, globalFilterMode, sorting } = query;
         const result = await this.nodePluginService.getTorrentBlockerReports({

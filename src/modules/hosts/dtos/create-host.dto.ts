@@ -2,6 +2,6 @@ import { createZodDto } from 'nestjs-zod';
 
 import { CreateHostCommand } from '@libs/contracts/commands';
 
-export class CreateHostRequestDto extends createZodDto(CreateHostCommand.RequestSchema) {}
+export class CreateHostBodyDto extends createZodDto(CreateHostCommand.RequestBodySchema) {}
 
 export class CreateHostResponseDto extends createZodDto(CreateHostCommand.ResponseSchema) {}

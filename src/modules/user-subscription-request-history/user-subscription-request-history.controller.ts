@@ -1,5 +1,5 @@
 import { Controller, HttpStatus, Query, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -17,7 +17,7 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    GetSubscriptionRequestHistoryRequestQueryDto,
+    GetSubscriptionRequestHistoryQueryDto,
     GetSubscriptionRequestHistoryResponseDto,
     GetSubscriptionRequestHistoryStatsResponseDto,
 } from './dtos';
@@ -43,24 +43,12 @@ export class UserSubscriptionRequestHistoryController {
         type: GetSubscriptionRequestHistoryResponseDto,
         description: 'Subscription request history fetched successfully',
     })
-    @ApiQuery({
-        name: 'start',
-        type: 'number',
-        required: false,
-        description: 'Offset for pagination',
-    })
-    @ApiQuery({
-        name: 'size',
-        type: 'number',
-        required: false,
-        description: 'Page size for pagination',
-    })
     @Endpoint({
         command: GetSubscriptionRequestHistoryCommand,
         httpCode: HttpStatus.OK,
     })
     async getSubscriptionRequestHistory(
-        @Query() query: GetSubscriptionRequestHistoryRequestQueryDto,
+        @Query() query: GetSubscriptionRequestHistoryQueryDto,
     ): Promise<GetSubscriptionRequestHistoryResponseDto> {
         const { start, size, filters, filterModes, globalFilterMode, sorting } = query;
         const result =

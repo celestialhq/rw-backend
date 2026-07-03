@@ -14,7 +14,7 @@ export namespace ResolveUserCommand {
         { scope: 'resolve', kind: 'read' },
     );
 
-    export const RequestSchema = z
+    export const RequestBodySchema = z
         .object({
             uuid: z.string().uuid().optional(),
             id: z.number().optional(),
@@ -33,8 +33,6 @@ export namespace ResolveUserCommand {
             },
         );
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             uuid: z.string().uuid(),
@@ -44,5 +42,6 @@ export namespace ResolveUserCommand {
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

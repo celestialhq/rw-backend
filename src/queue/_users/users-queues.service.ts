@@ -8,7 +8,7 @@ import { TypedConfigService } from '@common/config/app-config';
 import { md5 } from '@common/utils';
 import { TUsersStatus } from '@libs/contracts/constants';
 
-import { BulkAllUpdateUsersRequestDto, BulkUpdateUsersRequestDto } from '@modules/users/dtos';
+import { BulkAllUpdateUsersBodyDto, BulkUpdateUsersBodyDto } from '@modules/users/dtos';
 
 import { QUEUES_NAMES } from '@queue/queue.enum';
 
@@ -102,7 +102,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
         );
     }
 
-    public async updateUsersBulk(dto: BulkUpdateUsersRequestDto) {
+    public async updateUsersBulk(dto: BulkUpdateUsersBodyDto) {
         return this.modifyManyUsersQueue.addBulk(
             dto.uuids.map((uuid) => ({
                 name: USERS_JOB_NAMES.UPDATE_MANY_USERS,
@@ -274,7 +274,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
         return this.userEventsQueue.add(USERS_JOB_NAMES.FIRE_TORRENT_BLOCKER_EVENT, payload);
     }
 
-    public async bulkUpdateAllUsers(payload: BulkAllUpdateUsersRequestDto) {
+    public async bulkUpdateAllUsers(payload: BulkAllUpdateUsersBodyDto) {
         return this.serialUsersOperationsQueue.add(USERS_JOB_NAMES.BULK_UPDATE_ALL_USERS, {
             dto: payload,
         });

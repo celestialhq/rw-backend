@@ -15,11 +15,9 @@ export namespace GetInboundsByProfileUuidCommand {
         { scope: 'list-profile-inbounds', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
-        uuid: z.string().uuid(),
+    export const RequestParamSchema = z.object({
+        uuid: z.string().uuid().describe('UUID of the config profile'),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -32,5 +30,6 @@ export namespace GetInboundsByProfileUuidCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

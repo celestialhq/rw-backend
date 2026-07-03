@@ -14,18 +14,14 @@ export namespace GetLegacyStatsUserUsageCommand {
         { scope: 'user-usage-legacy', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         uuid: z.string().uuid(),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const RequestQuerySchema = z.object({
-        start: z.string(),
-        end: z.string(),
+        start: z.string().datetime().describe('Start date'),
+        end: z.string().datetime().describe('End date'),
     });
-
-    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
 
     export const ResponseSchema = z.object({
         response: z.array(
@@ -40,5 +36,7 @@ export namespace GetLegacyStatsUserUsageCommand {
         ),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

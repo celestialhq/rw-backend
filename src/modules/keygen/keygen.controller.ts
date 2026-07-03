@@ -10,10 +10,10 @@ import { RolesGuard } from '@common/guards/roles';
 import { ScopesGuard } from '@common/guards/scopes';
 import { errorHandler } from '@common/helpers/error-handler.helper';
 import { CONTROLLERS_INFO, KEYGEN_CONTROLLER } from '@libs/contracts/api';
-import { GetPubKeyCommand } from '@libs/contracts/commands';
+import { GetNodeSecretKeyCommand } from '@libs/contracts/commands';
 import { ROLE } from '@libs/contracts/constants';
 
-import { GetPubKeyResponseDto } from './dtos';
+import { GetNodeSecretKeyResponseDto } from './dtos';
 import { KeygenService } from './keygen.service';
 import { KeygenResponseModel } from './model';
 
@@ -28,14 +28,14 @@ export class KeygenController {
     constructor(private readonly keygenService: KeygenService) {}
 
     @ApiOkResponse({
-        type: GetPubKeyResponseDto,
+        type: GetNodeSecretKeyResponseDto,
         description: 'Get SECRET_KEY for Remnawave Node',
     })
     @Endpoint({
-        command: GetPubKeyCommand,
+        command: GetNodeSecretKeyCommand,
         httpCode: HttpStatus.OK,
     })
-    async generateKey(): Promise<GetPubKeyResponseDto> {
+    async generateKey(): Promise<GetNodeSecretKeyResponseDto> {
         const result = await this.keygenService.generateKey();
 
         const data = errorHandler(result);

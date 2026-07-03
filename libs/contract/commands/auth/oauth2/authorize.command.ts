@@ -14,7 +14,7 @@ export namespace OAuth2AuthorizeCommand {
         { scope: 'authorize', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         provider: z.nativeEnum(OAUTH2_PROVIDERS),
     });
 
@@ -24,5 +24,6 @@ export namespace OAuth2AuthorizeCommand {
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

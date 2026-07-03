@@ -27,24 +27,24 @@ import { ROLE } from '@libs/contracts/constants';
 
 import {
     BulkAllResetTrafficUsersResponseDto,
-    BulkAllUpdateUsersRequestDto,
+    BulkAllUpdateUsersBodyDto,
     BulkAllUpdateUsersResponseDto,
-    BulkDeleteUsersByStatusRequestDto,
+    BulkDeleteUsersByStatusBodyDto,
     BulkDeleteUsersByStatusResponseDto,
-    BulkDeleteUsersRequestDto,
+    BulkDeleteUsersBodyDto,
     BulkDeleteUsersResponseDto,
-    BulkResetTrafficUsersRequestDto,
+    BulkResetTrafficUsersBodyDto,
     BulkResetTrafficUsersResponseDto,
-    BulkRevokeUsersSubscriptionRequestDto,
+    BulkRevokeUsersSubscriptionBodyDto,
     BulkRevokeUsersSubscriptionResponseDto,
-    BulkUpdateUsersSquadsRequestDto,
+    BulkUpdateUsersSquadsBodyDto,
     BulkUpdateUsersSquadsResponseDto,
-    BulkUpdateUsersRequestDto,
+    BulkUpdateUsersBodyDto,
     BulkUpdateUsersResponseDto,
     BulkAllExtendExpirationDateResponseDto,
-    BulkAllExtendExpirationDateRequestDto,
+    BulkAllExtendExpirationDateBodyDto,
     BulkExtendExpirationDateResponseDto,
-    BulkExtendExpirationDateRequestDto,
+    BulkExtendExpirationDateBodyDto,
 } from '../dtos';
 import { UsersService } from '../users.service';
 
@@ -71,10 +71,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkDeleteUsersByStatusCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkDeleteUsersByStatusRequestDto,
     })
     async bulkDeleteUsersByStatus(
-        @Body() body: BulkDeleteUsersByStatusRequestDto,
+        @Body() body: BulkDeleteUsersByStatusBodyDto,
     ): Promise<BulkDeleteUsersByStatusResponseDto> {
         const result = await this.usersService.bulkDeleteUsersByStatus(body);
 
@@ -91,10 +90,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkDeleteUsersCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkDeleteUsersRequestDto,
     })
     async bulkDeleteUsers(
-        @Body() body: BulkDeleteUsersRequestDto,
+        @Body() body: BulkDeleteUsersBodyDto,
     ): Promise<BulkDeleteUsersResponseDto> {
         const result = await this.usersService.bulkDeleteUsersByUuid(body.uuids);
 
@@ -111,10 +109,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkRevokeUsersSubscriptionCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkRevokeUsersSubscriptionRequestDto,
     })
     async bulkRevokeUsersSubscription(
-        @Body() body: BulkRevokeUsersSubscriptionRequestDto,
+        @Body() body: BulkRevokeUsersSubscriptionBodyDto,
     ): Promise<BulkRevokeUsersSubscriptionResponseDto> {
         const result = await this.usersService.bulkRevokeUsersSubscription(body.uuids);
 
@@ -131,10 +128,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkResetTrafficUsersCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkResetTrafficUsersRequestDto,
     })
     async bulkResetUserTraffic(
-        @Body() body: BulkResetTrafficUsersRequestDto,
+        @Body() body: BulkResetTrafficUsersBodyDto,
     ): Promise<BulkResetTrafficUsersResponseDto> {
         const result = await this.usersService.bulkResetUserTraffic(body.uuids);
 
@@ -151,10 +147,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkUpdateUsersCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkUpdateUsersRequestDto,
     })
     async bulkUpdateUsers(
-        @Body() body: BulkUpdateUsersRequestDto,
+        @Body() body: BulkUpdateUsersBodyDto,
     ): Promise<BulkUpdateUsersResponseDto> {
         const result = await this.usersService.bulkUpdateUsers(body);
 
@@ -171,10 +166,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkUpdateUsersSquadsCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkUpdateUsersSquadsRequestDto,
     })
     async bulkUpdateUsersInternalSquads(
-        @Body() body: BulkUpdateUsersSquadsRequestDto,
+        @Body() body: BulkUpdateUsersSquadsBodyDto,
     ): Promise<BulkUpdateUsersSquadsResponseDto> {
         const result = await this.usersService.bulkUpdateUsersInternalSquads(
             body.uuids,
@@ -198,10 +192,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkExtendExpirationDateCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkExtendExpirationDateRequestDto,
     })
     async bulkExtendExpirationDate(
-        @Body() body: BulkExtendExpirationDateRequestDto,
+        @Body() body: BulkExtendExpirationDateBodyDto,
     ): Promise<BulkExtendExpirationDateResponseDto> {
         const result = await this.usersService.bulkExtendExpirationDate({
             uuids: body.uuids,
@@ -221,10 +214,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkAllUpdateUsersCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkAllUpdateUsersRequestDto,
     })
     async bulkUpdateAllUsers(
-        @Body() body: BulkAllUpdateUsersRequestDto,
+        @Body() body: BulkAllUpdateUsersBodyDto,
     ): Promise<BulkAllUpdateUsersResponseDto> {
         const result = await this.usersService.bulkUpdateAllUsers(body);
 
@@ -266,10 +258,9 @@ export class UsersBulkActionsController {
     @Endpoint({
         command: BulkAllExtendExpirationDateCommand,
         httpCode: HttpStatus.OK,
-        apiBody: BulkAllExtendExpirationDateRequestDto,
     })
     async bulkAllExtendExpirationDate(
-        @Body() body: BulkAllExtendExpirationDateRequestDto,
+        @Body() body: BulkAllExtendExpirationDateBodyDto,
     ): Promise<BulkAllExtendExpirationDateResponseDto> {
         const result = await this.usersService.bulkAllExtendExpirationDate(body.extendDays);
 

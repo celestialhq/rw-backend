@@ -15,12 +15,14 @@ export namespace GetStatsNodesUsageCommand {
     );
 
     export const RequestQuerySchema = z.object({
-        start: z.string().date(),
-        end: z.string().date(),
-        topNodesLimit: z.coerce.number().min(1).default(20),
+        start: z.string().date().describe('Start date (YYYY-MM-DD)'),
+        end: z.string().date().describe('End date (YYYY-MM-DD)'),
+        topNodesLimit: z.coerce
+            .number()
+            .min(1)
+            .default(20)
+            .describe('Limit of top nodes to return'),
     });
-
-    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -48,5 +50,6 @@ export namespace GetStatsNodesUsageCommand {
         }),
     });
 
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

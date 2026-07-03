@@ -14,7 +14,7 @@ export namespace BulkNodesProfileModificationCommand {
         { scope: 'bulk-profile-modification', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuids: z.array(z.string().uuid()).min(1, 'Must be at least 1 Node UUID'),
         configProfile: z.object({
             activeConfigProfileUuid: z.string().uuid(),
@@ -26,13 +26,12 @@ export namespace BulkNodesProfileModificationCommand {
         }),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             eventSent: z.boolean(),
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

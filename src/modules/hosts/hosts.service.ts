@@ -6,11 +6,14 @@ import { nullifyEmpty } from '@common/utils/convert-type';
 import { ERRORS } from '@libs/contracts/constants';
 
 import { GetConfigProfileByUuidQuery } from '@modules/config-profiles/queries/get-config-profile-by-uuid';
-import { ReorderHostRequestDto } from '@modules/hosts/dtos/reorder-hosts.dto';
 import { GetSubscriptionTemplateByUuidQuery } from '@modules/subscription-template/queries/get-template-by-uuid';
 
-import { UpdateHostRequestDto, UpdateManyHostsRequestDto } from './dtos';
-import { CreateHostRequestDto } from './dtos/create-host.dto';
+import {
+    CreateHostBodyDto,
+    ReorderHostsBodyDto,
+    UpdateHostBodyDto,
+    UpdateManyHostsBodyDto,
+} from './dtos';
 import { HostsEntity } from './entities/hosts.entity';
 import { DeleteHostResponseModel } from './models/delete-host.response.model';
 import { HostsRepository } from './repositories/hosts.repository';
@@ -23,7 +26,7 @@ export class HostsService {
         private readonly queryBus: QueryBus,
     ) {}
 
-    public async createHost(dto: CreateHostRequestDto): Promise<TResult<HostsEntity>> {
+    public async createHost(dto: CreateHostBodyDto): Promise<TResult<HostsEntity>> {
         try {
             if (dto.xrayJsonTemplateUuid) {
                 const xrayJsonTemplate = await this.queryBus.execute(
@@ -107,7 +110,7 @@ export class HostsService {
         }
     }
 
-    public async updateHost(dto: UpdateHostRequestDto): Promise<TResult<HostsEntity>> {
+    public async updateHost(dto: UpdateHostBodyDto): Promise<TResult<HostsEntity>> {
         try {
             const { inbound: inboundObj, nodes, excludedInternalSquads, ...rest } = dto;
 
@@ -253,7 +256,7 @@ export class HostsService {
         }
     }
 
-    public async getAllHosts(): Promise<TResult<HostsEntity[]>> {
+    public async getHosts(): Promise<TResult<HostsEntity[]>> {
         try {
             const result = await this.hostsRepository.findAll();
 
@@ -264,7 +267,7 @@ export class HostsService {
         }
     }
 
-    public async getOneHost(hostUuid: string): Promise<TResult<HostsEntity>> {
+    public async getHost(hostUuid: string): Promise<TResult<HostsEntity>> {
         try {
             const result = await this.hostsRepository.findByUUID(hostUuid);
 
@@ -279,7 +282,7 @@ export class HostsService {
         }
     }
 
-    public async reorderHosts(dto: ReorderHostRequestDto): Promise<
+    public async reorderHosts(dto: ReorderHostsBodyDto): Promise<
         TResult<{
             isUpdated: boolean;
         }>
@@ -298,7 +301,7 @@ export class HostsService {
         try {
             await this.hostsRepository.deleteMany(uuids);
 
-            const result = await this.getAllHosts();
+            const result = await this.getHosts();
 
             if (!result.isOk) {
                 return fail(ERRORS.DELETE_HOSTS_ERROR);
@@ -315,7 +318,7 @@ export class HostsService {
         try {
             await this.hostsRepository.enableMany(uuids);
 
-            const result = await this.getAllHosts();
+            const result = await this.getHosts();
 
             if (!result.isOk) {
                 return fail(ERRORS.BULK_ENABLE_HOSTS_ERROR);
@@ -332,7 +335,7 @@ export class HostsService {
         try {
             await this.hostsRepository.disableMany(uuids);
 
-            const result = await this.getAllHosts();
+            const result = await this.getHosts();
 
             if (!result.isOk) {
                 return fail(ERRORS.BULK_DISABLE_HOSTS_ERROR);
@@ -345,7 +348,7 @@ export class HostsService {
         }
     }
 
-    public async getAllHostTags(): Promise<TResult<string[]>> {
+    public async getHostsTags(): Promise<TResult<string[]>> {
         try {
             const result = await this.hostsRepository.findAllTags();
 
@@ -356,7 +359,7 @@ export class HostsService {
         }
     }
 
-    public async updateManyHosts(dto: UpdateManyHostsRequestDto): Promise<TResult<HostsEntity[]>> {
+    public async updateManyHosts(dto: UpdateManyHostsBodyDto): Promise<TResult<HostsEntity[]>> {
         try {
             const {
                 uuids,
@@ -434,7 +437,7 @@ export class HostsService {
                 },
             });
 
-            return await this.getAllHosts();
+            return await this.getHosts();
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.UPDATE_HOSTS_ERROR);

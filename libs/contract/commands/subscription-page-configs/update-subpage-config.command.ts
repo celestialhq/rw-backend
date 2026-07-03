@@ -4,7 +4,7 @@ import { REST_API, SUBSCRIPTION_PAGE_CONFIGS_ROUTES } from '../../api';
 import { getEndpointDetails } from '../../constants';
 import { SubscriptionPageConfigSchema } from '../../models';
 
-export namespace UpdateSubscriptionPageConfigCommand {
+export namespace UpdateSubpageConfigCommand {
     export const url = REST_API.SUBSCRIPTION_PAGE_CONFIGS.UPDATE;
     export const TSQ_url = url;
 
@@ -15,7 +15,7 @@ export namespace UpdateSubscriptionPageConfigCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuid: z.string().uuid(),
         name: z
             .string()
@@ -29,13 +29,12 @@ export namespace UpdateSubscriptionPageConfigCommand {
         config: z.optional(z.unknown()),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: SubscriptionPageConfigSchema.extend({
             config: z.unknown(),
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

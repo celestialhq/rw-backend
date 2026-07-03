@@ -3,7 +3,6 @@ import { QueryBus } from '@nestjs/cqrs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { fail, ok, TResult } from '@common/types';
-import { GetAllHwidDevicesCommand } from '@libs/contracts/commands';
 import { ERRORS, EVENTS } from '@libs/contracts/constants';
 import { THwidSettings } from '@libs/contracts/models';
 
@@ -13,7 +12,7 @@ import { GetCachedExternalSquadSettingsQuery } from '@modules/external-squads/qu
 import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
 import { GetUserByUniqueFieldQuery } from '@modules/users/queries/get-user-by-unique-field';
 
-import { CreateUserHwidDeviceRequestDto } from './dtos';
+import { CreateUserHwidDeviceBodyDto, GetHwidDevicesQueryDto } from './dtos';
 import { HwidUserDeviceEntity } from './entities/hwid-user-device.entity';
 import { GetHwidDevicesStatsResponseModel, GetTopUsersByHwidDevicesResponseModel } from './models';
 import { HwidUserDevicesRepository } from './repositories/hwid-user-devices.repository';
@@ -29,7 +28,7 @@ export class HwidUserDevicesService {
     ) {}
 
     public async createUserHwidDevice(
-        dto: CreateUserHwidDeviceRequestDto,
+        dto: CreateUserHwidDeviceBodyDto,
     ): Promise<TResult<HwidUserDeviceEntity[]>> {
         try {
             const user = await this.queryBus.execute(
@@ -230,7 +229,7 @@ export class HwidUserDevicesService {
         }
     }
 
-    public async getAllHwidDevices(dto: GetAllHwidDevicesCommand.RequestQuery): Promise<
+    public async getAllHwidDevices(dto: GetHwidDevicesQueryDto): Promise<
         TResult<{
             total: number;
             devices: HwidUserDeviceEntity[];

@@ -15,18 +15,17 @@ export namespace GetUserByTagCommand {
         { scope: 'by-tag', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         tag: z
             .string()
             .regex(/^[A-Z0-9_]+$/, 'Tag can only contain uppercase letters, numbers, underscores')
             .max(16, 'Tag must be less than 16 characters'),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: z.array(ExtendedUsersSchema),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, SUBSCRIPTION_PAGE_CONFIGS_CONTROLLER } from '@contrac
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -13,29 +13,29 @@ import { RolesGuard } from '@common/guards/roles';
 import { ScopesGuard } from '@common/guards/scopes';
 import { errorHandler } from '@common/helpers/error-handler.helper';
 import {
-    CloneSubscriptionPageConfigCommand,
-    CreateSubscriptionPageConfigCommand,
-    DeleteSubscriptionPageConfigCommand,
-    GetSubscriptionPageConfigCommand,
-    GetSubscriptionPageConfigsCommand,
-    ReorderSubscriptionPageConfigsCommand,
-    UpdateSubscriptionPageConfigCommand,
+    CloneSubpageConfigCommand,
+    CreateSubpageConfigCommand,
+    DeleteSubpageConfigCommand,
+    GetSubpageConfigCommand,
+    GetSubpageConfigsCommand,
+    ReorderSubpageConfigsCommand,
+    UpdateSubpageConfigCommand,
 } from '@libs/contracts/commands';
 
 import {
-    ReorderSubscriptionPageConfigsRequestDto,
-    ReorderSubscriptionPageConfigsResponseDto,
-    GetSubscriptionPageConfigsResponseDto,
-    GetSubscriptionPageConfigResponseDto,
-    UpdateSubscriptionPageConfigRequestDto,
-    UpdateSubscriptionPageConfigResponseDto,
-    DeleteSubscriptionPageConfigRequestDto,
-    DeleteSubscriptionPageConfigResponseDto,
-    CreateSubscriptionPageConfigRequestDto,
-    CreateSubscriptionPageConfigResponseDto,
-    GetSubscriptionPageConfigRequestDto,
-    CloneSubscriptionPageConfigResponseDto,
-    CloneSubscriptionPageConfigRequestDto,
+    ReorderSubpageConfigsBodyDto,
+    ReorderSubpageConfigsResponseDto,
+    GetSubpageConfigsResponseDto,
+    GetSubpageConfigResponseDto,
+    UpdateSubpageConfigBodyDto,
+    UpdateSubpageConfigResponseDto,
+    DeleteSubpageConfigParamDto,
+    DeleteSubpageConfigResponseDto,
+    CreateSubpageConfigBodyDto,
+    CreateSubpageConfigResponseDto,
+    GetSubpageConfigParamDto,
+    CloneSubpageConfigResponseDto,
+    CloneSubpageConfigBodyDto,
 } from './dtos/subpage-configs.dtos';
 import { SubscriptionPageConfigService } from './subpage-configs.service';
 
@@ -50,14 +50,14 @@ export class SubscriptionPageConfigController {
     constructor(private readonly subscriptionPageConfigService: SubscriptionPageConfigService) {}
 
     @ApiOkResponse({
-        type: GetSubscriptionPageConfigsResponseDto,
+        type: GetSubpageConfigsResponseDto,
         description: 'Subscription page configs retrieved successfully',
     })
     @Endpoint({
-        command: GetSubscriptionPageConfigsCommand,
+        command: GetSubpageConfigsCommand,
         httpCode: HttpStatus.OK,
     })
-    async getAllConfigs(): Promise<GetSubscriptionPageConfigsResponseDto> {
+    async getAllConfigs(): Promise<GetSubpageConfigsResponseDto> {
         const result = await this.subscriptionPageConfigService.getAllConfigs();
 
         const data = errorHandler(result);
@@ -67,17 +67,16 @@ export class SubscriptionPageConfigController {
     }
 
     @ApiOkResponse({
-        type: GetSubscriptionPageConfigResponseDto,
+        type: GetSubpageConfigResponseDto,
         description: 'Subscription page config retrieved successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Subscription page config UUID' })
     @Endpoint({
-        command: GetSubscriptionPageConfigCommand,
+        command: GetSubpageConfigCommand,
         httpCode: HttpStatus.OK,
     })
     async getConfigByUuid(
-        @Param() paramData: GetSubscriptionPageConfigRequestDto,
-    ): Promise<GetSubscriptionPageConfigResponseDto> {
+        @Param() paramData: GetSubpageConfigParamDto,
+    ): Promise<GetSubpageConfigResponseDto> {
         const { uuid } = paramData;
         const result = await this.subscriptionPageConfigService.getConfigByUuid(uuid);
         const data = errorHandler(result);
@@ -90,17 +89,16 @@ export class SubscriptionPageConfigController {
     }
 
     @ApiOkResponse({
-        type: UpdateSubscriptionPageConfigResponseDto,
+        type: UpdateSubpageConfigResponseDto,
         description: 'Subscription page config updated successfully',
     })
     @Endpoint({
-        command: UpdateSubscriptionPageConfigCommand,
+        command: UpdateSubpageConfigCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateSubscriptionPageConfigRequestDto,
     })
     async updateConfig(
-        @Body() body: UpdateSubscriptionPageConfigRequestDto,
-    ): Promise<UpdateSubscriptionPageConfigResponseDto> {
+        @Body() body: UpdateSubpageConfigBodyDto,
+    ): Promise<UpdateSubpageConfigResponseDto> {
         const result = await this.subscriptionPageConfigService.updateConfig(
             body.uuid,
             body.name?.trim() ?? undefined,
@@ -117,18 +115,17 @@ export class SubscriptionPageConfigController {
     }
 
     @ApiOkResponse({
-        type: DeleteSubscriptionPageConfigResponseDto,
+        type: DeleteSubpageConfigResponseDto,
         description: 'Subscription page config deleted successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Subscription page config UUID' })
     @Endpoint({
-        command: DeleteSubscriptionPageConfigCommand,
+        command: DeleteSubpageConfigCommand,
         httpCode: HttpStatus.OK,
     })
     async deleteConfig(
-        @Param() paramData: DeleteSubscriptionPageConfigRequestDto,
-    ): Promise<DeleteSubscriptionPageConfigResponseDto> {
-        const result = await this.subscriptionPageConfigService.deleteConfig(paramData.uuid);
+        @Param() param: DeleteSubpageConfigParamDto,
+    ): Promise<DeleteSubpageConfigResponseDto> {
+        const result = await this.subscriptionPageConfigService.deleteConfig(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -137,17 +134,16 @@ export class SubscriptionPageConfigController {
     }
 
     @ApiOkResponse({
-        type: CreateSubscriptionPageConfigResponseDto,
+        type: CreateSubpageConfigResponseDto,
         description: 'Subscription page config created successfully',
     })
     @Endpoint({
-        command: CreateSubscriptionPageConfigCommand,
+        command: CreateSubpageConfigCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: CreateSubscriptionPageConfigRequestDto,
     })
     async createConfig(
-        @Body() body: CreateSubscriptionPageConfigRequestDto,
-    ): Promise<CreateSubscriptionPageConfigResponseDto> {
+        @Body() body: CreateSubpageConfigBodyDto,
+    ): Promise<CreateSubpageConfigResponseDto> {
         const result = await this.subscriptionPageConfigService.createConfig(body.name);
 
         const data = errorHandler(result);
@@ -157,17 +153,16 @@ export class SubscriptionPageConfigController {
     }
 
     @ApiOkResponse({
-        type: ReorderSubscriptionPageConfigsResponseDto,
+        type: ReorderSubpageConfigsResponseDto,
         description: 'Subscription page configs reordered successfully',
     })
     @Endpoint({
-        command: ReorderSubscriptionPageConfigsCommand,
+        command: ReorderSubpageConfigsCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ReorderSubscriptionPageConfigsRequestDto,
     })
     async reorderSubscriptionPageConfigs(
-        @Body() body: ReorderSubscriptionPageConfigsRequestDto,
-    ): Promise<ReorderSubscriptionPageConfigsResponseDto> {
+        @Body() body: ReorderSubpageConfigsBodyDto,
+    ): Promise<ReorderSubpageConfigsResponseDto> {
         const result = await this.subscriptionPageConfigService.reorderSubscriptionPageConfigs(
             body.items,
         );
@@ -179,17 +174,16 @@ export class SubscriptionPageConfigController {
     }
 
     @ApiOkResponse({
-        type: CloneSubscriptionPageConfigResponseDto,
+        type: CloneSubpageConfigResponseDto,
         description: 'Subscription page config cloned successfully',
     })
     @Endpoint({
-        command: CloneSubscriptionPageConfigCommand,
+        command: CloneSubpageConfigCommand,
         httpCode: HttpStatus.OK,
-        apiBody: CloneSubscriptionPageConfigRequestDto,
     })
     async cloneSubscriptionPageConfig(
-        @Body() body: CloneSubscriptionPageConfigRequestDto,
-    ): Promise<CloneSubscriptionPageConfigResponseDto> {
+        @Body() body: CloneSubpageConfigBodyDto,
+    ): Promise<CloneSubpageConfigResponseDto> {
         const result = await this.subscriptionPageConfigService.cloneSubscriptionPageConfig(
             body.cloneFromUuid,
         );

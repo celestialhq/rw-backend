@@ -19,7 +19,7 @@ import {
 
 import {
     GetSubscriptionSettingsResponseDto,
-    UpdateSubscriptionSettingsRequestDto,
+    UpdateSubscriptionSettingsBodyDto,
     UpdateSubscriptionSettingsResponseDto,
 } from './dtos';
 import { SubscriptionSettingsResponseModel } from './models/get-subscription-settings.response.model';
@@ -59,10 +59,9 @@ export class SubscriptionSettingsController {
     @Endpoint({
         command: UpdateSubscriptionSettingsCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateSubscriptionSettingsRequestDto,
     })
     async updateSettings(
-        @Body() body: UpdateSubscriptionSettingsRequestDto,
+        @Body() body: UpdateSubscriptionSettingsBodyDto,
     ): Promise<UpdateSubscriptionSettingsResponseDto> {
         const result = await this.subscriptionSettingsService.updateSettings(body);
 

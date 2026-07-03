@@ -15,15 +15,14 @@ export namespace GetUserByTelegramIdCommand {
         { scope: 'by-telegram-id', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestParamSchema = z.object({
         telegramId: z.string(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.array(ExtendedUsersSchema),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

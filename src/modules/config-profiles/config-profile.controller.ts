@@ -32,17 +32,21 @@ import { ROLE } from '@libs/contracts/constants';
 
 import { ConfigProfileService } from './config-profile.service';
 import {
-    CreateConfigProfileRequestDto,
+    CreateConfigProfileBodyDto,
     CreateConfigProfileResponseDto,
+    DeleteConfigProfileParamDto,
     DeleteConfigProfileResponseDto,
     GetAllInboundsResponseDto,
+    GetComputedConfigProfileByUuidParamDto,
     GetComputedConfigProfileByUuidResponseDto,
+    GetConfigProfileByUuidParamDto,
     GetConfigProfileByUuidResponseDto,
     GetConfigProfilesResponseDto,
+    GetInboundsByProfileUuidParamDto,
     GetInboundsByProfileUuidResponseDto,
-    ReorderConfigProfilesRequestDto,
+    ReorderConfigProfilesBodyDto,
     ReorderConfigProfilesResponseDto,
-    UpdateConfigProfileRequestDto,
+    UpdateConfigProfileBodyDto,
     UpdateConfigProfileResponseDto,
 } from './dtos';
 
@@ -102,9 +106,9 @@ export class ConfigProfileController {
         httpCode: HttpStatus.OK,
     })
     async getInboundsByProfileUuid(
-        @Param('uuid') profileUuid: string,
+        @Param() param: GetInboundsByProfileUuidParamDto,
     ): Promise<GetInboundsByProfileUuidResponseDto> {
-        const result = await this.configProfileService.getInboundsByProfileUuid(profileUuid);
+        const result = await this.configProfileService.getInboundsByProfileUuid(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -124,9 +128,9 @@ export class ConfigProfileController {
         httpCode: HttpStatus.OK,
     })
     async getConfigProfileByUuid(
-        @Param('uuid') uuid: string,
+        @Param() param: GetConfigProfileByUuidParamDto,
     ): Promise<GetConfigProfileByUuidResponseDto> {
-        const result = await this.configProfileService.getConfigProfileByUUID(uuid);
+        const result = await this.configProfileService.getConfigProfileByUUID(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -146,9 +150,9 @@ export class ConfigProfileController {
         httpCode: HttpStatus.OK,
     })
     async getComputedConfigProfileByUuid(
-        @Param('uuid') uuid: string,
+        @Param() param: GetComputedConfigProfileByUuidParamDto,
     ): Promise<GetComputedConfigProfileByUuidResponseDto> {
-        const result = await this.configProfileService.getComputedConfigProfileByUUID(uuid);
+        const result = await this.configProfileService.getComputedConfigProfileByUUID(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -168,9 +172,9 @@ export class ConfigProfileController {
         httpCode: HttpStatus.OK,
     })
     async deleteConfigProfileByUuid(
-        @Param('uuid') uuid: string,
+        @Param() param: DeleteConfigProfileParamDto,
     ): Promise<DeleteConfigProfileResponseDto> {
-        const result = await this.configProfileService.deleteConfigProfileByUUID(uuid);
+        const result = await this.configProfileService.deleteConfigProfileByUUID(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -191,12 +195,9 @@ export class ConfigProfileController {
         httpCode: HttpStatus.CREATED,
     })
     async createConfigProfile(
-        @Body() createConfigProfileDto: CreateConfigProfileRequestDto,
+        @Body() body: CreateConfigProfileBodyDto,
     ): Promise<CreateConfigProfileResponseDto> {
-        const result = await this.configProfileService.createConfigProfile(
-            createConfigProfileDto.name,
-            createConfigProfileDto.config,
-        );
+        const result = await this.configProfileService.createConfigProfile(body.name, body.config);
 
         const data = errorHandler(result);
         return {
@@ -220,12 +221,12 @@ export class ConfigProfileController {
         httpCode: HttpStatus.OK,
     })
     async updateConfigProfile(
-        @Body() updateConfigProfileDto: UpdateConfigProfileRequestDto,
+        @Body() body: UpdateConfigProfileBodyDto,
     ): Promise<UpdateConfigProfileResponseDto> {
         const result = await this.configProfileService.updateConfigProfile(
-            updateConfigProfileDto.uuid,
-            updateConfigProfileDto.name,
-            updateConfigProfileDto.config,
+            body.uuid,
+            body.name,
+            body.config,
         );
 
         const data = errorHandler(result);
@@ -241,10 +242,9 @@ export class ConfigProfileController {
     @Endpoint({
         command: ReorderConfigProfileCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ReorderConfigProfilesRequestDto,
     })
     async reorderConfigProfiles(
-        @Body() body: ReorderConfigProfilesRequestDto,
+        @Body() body: ReorderConfigProfilesBodyDto,
     ): Promise<ReorderConfigProfilesResponseDto> {
         const result = await this.configProfileService.reorderConfigProfiles(body);
 

@@ -2,5 +2,5 @@ import { createZodDto } from 'nestjs-zod';
 
 import { DisableUserCommand } from '@libs/contracts/commands';
 
-export class DisableUserRequestDto extends createZodDto(DisableUserCommand.RequestSchema) {}
+export class DisableUserParamDto extends createZodDto(DisableUserCommand.RequestParamSchema) {}
 export class DisableUserResponseDto extends createZodDto(DisableUserCommand.ResponseSchema) {}

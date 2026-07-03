@@ -18,13 +18,9 @@ export namespace UpsertUserMetadataCommand {
         uuid: z.string().uuid(),
     });
 
-    export type RequestParams = z.infer<typeof RequestParamsSchema>;
-
     export const RequestBodySchema = z.object({
         metadata: z.object({}).passthrough(),
     });
-
-    export type RequestBody = z.infer<typeof RequestBodySchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -32,5 +28,7 @@ export namespace UpsertUserMetadataCommand {
         }),
     });
 
+    export type RequestParams = z.infer<typeof RequestParamsSchema>;
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

@@ -15,7 +15,7 @@ export namespace UpdateInternalSquadCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuid: z.string().uuid(),
         name: z
             .string()
@@ -29,11 +29,10 @@ export namespace UpdateInternalSquadCommand {
         inbounds: z.array(z.string().uuid()).optional(),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: InternalSquadSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

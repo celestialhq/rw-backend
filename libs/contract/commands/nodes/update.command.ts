@@ -13,7 +13,7 @@ export namespace UpdateNodeCommand {
         kind: 'write',
     });
 
-    export const RequestSchema = NodesSchema.pick({
+    export const RequestBodySchema = NodesSchema.pick({
         uuid: true,
     }).extend({
         name: z.optional(z.string().min(3, 'Min. 3 characters').max(30, 'Max. 30 characters')),
@@ -90,11 +90,10 @@ export namespace UpdateNodeCommand {
         note: z.optional(z.string().max(255, 'Note must be less than 255 characters').nullable()),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: NodesSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

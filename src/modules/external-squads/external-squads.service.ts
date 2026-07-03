@@ -10,7 +10,7 @@ import { ERRORS } from '@libs/contracts/constants/errors';
 
 import { SquadsQueueService } from '@queue/_squads';
 
-import { ReorderExternalSquadsRequestDto, UpdateExternalSquadRequestDto } from './dtos';
+import { ReorderExternalSquadsBodyDto, UpdateExternalSquadBodyDto } from './dtos';
 import { ExternalSquadEntity } from './entities';
 import {
     DeleteExternalSquadByUuidResponseModel,
@@ -88,7 +88,7 @@ export class ExternalSquadService {
     }
 
     public async updateExternalSquad(
-        dto: UpdateExternalSquadRequestDto,
+        dto: UpdateExternalSquadBodyDto,
     ): Promise<TResult<GetExternalSquadByUuidResponseModel>> {
         const {
             uuid,
@@ -232,7 +232,7 @@ export class ExternalSquadService {
     }
 
     public async reorderExternalSquads(
-        dto: ReorderExternalSquadsRequestDto,
+        dto: ReorderExternalSquadsBodyDto,
     ): Promise<TResult<GetExternalSquadsResponseModel>> {
         try {
             await this.externalSquadRepository.reorderMany(dto.items);

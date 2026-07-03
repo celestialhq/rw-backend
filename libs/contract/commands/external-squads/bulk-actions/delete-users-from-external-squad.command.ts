@@ -14,11 +14,9 @@ export namespace DeleteUsersFromExternalSquadCommand {
         { scope: 'remove-users', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
-        uuid: z.string().uuid(),
+    export const RequestParamSchema = z.object({
+        uuid: z.string().uuid().describe('UUID of the external squad'),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -26,5 +24,6 @@ export namespace DeleteUsersFromExternalSquadCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

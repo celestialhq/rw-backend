@@ -7,15 +7,15 @@ import {
     UpdateSnippetCommand,
 } from '@libs/contracts/commands';
 
-export class CreateSnippetRequestDto extends createZodDto(CreateSnippetCommand.RequestSchema) {}
+export class CreateSnippetBodyDto extends createZodDto(CreateSnippetCommand.RequestBodySchema) {}
 
 export class CreateSnippetResponseDto extends createZodDto(CreateSnippetCommand.ResponseSchema) {}
 
-export class UpdateSnippetRequestDto extends createZodDto(UpdateSnippetCommand.RequestSchema) {}
+export class UpdateSnippetBodyDto extends createZodDto(UpdateSnippetCommand.RequestBodySchema) {}
 
 export class UpdateSnippetResponseDto extends createZodDto(UpdateSnippetCommand.ResponseSchema) {}
 
-export class DeleteSnippetRequestDto extends createZodDto(DeleteSnippetCommand.RequestSchema) {}
+export class DeleteSnippetBodyDto extends createZodDto(DeleteSnippetCommand.RequestBodySchema) {}
 
 export class DeleteSnippetResponseDto extends createZodDto(DeleteSnippetCommand.ResponseSchema) {}
 

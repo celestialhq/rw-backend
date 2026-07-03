@@ -4,8 +4,6 @@ import {
     ApiCreatedResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
-    ApiParam,
-    ApiQuery,
     ApiTags,
 } from '@nestjs/swagger';
 
@@ -24,8 +22,8 @@ import {
     DeleteUserCommand,
     DisableUserCommand,
     EnableUserCommand,
-    GetAllTagsCommand,
-    GetAllUsersCommand,
+    GetUsersTagsCommand,
+    GetUsersCommand,
     GetUserAccessibleNodesCommand,
     GetUserByEmailCommand,
     GetUserByIdCommand,
@@ -44,49 +42,47 @@ import {
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    CreateUserRequestDto,
+    CreateUserBodyDto,
     CreateUserResponseDto,
-    DeleteUserRequestDto,
+    DeleteUserParamDto,
     DeleteUserResponseDto,
-    DisableUserRequestDto,
+    DisableUserParamDto,
     DisableUserResponseDto,
-    EnableUserRequestDto,
+    EnableUserParamDto,
     EnableUserResponseDto,
-    GetAllTagsResponseDto,
-    GetAllUsersQueryDto,
-    GetAllUsersResponseDto,
-    GetUserAccessibleNodesRequestDto,
+    GetUsersTagsResponseDto,
+    GetUsersQueryDto,
+    GetUserAccessibleNodesParamDto,
     GetUserAccessibleNodesResponseDto,
-    GetUserByIdRequestDto,
     GetUserByIdResponseDto,
-    GetUserByShortUuidRequestDto,
+    GetUserByShortUuidParamDto,
     GetUserByShortUuidResponseDto,
-    GetUserByTagRequestDto,
+    GetUserByTagParamDto,
     GetUserByTagResponseDto,
-    GetUserByUsernameRequestDto,
+    GetUserByUsernameParamDto,
     GetUserByUsernameResponseDto,
-    GetUserByUuidRequestDto,
+    GetUserByUuidParamDto,
     GetUserByUuidResponseDto,
     GetUsersStreamQueryDto,
     GetUsersStreamResponseDto,
-    GetUserSubscriptionRequestHistoryRequestDto,
+    GetUserSubscriptionRequestHistoryParamDto,
     GetUserSubscriptionRequestHistoryResponseDto,
-    ResetUserTrafficRequestDto,
+    ResetUserTrafficParamDto,
     ResetUserTrafficResponseDto,
-    ResolveUserRequestBodyDto,
+    ResolveUserBodyDto,
     ResolveUserResponseDto,
     RevokeUserSubscriptionBodyDto,
-    RevokeUserSubscriptionRequestDto,
+    RevokeUserSubscriptionParamDto,
     RevokeUserSubscriptionResponseDto,
-    UpdateUserRequestDto,
+    UpdateUserBodyDto,
     UpdateUserResponseDto,
-} from '../dtos';
-import { GetUserByEmailResponseDto } from '../dtos/get-user-by-email.dto';
-import { GetUserByEmailRequestDto } from '../dtos/get-user-by-email.dto';
-import {
-    GetUserByTelegramIdRequestDto,
+    GetUsersResponseDto,
+    GetUserByIdParamDto,
     GetUserByTelegramIdResponseDto,
-} from '../dtos/get-user-by-telegram-id.dto';
+    GetUserByTelegramIdParamDto,
+    GetUserByEmailResponseDto,
+    GetUserByEmailParamDto,
+} from '../dtos';
 import {
     GetAllTagsResponseModel,
     GetAllUsersResponseModel,
@@ -118,9 +114,8 @@ export class UsersController {
     @Endpoint({
         command: CreateUserCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: CreateUserRequestDto,
     })
-    async createUser(@Body() body: CreateUserRequestDto): Promise<CreateUserResponseDto> {
+    async createUser(@Body() body: CreateUserBodyDto): Promise<CreateUserResponseDto> {
         const result = await this.usersService.createUser(body);
 
         const data = errorHandler(result);
@@ -136,9 +131,8 @@ export class UsersController {
     @Endpoint({
         command: UpdateUserCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateUserRequestDto,
     })
-    async updateUser(@Body() body: UpdateUserRequestDto): Promise<UpdateUserResponseDto> {
+    async updateUser(@Body() body: UpdateUserBodyDto): Promise<UpdateUserResponseDto> {
         const result = await this.usersService.updateUser(body);
 
         const data = errorHandler(result);
@@ -154,13 +148,12 @@ export class UsersController {
         type: DeleteUserResponseDto,
         description: 'User deleted successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: DeleteUserCommand,
         httpCode: HttpStatus.OK,
     })
-    async deleteUser(@Param() paramData: DeleteUserRequestDto): Promise<DeleteUserResponseDto> {
-        const result = await this.usersService.deleteUser(paramData.uuid);
+    async deleteUser(@Param() param: DeleteUserParamDto): Promise<DeleteUserResponseDto> {
+        const result = await this.usersService.deleteUser(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -169,26 +162,14 @@ export class UsersController {
     }
 
     @ApiOkResponse({
-        type: GetAllUsersResponseDto,
+        type: GetUsersResponseDto,
         description: 'Users fetched successfully',
     })
-    @ApiQuery({
-        name: 'start',
-        type: 'number',
-        required: false,
-        description: 'Offset for pagination',
-    })
-    @ApiQuery({
-        name: 'size',
-        type: 'number',
-        required: false,
-        description: 'Page size for pagination',
-    })
     @Endpoint({
-        command: GetAllUsersCommand,
+        command: GetUsersCommand,
         httpCode: HttpStatus.OK,
     })
-    async getAllUsers(@Query() query: GetAllUsersQueryDto): Promise<GetAllUsersResponseDto> {
+    async getUsers(@Query() query: GetUsersQueryDto): Promise<GetUsersResponseDto> {
         const { start, size, filters, filterModes, globalFilterMode, sorting } = query;
 
         const result = await this.usersService.getAllUsers({
@@ -215,18 +196,6 @@ export class UsersController {
         type: GetUsersStreamResponseDto,
         description: 'Users fetched successfully',
     })
-    @ApiQuery({
-        name: 'cursor',
-        type: 'string',
-        required: false,
-        description: 'Cursor from the previous response (nextCursor). Omit on the first request',
-    })
-    @ApiQuery({
-        name: 'size',
-        type: 'number',
-        required: false,
-        description: 'Page size, no more than 1000 (default 250)',
-    })
     @Endpoint({
         command: GetUsersStreamCommand,
         httpCode: HttpStatus.OK,
@@ -251,14 +220,14 @@ export class UsersController {
     }
 
     @ApiOkResponse({
-        type: GetAllTagsResponseDto,
+        type: GetUsersTagsResponseDto,
         description: 'Tags fetched successfully',
     })
     @Endpoint({
-        command: GetAllTagsCommand,
+        command: GetUsersTagsCommand,
         httpCode: HttpStatus.OK,
     })
-    async getAllTags(): Promise<GetAllTagsResponseDto> {
+    async getUsersTags(): Promise<GetUsersTagsResponseDto> {
         const result = await this.usersService.getAllTags();
 
         const data = errorHandler(result);
@@ -276,15 +245,14 @@ export class UsersController {
         type: GetUserAccessibleNodesResponseDto,
         description: 'User accessible nodes fetched successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: GetUserAccessibleNodesCommand,
         httpCode: HttpStatus.OK,
     })
     async getUserAccessibleNodes(
-        @Param() paramData: GetUserAccessibleNodesRequestDto,
+        @Param() param: GetUserAccessibleNodesParamDto,
     ): Promise<GetUserAccessibleNodesResponseDto> {
-        const result = await this.usersService.getUserAccessibleNodes(paramData.uuid);
+        const result = await this.usersService.getUserAccessibleNodes(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -299,15 +267,14 @@ export class UsersController {
         type: GetUserSubscriptionRequestHistoryResponseDto,
         description: 'User subscription request history fetched successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: GetUserSubscriptionRequestHistoryCommand,
         httpCode: HttpStatus.OK,
     })
     async getUserSubscriptionRequestHistory(
-        @Param() paramData: GetUserSubscriptionRequestHistoryRequestDto,
+        @Param() param: GetUserSubscriptionRequestHistoryParamDto,
     ): Promise<GetUserSubscriptionRequestHistoryResponseDto> {
-        const result = await this.usersService.getUserSubscriptionRequestHistory(paramData.uuid);
+        const result = await this.usersService.getUserSubscriptionRequestHistory(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -329,21 +296,15 @@ export class UsersController {
         type: GetUserByShortUuidResponseDto,
         description: 'User fetched successfully',
     })
-    @ApiParam({
-        name: 'shortUuid',
-        type: String,
-        description: 'Short UUID of the user',
-        required: true,
-    })
     @Endpoint({
         command: GetUserByShortUuidCommand,
         httpCode: HttpStatus.OK,
     })
     async getUserByShortUuid(
-        @Param() paramData: GetUserByShortUuidRequestDto,
+        @Param() param: GetUserByShortUuidParamDto,
     ): Promise<GetUserByShortUuidResponseDto> {
         const result = await this.usersService.getUserByUniqueFields({
-            shortUuid: paramData.shortUuid,
+            shortUuid: param.shortUuid,
         });
 
         const data = errorHandler(result);
@@ -359,15 +320,12 @@ export class UsersController {
         type: GetUserByUuidResponseDto,
         description: 'User fetched successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: GetUserByUuidCommand,
         httpCode: HttpStatus.OK,
     })
-    async getUserByUuid(
-        @Param() paramData: GetUserByUuidRequestDto,
-    ): Promise<GetUserByUuidResponseDto> {
-        const result = await this.usersService.getUserByUniqueFields({ uuid: paramData.uuid });
+    async getUserByUuid(@Param() param: GetUserByUuidParamDto): Promise<GetUserByUuidResponseDto> {
+        const result = await this.usersService.getUserByUniqueFields({ uuid: param.uuid });
 
         const data = errorHandler(result);
         return {
@@ -382,21 +340,15 @@ export class UsersController {
         type: GetUserByUsernameResponseDto,
         description: 'User fetched successfully',
     })
-    @ApiParam({
-        name: 'username',
-        type: String,
-        description: 'Username of the user',
-        required: true,
-    })
     @Endpoint({
         command: GetUserByUsernameCommand,
         httpCode: HttpStatus.OK,
     })
     async getUserByUsername(
-        @Param() paramData: GetUserByUsernameRequestDto,
+        @Param() param: GetUserByUsernameParamDto,
     ): Promise<GetUserByUsernameResponseDto> {
         const result = await this.usersService.getUserByUniqueFields({
-            username: paramData.username,
+            username: param.username,
         });
 
         const data = errorHandler(result);
@@ -412,19 +364,13 @@ export class UsersController {
         type: GetUserByIdResponseDto,
         description: 'User fetched successfully',
     })
-    @ApiParam({
-        name: 'id',
-        type: String,
-        description: 'ID of the user',
-        required: true,
-    })
     @Endpoint({
         command: GetUserByIdCommand,
         httpCode: HttpStatus.OK,
     })
-    async getUserById(@Param() paramData: GetUserByIdRequestDto): Promise<GetUserByIdResponseDto> {
+    async getUserById(@Param() param: GetUserByIdParamDto): Promise<GetUserByIdResponseDto> {
         const result = await this.usersService.getUserByUniqueFields({
-            tId: paramData.id,
+            tId: param.id,
         });
 
         const data = errorHandler(result);
@@ -437,21 +383,15 @@ export class UsersController {
         type: GetUserByTelegramIdResponseDto,
         description: 'Users fetched successfully',
     })
-    @ApiParam({
-        name: 'telegramId',
-        type: String,
-        description: 'Telegram ID of the user',
-        required: true,
-    })
     @Endpoint({
         command: GetUserByTelegramIdCommand,
         httpCode: HttpStatus.OK,
     })
     async getUserByTelegramId(
-        @Param() paramData: GetUserByTelegramIdRequestDto,
+        @Param() param: GetUserByTelegramIdParamDto,
     ): Promise<GetUserByTelegramIdResponseDto> {
         const result = await this.usersService.getUsersByNonUniqueFields({
-            telegramId: paramData.telegramId,
+            telegramId: param.telegramId,
         });
 
         const data = errorHandler(result);
@@ -464,21 +404,15 @@ export class UsersController {
         type: GetUserByEmailResponseDto,
         description: 'Users fetched successfully',
     })
-    @ApiParam({
-        name: 'email',
-        type: String,
-        description: 'Email of the user',
-        required: true,
-    })
     @Endpoint({
         command: GetUserByEmailCommand,
         httpCode: HttpStatus.OK,
     })
     async getUsersByEmail(
-        @Param() paramData: GetUserByEmailRequestDto,
+        @Param() param: GetUserByEmailParamDto,
     ): Promise<GetUserByEmailResponseDto> {
         const result = await this.usersService.getUsersByNonUniqueFields({
-            email: paramData.email,
+            email: param.email,
         });
 
         const data = errorHandler(result);
@@ -491,22 +425,13 @@ export class UsersController {
         type: GetUserByTagResponseDto,
         description: 'Users fetched successfully',
     })
-    @ApiParam({
-        name: 'tag',
-        type: String,
-        description: 'Tag of the user',
-        required: true,
-        example: 'PROMO_1',
-    })
     @Endpoint({
         command: GetUserByTagCommand,
         httpCode: HttpStatus.OK,
     })
-    async getUsersByTag(
-        @Param() paramData: GetUserByTagRequestDto,
-    ): Promise<GetUserByTagResponseDto> {
+    async getUsersByTag(@Param() param: GetUserByTagParamDto): Promise<GetUserByTagResponseDto> {
         const result = await this.usersService.getUsersByNonUniqueFields({
-            tag: paramData.tag,
+            tag: param.tag,
         });
 
         const data = errorHandler(result);
@@ -529,17 +454,15 @@ export class UsersController {
         type: RevokeUserSubscriptionResponseDto,
         description: 'User subscription revoked successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: RevokeUserSubscriptionCommand,
         httpCode: HttpStatus.OK,
-        apiBody: RevokeUserSubscriptionBodyDto,
     })
     async revokeUserSubscription(
-        @Param() paramData: RevokeUserSubscriptionRequestDto,
-        @Body() bodyData: RevokeUserSubscriptionBodyDto,
+        @Param() param: RevokeUserSubscriptionParamDto,
+        @Body() body: RevokeUserSubscriptionBodyDto,
     ): Promise<RevokeUserSubscriptionResponseDto> {
-        const result = await this.usersService.revokeUserSubscription(paramData.uuid, bodyData);
+        const result = await this.usersService.revokeUserSubscription(param.uuid, body);
 
         const data = errorHandler(result);
         return {
@@ -554,13 +477,12 @@ export class UsersController {
         type: DisableUserResponseDto,
         description: 'User disabled successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: DisableUserCommand,
         httpCode: HttpStatus.OK,
     })
-    async disableUser(@Param() paramData: DisableUserRequestDto): Promise<DisableUserResponseDto> {
-        const result = await this.usersService.disableUser(paramData.uuid);
+    async disableUser(@Param() param: DisableUserParamDto): Promise<DisableUserResponseDto> {
+        const result = await this.usersService.disableUser(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -575,13 +497,12 @@ export class UsersController {
         type: EnableUserResponseDto,
         description: 'User enabled successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: EnableUserCommand,
         httpCode: HttpStatus.OK,
     })
-    async enableUser(@Param() paramData: EnableUserRequestDto): Promise<EnableUserResponseDto> {
-        const result = await this.usersService.enableUser(paramData.uuid);
+    async enableUser(@Param() param: EnableUserParamDto): Promise<EnableUserResponseDto> {
+        const result = await this.usersService.enableUser(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -596,15 +517,14 @@ export class UsersController {
         type: ResetUserTrafficResponseDto,
         description: 'User traffic reset successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
     @Endpoint({
         command: ResetUserTrafficCommand,
         httpCode: HttpStatus.OK,
     })
     async resetUserTraffic(
-        @Param() paramData: ResetUserTrafficRequestDto,
+        @Param() param: ResetUserTrafficParamDto,
     ): Promise<ResetUserTrafficResponseDto> {
-        const result = await this.usersService.resetUserTraffic(paramData.uuid);
+        const result = await this.usersService.resetUserTraffic(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -622,12 +542,9 @@ export class UsersController {
     @Endpoint({
         command: ResolveUserCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ResolveUserRequestBodyDto,
     })
-    async resolveUser(
-        @Body() bodyData: ResolveUserRequestBodyDto,
-    ): Promise<ResolveUserResponseDto> {
-        const result = await this.usersService.resolveUser(bodyData);
+    async resolveUser(@Body() body: ResolveUserBodyDto): Promise<ResolveUserResponseDto> {
+        const result = await this.usersService.resolveUser(body);
 
         const data = errorHandler(result);
         return {

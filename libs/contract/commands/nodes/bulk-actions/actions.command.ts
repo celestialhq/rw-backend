@@ -14,12 +14,10 @@ export namespace BulkNodesActionsCommand {
         { scope: 'bulk-actions', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuids: z.array(z.string().uuid()).min(1, 'Must be at least 1 Node UUID'),
         action: z.nativeEnum(NODES_BULK_ACTIONS),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -27,5 +25,6 @@ export namespace BulkNodesActionsCommand {
         }),
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

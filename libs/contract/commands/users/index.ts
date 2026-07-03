@@ -5,7 +5,7 @@ export * from './bulk-all';
 export * from './create-user.command';
 export * from './delete-user.command';
 
-export * from './get-all-users.command';
+export * from './get-users.command';
 export * from './get-by';
 export * from './get-user-accessible-nodes.command';
 

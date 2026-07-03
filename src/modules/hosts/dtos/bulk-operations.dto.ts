@@ -7,24 +7,30 @@ import {
     UpdateManyHostsCommand,
 } from '@libs/contracts/commands';
 
-export class BulkDeleteHostsRequestDto extends createZodDto(BulkDeleteHostsCommand.RequestSchema) {}
+export class BulkDeleteHostsBodyDto extends createZodDto(
+    BulkDeleteHostsCommand.RequestBodySchema,
+) {}
 export class BulkDeleteHostsResponseDto extends createZodDto(
     BulkDeleteHostsCommand.ResponseSchema,
 ) {}
 
-export class BulkDisableHostsRequestDto extends createZodDto(
-    BulkDisableHostsCommand.RequestSchema,
+export class BulkDisableHostsBodyDto extends createZodDto(
+    BulkDisableHostsCommand.RequestBodySchema,
 ) {}
 export class BulkDisableHostsResponseDto extends createZodDto(
     BulkDisableHostsCommand.ResponseSchema,
 ) {}
 
-export class BulkEnableHostsRequestDto extends createZodDto(BulkEnableHostsCommand.RequestSchema) {}
+export class BulkEnableHostsBodyDto extends createZodDto(
+    BulkEnableHostsCommand.RequestBodySchema,
+) {}
 export class BulkEnableHostsResponseDto extends createZodDto(
     BulkEnableHostsCommand.ResponseSchema,
 ) {}
 
-export class UpdateManyHostsRequestDto extends createZodDto(UpdateManyHostsCommand.RequestSchema) {}
+export class UpdateManyHostsBodyDto extends createZodDto(
+    UpdateManyHostsCommand.RequestBodySchema,
+) {}
 export class UpdateManyHostsResponseDto extends createZodDto(
     UpdateManyHostsCommand.ResponseSchema,
 ) {}

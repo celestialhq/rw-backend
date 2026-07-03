@@ -17,7 +17,7 @@ import {
 
 import {
     GetRemnawaveSettingsResponseDto,
-    UpdateRemnawaveSettingsRequestDto,
+    UpdateRemnawaveSettingsBodyDto,
     UpdateRemnawaveSettingsResponseDto,
 } from './dto';
 import { RemnawaveSettingsResponseModel } from './models/get-remnawave-settings.response.model';
@@ -56,10 +56,9 @@ export class RemnawaveSettingsController {
     @Endpoint({
         command: UpdateRemnawaveSettingsCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateRemnawaveSettingsRequestDto,
     })
     async updateSettings(
-        @Body() body: UpdateRemnawaveSettingsRequestDto,
+        @Body() body: UpdateRemnawaveSettingsBodyDto,
     ): Promise<UpdateRemnawaveSettingsResponseDto> {
         const result = await this.remnawaveSettingsService.updateSettingsFromController(body);
 

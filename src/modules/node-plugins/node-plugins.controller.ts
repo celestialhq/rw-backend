@@ -2,7 +2,7 @@ import { CONTROLLERS_INFO, NODE_PLUGINS_CONTROLLER } from '@contract/api';
 import { ROLE } from '@contract/constants';
 
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -24,21 +24,21 @@ import {
 } from '@libs/contracts/commands';
 
 import {
-    ReorderNodePluginsRequestDto,
+    ReorderNodePluginsBodyDto,
     ReorderNodePluginsResponseDto,
     GetNodePluginsResponseDto,
     GetNodePluginResponseDto,
-    UpdateNodePluginRequestDto,
+    UpdateNodePluginBodyDto,
     UpdateNodePluginResponseDto,
-    DeleteNodePluginRequestDto,
+    DeleteNodePluginParamDto,
     DeleteNodePluginResponseDto,
-    CreateNodePluginRequestDto,
+    CreateNodePluginBodyDto,
     CreateNodePluginResponseDto,
-    GetNodePluginRequestDto,
     CloneNodePluginResponseDto,
-    CloneNodePluginRequestDto,
+    CloneNodePluginBodyDto,
     PluginExecutorResponseDto,
-    PluginExecutorRequestDto,
+    PluginExecutorBodyDto,
+    GetNodePluginParamDto,
 } from './dtos/node-plugins.dtos';
 import { NodePluginService } from './node-plugins.service';
 
@@ -73,15 +73,14 @@ export class NodePluginController {
         type: GetNodePluginResponseDto,
         description: 'Node plugin retrieved successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node plugin UUID' })
     @Endpoint({
         command: GetNodePluginCommand,
         httpCode: HttpStatus.OK,
     })
     async getConfigByUuid(
-        @Param() paramData: GetNodePluginRequestDto,
+        @Param() param: GetNodePluginParamDto,
     ): Promise<GetNodePluginResponseDto> {
-        const { uuid } = paramData;
+        const { uuid } = param;
         const result = await this.nodePluginService.getConfigByUuid(uuid);
         const data = errorHandler(result);
         return {
@@ -99,10 +98,9 @@ export class NodePluginController {
     @Endpoint({
         command: UpdateNodePluginCommand,
         httpCode: HttpStatus.OK,
-        apiBody: UpdateNodePluginRequestDto,
     })
     async updateConfig(
-        @Body() body: UpdateNodePluginRequestDto,
+        @Body() body: UpdateNodePluginBodyDto,
     ): Promise<UpdateNodePluginResponseDto> {
         const result = await this.nodePluginService.updateConfig(
             body.uuid,
@@ -123,15 +121,14 @@ export class NodePluginController {
         type: DeleteNodePluginResponseDto,
         description: 'Node plugin deleted successfully',
     })
-    @ApiParam({ name: 'uuid', type: String, description: 'Node plugin UUID' })
     @Endpoint({
         command: DeleteNodePluginCommand,
         httpCode: HttpStatus.OK,
     })
     async deleteConfig(
-        @Param() paramData: DeleteNodePluginRequestDto,
+        @Param() param: DeleteNodePluginParamDto,
     ): Promise<DeleteNodePluginResponseDto> {
-        const result = await this.nodePluginService.deleteConfig(paramData.uuid);
+        const result = await this.nodePluginService.deleteConfig(param.uuid);
 
         const data = errorHandler(result);
         return {
@@ -146,10 +143,9 @@ export class NodePluginController {
     @Endpoint({
         command: CreateNodePluginCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: CreateNodePluginRequestDto,
     })
     async createConfig(
-        @Body() body: CreateNodePluginRequestDto,
+        @Body() body: CreateNodePluginBodyDto,
     ): Promise<CreateNodePluginResponseDto> {
         const result = await this.nodePluginService.createConfig(body.name);
 
@@ -166,10 +162,9 @@ export class NodePluginController {
     @Endpoint({
         command: ReorderNodePluginCommand,
         httpCode: HttpStatus.OK,
-        apiBody: ReorderNodePluginsRequestDto,
     })
     async reorderNodePlugins(
-        @Body() body: ReorderNodePluginsRequestDto,
+        @Body() body: ReorderNodePluginsBodyDto,
     ): Promise<ReorderNodePluginsResponseDto> {
         const result = await this.nodePluginService.reorderNodePlugins(body.items);
 
@@ -186,10 +181,9 @@ export class NodePluginController {
     @Endpoint({
         command: CloneNodePluginCommand,
         httpCode: HttpStatus.OK,
-        apiBody: CloneNodePluginRequestDto,
     })
     async cloneNodePlugin(
-        @Body() body: CloneNodePluginRequestDto,
+        @Body() body: CloneNodePluginBodyDto,
     ): Promise<CloneNodePluginResponseDto> {
         const result = await this.nodePluginService.cloneNodePlugin(body.cloneFromUuid);
 
@@ -206,11 +200,8 @@ export class NodePluginController {
     @Endpoint({
         command: PluginExecutorCommand,
         httpCode: HttpStatus.OK,
-        apiBody: PluginExecutorRequestDto,
     })
-    async pluginExecutor(
-        @Body() body: PluginExecutorRequestDto,
-    ): Promise<PluginExecutorResponseDto> {
+    async pluginExecutor(@Body() body: PluginExecutorBodyDto): Promise<PluginExecutorResponseDto> {
         const result = await this.nodePluginService.executePluginCommand(body);
 
         const data = errorHandler(result);

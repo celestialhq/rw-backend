@@ -15,7 +15,7 @@ export namespace CreateUserCommand {
         { scope: 'create', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         username: z
             .string({
                 required_error: 'Username is required',
@@ -163,11 +163,10 @@ export namespace CreateUserCommand {
             .describe('Optional. External squad UUID.'),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: ExtendedUsersSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

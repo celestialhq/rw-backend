@@ -12,7 +12,7 @@ import { GetUserIdsByUserUuidsQuery } from '@modules/users/queries/get-user-ids-
 
 import { NodesQueuesService } from '@queue/_nodes';
 
-import { DropConnectionsRequestDto } from './dtos';
+import { DropConnectionsBodyDto } from './dtos';
 import {
     BaseEventResponseModel,
     FetchUsersIpsResponseModel,
@@ -71,7 +71,7 @@ export class IpControlService {
     }
 
     public async dropConnections(
-        data: DropConnectionsRequestDto,
+        dto: DropConnectionsBodyDto,
     ): Promise<TResult<BaseEventResponseModel>> {
         try {
             const findResult = await this.queryBus.execute(
@@ -88,10 +88,10 @@ export class IpControlService {
 
             let nodes: NodesEntity[] = [];
 
-            if (data.targetNodes.target === 'allNodes') {
+            if (dto.targetNodes.target === 'allNodes') {
                 nodes = findResult.response;
             } else {
-                const { nodeUuids } = data.targetNodes;
+                const { nodeUuids } = dto.targetNodes;
                 nodes = findResult.response.filter((node) => nodeUuids.includes(node.uuid));
             }
 
@@ -99,10 +99,10 @@ export class IpControlService {
                 return fail(ERRORS.CONNECTED_NODES_NOT_FOUND);
             }
 
-            switch (data.dropBy.by) {
+            switch (dto.dropBy.by) {
                 case 'userUuids':
                     const userIds = await this.queryBus.execute(
-                        new GetUserIdsByUserUuidsQuery(data.dropBy.userUuids),
+                        new GetUserIdsByUserUuidsQuery(dto.dropBy.userUuids),
                     );
                     if (!userIds.isOk) {
                         return fail(ERRORS.USER_NOT_FOUND);
@@ -126,7 +126,7 @@ export class IpControlService {
                     for (const node of nodes) {
                         await this.nodesQueuesService.dropIpsConnections({
                             data: {
-                                ips: data.dropBy.ipAddresses,
+                                ips: dto.dropBy.ipAddresses,
                             },
                             node: {
                                 address: node.address,

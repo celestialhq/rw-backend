@@ -15,7 +15,7 @@ export namespace UpdateInfraProviderCommand {
         { scope: 'update-provider', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         uuid: z.string().uuid(),
         name: z
             .string()
@@ -26,11 +26,10 @@ export namespace UpdateInfraProviderCommand {
         loginUrl: z.optional(z.nullable(z.string().url())),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: InfraProviderSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }
