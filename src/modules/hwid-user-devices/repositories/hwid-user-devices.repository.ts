@@ -19,6 +19,7 @@ const HWID_FILTER_COLUMN_MAP = {
     userAgent: sql.ref('hwid_user_devices.user_agent'),
     osVersion: sql.ref('hwid_user_devices.os_version'),
     deviceModel: sql.ref('hwid_user_devices.device_model'),
+    requestIp: sql.ref('hwid_user_devices.request_ip'),
 } as const;
 
 type AllowedHwidFilterId = keyof typeof HWID_FILTER_COLUMN_MAP;
