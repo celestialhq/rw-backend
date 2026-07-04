@@ -34,8 +34,6 @@ jobs:
   build-docker-images:
     name: Build ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
-    outputs:
-      images: ${{ steps.meta.outputs.images }}
     strategy:
       fail-fast: false
       matrix:
@@ -78,43 +76,22 @@ jobs:
         id: meta
         env:
           DOCKERHUB_BACKEND_IMAGE: ${{ vars.DOCKERHUB_BACKEND_IMAGE }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           FRONTEND_REPOSITORY: ${{ vars.FRONTEND_REPOSITORY }}
         run: |
           FRONTEND_REPOSITORY="${FRONTEND_REPOSITORY:-${GITHUB_REPOSITORY_OWNER}/rw-frontend}"
           GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
 
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-            TAGS="${GHCR_IMAGE}:${GITHUB_REF_NAME}"$'\n'"${GHCR_IMAGE}:latest"
-            if [[ "$GITHUB_REF_NAME" == 2.* ]]; then
-              TAGS="${TAGS}"$'\n'"${GHCR_IMAGE}:2"
-            fi
             FRONTEND_URL="https://github.com/${FRONTEND_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/remnawave-frontend.zip"
           else
-            TAGS="${GHCR_IMAGE}:main"
             FRONTEND_URL="https://github.com/${FRONTEND_REPOSITORY}/releases/latest/download/remnawave-frontend.zip"
           fi
 
-          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
-            if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-              TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:${GITHUB_REF_NAME}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:latest"
-              if [[ "$GITHUB_REF_NAME" == 2.* ]]; then
-                TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:2"
-              fi
-            else
-              TAGS="${TAGS}"$'\n'"${DOCKERHUB_BACKEND_IMAGE}:main"
-            fi
-          fi
-
           IMAGES="${GHCR_IMAGE}"
-          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ]; then
             IMAGES="${IMAGES},${DOCKERHUB_BACKEND_IMAGE}"
           fi
 
-          echo "tags<<EOF" >> $GITHUB_OUTPUT
-          echo "$TAGS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
           echo "images=${IMAGES}" >> $GITHUB_OUTPUT
           echo "frontend_url=${FRONTEND_URL}" >> $GITHUB_OUTPUT
           echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
@@ -188,8 +165,15 @@ jobs:
 
       - name: Create & push manifest lists
         working-directory: ${{ runner.temp }}/digests
+        env:
+          DOCKERHUB_BACKEND_IMAGE: ${{ vars.DOCKERHUB_BACKEND_IMAGE }}
         run: |
-          IFS=',' read -ra IMAGE_ARR <<< "${{ needs.build-docker-images.outputs.images }}"
+          IMAGES="ghcr.io/${GITHUB_REPOSITORY}"
+          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ]; then
+            IMAGES="${IMAGES},${DOCKERHUB_BACKEND_IMAGE}"
+          fi
+
+          IFS=',' read -ra IMAGE_ARR <<< "$IMAGES"
           for IMAGE in "${IMAGE_ARR[@]}"; do
             TAGS=(-t "${IMAGE}:latest" -t "${IMAGE}:${{ github.ref_name }}")
             if [[ "${{ github.ref_name }}" == 2.* ]]; then
@@ -201,8 +185,15 @@ jobs:
           done
 
       - name: Inspect image
+        env:
+          DOCKERHUB_BACKEND_IMAGE: ${{ vars.DOCKERHUB_BACKEND_IMAGE }}
         run: |
-          IFS=',' read -ra IMAGE_ARR <<< "${{ needs.build-docker-images.outputs.images }}"
+          IMAGES="ghcr.io/${GITHUB_REPOSITORY}"
+          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ]; then
+            IMAGES="${IMAGES},${DOCKERHUB_BACKEND_IMAGE}"
+          fi
+
+          IFS=',' read -ra IMAGE_ARR <<< "$IMAGES"
           for IMAGE in "${IMAGE_ARR[@]}"; do
             docker buildx imagetools inspect "${IMAGE}:${{ github.ref_name }}"
           done
