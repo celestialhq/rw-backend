@@ -16,7 +16,7 @@ export namespace GetInboundsByProfileUuidCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the config profile'),
+        uuid: z.uuid().describe('UUID of the config profile'),
     });
 
     export const ResponseSchema = z.object({
@@ -24,7 +24,7 @@ export namespace GetInboundsByProfileUuidCommand {
             total: z.number(),
             inbounds: z.array(
                 ConfigProfileInboundsSchema.extend({
-                    activeSquads: z.array(z.string().uuid()),
+                    activeSquads: z.array(z.uuid()),
                 }),
             ),
         }),

@@ -15,12 +15,12 @@ export namespace GetNodeMetadataCommand {
     );
 
     export const RequestParamsSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const ResponseSchema = z.object({
         response: z.object({
-            metadata: z.object({}).passthrough(),
+            metadata: z.looseObject({}),
         }),
     });
 

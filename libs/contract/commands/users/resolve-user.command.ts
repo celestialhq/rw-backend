@@ -16,7 +16,7 @@ export namespace ResolveUserCommand {
 
     export const RequestBodySchema = z
         .object({
-            uuid: z.string().uuid().optional(),
+            uuid: z.uuid().optional(),
             id: z.number().optional(),
             shortUuid: z.string().optional(),
             username: z.string().optional(),
@@ -29,13 +29,13 @@ export namespace ResolveUserCommand {
                 return provided.length === 1;
             },
             {
-                message: 'Exactly one of uuid, id, shortUuid, or username must be provided',
+                error: 'Exactly one of uuid, id, shortUuid, or username must be provided'
             },
         );
 
     export const ResponseSchema = z.object({
         response: z.object({
-            uuid: z.string().uuid(),
+            uuid: z.uuid(),
             username: z.string(),
             id: z.number(),
             shortUuid: z.string(),

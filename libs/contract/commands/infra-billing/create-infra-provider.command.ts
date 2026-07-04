@@ -20,8 +20,8 @@ export namespace CreateInfraProviderCommand {
             .string()
             .min(2, 'Name must be at least 2 characters')
             .max(30, 'Name must be less than 30 characters'),
-        faviconLink: z.string().url().optional(),
-        loginUrl: z.string().url().optional(),
+        faviconLink: z.url().optional(),
+        loginUrl: z.url().optional(),
     });
 
     export const ResponseSchema = z.object({

@@ -16,7 +16,7 @@ export namespace DeleteApiTokenCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the API token'),
+        uuid: z.uuid().describe('UUID of the API token'),
     });
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;

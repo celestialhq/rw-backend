@@ -16,7 +16,7 @@ export namespace UpdateSubpageConfigCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
         name: z
             .string()
             .min(2, 'Name must be at least 2 characters')

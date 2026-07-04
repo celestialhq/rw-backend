@@ -18,13 +18,13 @@ export namespace DropConnectionsCommand {
         z
             .object({
                 by: z.literal('userUuids'),
-                userUuids: z.array(z.string().uuid()).min(1),
+                userUuids: z.array(z.uuid()).min(1),
             })
             .describe('Drop by user UUIDs'),
         z
             .object({
                 by: z.literal('ipAddresses'),
-                ipAddresses: z.array(z.string().ip()).min(1),
+                ipAddresses: z.array(z.union([z.ipv4(), z.ipv6()])).min(1),
             })
             .describe('Drop by IP addresses'),
     ]);
@@ -38,7 +38,7 @@ export namespace DropConnectionsCommand {
         z
             .object({
                 target: z.literal('specificNodes'),
-                nodeUuids: z.array(z.string().uuid()).min(1),
+                nodeUuids: z.array(z.uuid()).min(1),
             })
             .describe('Target specific nodes'),
     ]);

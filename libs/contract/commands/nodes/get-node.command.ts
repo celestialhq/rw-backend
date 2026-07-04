@@ -16,7 +16,7 @@ export namespace GetNodeCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const ResponseSchema = NodeResponseSchema;

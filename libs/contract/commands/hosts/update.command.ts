@@ -27,30 +27,25 @@ export namespace UpdateHostCommand {
     }).extend({
         inbound: z
             .object({
-                configProfileUuid: z.string().uuid(),
-                configProfileInboundUuid: z.string().uuid(),
+                configProfileUuid: z.uuid(),
+                configProfileInboundUuid: z.uuid(),
             })
             .optional(),
         remark: z.string().min(1).max(100).optional(),
         address: z.string().optional(),
-        port: z.number().int().optional(),
+        port: z.int().optional(),
         path: z.string().nullish(),
         sni: z.string().nullish(),
         host: z.string().nullish(),
-        alpn: z.nativeEnum(ALPN).nullish(),
+        alpn: z.enum(ALPN).nullish(),
         fingerprint: z.string().nullish(),
         isDisabled: z.boolean().default(false),
-        securityLayer: z.optional(z.nativeEnum(SECURITY_LAYERS)),
+        securityLayer: z.optional(z.enum(SECURITY_LAYERS)),
         xhttpExtraParams: z.unknown().nullish(),
         muxParams: z.unknown().nullish(),
         sockoptParams: z.unknown().nullish(),
         finalMask: z.unknown().nullish(),
-        serverDescription: z
-            .string()
-            .max(30, {
-                message: 'Server description must be less than 30 characters',
-            })
-            .nullish(),
+        serverDescription: z.string().max(30).nullish(),
         tags: z.optional(
             z
                 .array(
@@ -67,19 +62,19 @@ export namespace UpdateHostCommand {
         isHidden: z.optional(z.boolean()),
         overrideSniFromAddress: z.optional(z.boolean()),
         keepSniBlank: z.optional(z.boolean()),
-        vlessRouteId: z.optional(z.number().int().min(0).max(65535).nullable()),
+        vlessRouteId: z.optional(z.int().min(0).max(65535).nullable()),
         pinnedPeerCertSha256: z.string().nullish(),
         verifyPeerCertByName: z.string().nullish(),
         shuffleHost: z.optional(z.boolean()),
         mihomoX25519: z.optional(z.boolean()),
-        mihomoIpVersion: z.nativeEnum(MIHOMO_IP_VERSION).nullish(),
-        nodes: z.optional(z.array(z.string().uuid())),
-        xrayJsonTemplateUuid: z.string().uuid().nullish(),
+        mihomoIpVersion: z.enum(MIHOMO_IP_VERSION).nullish(),
+        nodes: z.optional(z.array(z.uuid())),
+        xrayJsonTemplateUuid: z.uuid().nullish(),
         excludedInternalSquads: z
-            .optional(z.array(z.string().uuid()))
+            .optional(z.array(z.uuid()))
             .describe('Optional. Internal squads from which the host will be excluded.'),
         excludeFromSubscriptionTypes: z
-            .optional(z.array(z.nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE)))
+            .optional(z.array(z.enum(SUBSCRIPTION_TEMPLATE_TYPE)))
             .describe('Optional. Subscription types from which the host will be excluded from.'),
     });
 

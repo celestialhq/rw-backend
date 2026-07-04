@@ -16,7 +16,7 @@ export namespace ResetUserTrafficCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const ResponseSchema = UserResponseSchema;

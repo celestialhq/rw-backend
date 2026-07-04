@@ -24,7 +24,7 @@ export namespace GetRawSubscriptionByShortUuidCommand {
             .string()
             .transform((str) => str === 'true')
             .optional()
-            .default('false'),
+            .prefault('false'),
     });
 
     export const ResponseSchema = z.object({

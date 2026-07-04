@@ -16,7 +16,7 @@ export namespace GetExternalSquadByUuidCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the external squad'),
+        uuid: z.uuid().describe('UUID of the external squad'),
     });
 
     export const ResponseSchema = z.object({

@@ -82,7 +82,7 @@ export class NodePluginService {
 
                 if (!validatedConfig.success) {
                     this.logger.error(
-                        validatedConfig.error.errors
+                        validatedConfig.error.issues
                             .map(
                                 (err) =>
                                     `${err.path.length ? `${err.path.join('.')}: ` : ''}${err.message}`,

@@ -21,8 +21,8 @@ export namespace GetSubscriptionsCommand {
             .describe('Start index (offset) of the users to return, default is 0'),
         size: z.coerce
             .number()
-            .min(1, 'Size (limit) must be greater than 0')
-            .max(500, 'Size (limit) must be less than 500')
+            .min(1)
+            .max(500)
             .describe('Number of subscriptions to return, no more than 500')
             .default(25),
     });
@@ -42,13 +42,10 @@ export namespace GetSubscriptionsCommand {
                         trafficLimitBytes: z.string(),
                         lifetimeTrafficUsedBytes: z.string(),
                         username: z.string(),
-                        expiresAt: z
-                            .string()
-                            .datetime()
-                            .transform((str) => new Date(str)),
+                        expiresAt: z.iso.datetime().transform((str) => new Date(str)),
                         isActive: z.boolean(),
-                        userStatus: z.nativeEnum(USERS_STATUS),
-                        trafficLimitStrategy: z.nativeEnum(RESET_PERIODS),
+                        userStatus: z.enum(USERS_STATUS),
+                        trafficLimitStrategy: z.enum(RESET_PERIODS),
                     }),
                     links: z.array(z.string()),
                     ssConfLinks: z.record(z.string(), z.string()),

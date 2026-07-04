@@ -15,7 +15,7 @@ export namespace DeleteSubscriptionTemplateCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;

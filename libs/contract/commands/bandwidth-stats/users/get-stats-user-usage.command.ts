@@ -15,12 +15,12 @@ export namespace GetStatsUserUsageCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the user'),
+        uuid: z.uuid().describe('UUID of the user'),
     });
 
     export const RequestQuerySchema = z.object({
-        start: z.string().date().describe('Start date (YYYY-MM-DD)'),
-        end: z.string().date().describe('End date (YYYY-MM-DD)'),
+        start: z.iso.date().describe('Start date (YYYY-MM-DD)'),
+        end: z.iso.date().describe('End date (YYYY-MM-DD)'),
         topNodesLimit: z.coerce.number().min(1).default(20),
     });
 
@@ -30,7 +30,7 @@ export namespace GetStatsUserUsageCommand {
             sparklineData: z.array(z.number()),
             topNodes: z.array(
                 z.object({
-                    uuid: z.string().uuid(),
+                    uuid: z.uuid(),
                     color: z.string(),
                     name: z.string(),
                     countryCode: z.string(),
@@ -39,7 +39,7 @@ export namespace GetStatsUserUsageCommand {
             ),
             series: z.array(
                 z.object({
-                    uuid: z.string().uuid(),
+                    uuid: z.uuid(),
                     name: z.string(),
                     color: z.string(),
                     countryCode: z.string(),

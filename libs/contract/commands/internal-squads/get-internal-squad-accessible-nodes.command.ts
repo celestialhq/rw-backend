@@ -15,18 +15,18 @@ export namespace GetInternalSquadAccessibleNodesCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const ResponseSchema = z.object({
         response: z.object({
-            squadUuid: z.string().uuid(),
+            squadUuid: z.uuid(),
             accessibleNodes: z.array(
                 z.object({
-                    uuid: z.string().uuid(),
+                    uuid: z.uuid(),
                     nodeName: z.string(),
                     countryCode: z.string(),
-                    configProfileUuid: z.string().uuid(),
+                    configProfileUuid: z.uuid(),
                     configProfileName: z.string(),
                     activeInbounds: z.array(z.string()),
                 }),

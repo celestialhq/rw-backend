@@ -15,18 +15,18 @@ export namespace GetUserAccessibleNodesCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const ResponseSchema = z.object({
         response: z.object({
-            userUuid: z.string().uuid(),
+            userUuid: z.uuid(),
             activeNodes: z.array(
                 z.object({
-                    uuid: z.string().uuid(),
+                    uuid: z.uuid(),
                     nodeName: z.string(),
                     countryCode: z.string(),
-                    configProfileUuid: z.string().uuid(),
+                    configProfileUuid: z.uuid(),
                     configProfileName: z.string(),
                     activeSquads: z.array(
                         z.object({

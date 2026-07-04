@@ -15,19 +15,19 @@ export namespace GetLegacyStatsUserUsageCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const RequestQuerySchema = z.object({
-        start: z.string().datetime().describe('Start date'),
-        end: z.string().datetime().describe('End date'),
+        start: z.iso.datetime().describe('Start date'),
+        end: z.iso.datetime().describe('End date'),
     });
 
     export const ResponseSchema = z.object({
         response: z.array(
             z.object({
-                userUuid: z.string().uuid(),
-                nodeUuid: z.string().uuid(),
+                userUuid: z.uuid(),
+                nodeUuid: z.uuid(),
                 nodeName: z.string(),
                 countryCode: z.string(),
                 total: z.number(),

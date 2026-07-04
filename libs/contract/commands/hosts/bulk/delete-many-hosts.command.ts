@@ -15,7 +15,7 @@ export namespace BulkDeleteHostsCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuids: z.array(z.string().uuid()),
+        uuids: z.array(z.uuid()),
     });
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;

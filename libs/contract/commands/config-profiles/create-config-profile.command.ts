@@ -24,7 +24,7 @@ export namespace CreateConfigProfileCommand {
                 /^[A-Za-z0-9_\s-]+$/,
                 'Name can only contain letters, numbers, underscores, dashes and spaces',
             ),
-        config: z.object({}).passthrough(),
+        config: z.looseObject({}),
     });
 
     export const ResponseSchema = z.object({

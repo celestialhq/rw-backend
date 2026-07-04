@@ -15,14 +15,10 @@ export namespace BulkNodesProfileModificationCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuids: z.array(z.string().uuid()).min(1, 'Must be at least 1 Node UUID'),
+        uuids: z.array(z.uuid()).min(1),
         configProfile: z.object({
-            activeConfigProfileUuid: z.string().uuid(),
-            activeInbounds: z
-                .array(z.string().uuid(), {
-                    invalid_type_error: 'Must be an array of UUIDs',
-                })
-                .min(1, 'Must be at least 1 inbound UUID'),
+            activeConfigProfileUuid: z.uuid(),
+            activeInbounds: z.array(z.uuid()).min(1),
         }),
     });
 

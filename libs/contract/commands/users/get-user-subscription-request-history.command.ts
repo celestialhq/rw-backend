@@ -15,7 +15,7 @@ export namespace GetUserSubscriptionRequestHistoryCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const ResponseSchema = z.object({
@@ -25,9 +25,7 @@ export namespace GetUserSubscriptionRequestHistoryCommand {
                 z.object({
                     id: z.number(),
                     userId: z.number(),
-                    requestAt: z
-                        .string()
-                        .datetime()
+                    requestAt: z.iso.datetime()
                         .transform((str) => new Date(str)),
                     requestIp: z.string().optional().nullable(),
                     userAgent: z.string().optional().nullable(),
