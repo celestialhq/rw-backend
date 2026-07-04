@@ -46,7 +46,7 @@ jobs:
       - name: Publish package on NPM
         if: steps.published.outputs.exists != 'true'
         working-directory: 'libs/contract'
-        run: npm publish --access public
+        run: npm publish --access public --tag "${GITHUB_REF_NAME}"
 
       # - name: Install HashedSet dependencies and build
       #   working-directory: 'libs/hashed-set'
