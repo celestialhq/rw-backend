@@ -21,7 +21,7 @@ export namespace TestSrrMatcherCommand {
     export const ResponseSchema = z.object({
         response: z.object({
             matched: z.boolean(),
-            responseType: z.nativeEnum(RESPONSE_RULES_RESPONSE_TYPES),
+            responseType: z.enum(RESPONSE_RULES_RESPONSE_TYPES),
             matchedRule: z.nullable(ResponseRuleSchema),
             inputHeaders: z.record(z.string(), z.string()),
             outputHeaders: z.record(z.string(), z.string()),

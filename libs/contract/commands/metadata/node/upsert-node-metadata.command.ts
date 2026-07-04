@@ -15,16 +15,16 @@ export namespace UpsertNodeMetadataCommand {
     );
 
     export const RequestParamsSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const RequestBodySchema = z.object({
-        metadata: z.object({}).passthrough(),
+        metadata: z.looseObject({}),
     });
 
     export const ResponseSchema = z.object({
         response: z.object({
-            metadata: z.object({}).passthrough(),
+            metadata: z.looseObject({}),
         }),
     });
 

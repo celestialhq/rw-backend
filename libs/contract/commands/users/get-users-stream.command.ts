@@ -24,27 +24,26 @@ export namespace GetUsersStreamCommand {
             ),
         size: z.coerce
             .number()
-            .int()
-            .min(1, 'Size (limit) must be greater than 0')
-            .max(1000, 'Size (limit) must be less than 1000')
+            .min(1)
+            .max(1000)
             .describe('Number of results to return, no more than 1000')
             .optional()
             .default(250),
 
         // Filtering
-        status: z.nativeEnum(USERS_STATUS).optional().describe('Status to filter users by'),
+        status: z.enum(USERS_STATUS).optional().describe('Status to filter users by'),
         trafficLimitStrategy: z
-            .nativeEnum(RESET_PERIODS)
+            .enum(RESET_PERIODS)
             .optional()
             .describe('Traffic limit strategy to filter users by'),
-        telegramId: z.coerce.bigint().optional().describe('Telegram ID to filter users by'),
-        email: z.string().email().optional().describe('Email to filter users by'),
-        tag: z.string().optional().describe('Tag to filter users by'),
-        externalSquadUuid: z
+        telegramId: z
             .string()
-            .uuid()
+            .transform(BigInt)
             .optional()
-            .describe('External squad UUID to filter users by'),
+            .describe('Telegram ID to filter users by'),
+        email: z.email().optional().describe('Email to filter users by'),
+        tag: z.string().optional().describe('Tag to filter users by'),
+        externalSquadUuid: z.uuid().optional().describe('External squad UUID to filter users by'),
     });
 
     export const ResponseSchema = z.object({

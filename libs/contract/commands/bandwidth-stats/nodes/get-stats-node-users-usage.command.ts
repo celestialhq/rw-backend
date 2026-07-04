@@ -15,12 +15,12 @@ export namespace GetStatsNodeUsersUsageCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const RequestQuerySchema = z.object({
-        start: z.string().date().describe('Start date (YYYY-MM-DD)'),
-        end: z.string().date().describe('End date (YYYY-MM-DD)'),
+        start: z.iso.date().describe('Start date (YYYY-MM-DD)'),
+        end: z.iso.date().describe('End date (YYYY-MM-DD)'),
         topUsersLimit: z.coerce.number().min(1).default(100),
     });
 

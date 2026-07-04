@@ -15,16 +15,8 @@ export namespace BulkExtendExpirationDateCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuids: z
-            .array(z.string().uuid())
-            .min(1, 'Must be at least 1 user UUID')
-            .max(500, 'Maximum 500 user UUIDs'),
-
-        extendDays: z
-            .number()
-            .int()
-            .min(1, 'Extend days must be greater than 0')
-            .max(9999, 'Maximum 9999 days'),
+        uuids: z.array(z.uuid()).min(1).max(500),
+        extendDays: z.int().min(1).max(9999),
     });
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;

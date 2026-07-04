@@ -15,12 +15,12 @@ export namespace GetStatsNodesUsersUsageCommand {
     );
 
     export const RequestBodySchema = z.object({
-        nodesUuids: z.array(z.string().uuid()).min(1, 'Must be at least 1 node UUID'),
+        nodesUuids: z.array(z.uuid()).min(1),
     });
 
     export const RequestQuerySchema = z.object({
-        start: z.string().date().describe('Start date (YYYY-MM-DD)'),
-        end: z.string().date().describe('End date (YYYY-MM-DD)'),
+        start: z.iso.date().describe('Start date (YYYY-MM-DD)'),
+        end: z.iso.date().describe('End date (YYYY-MM-DD)'),
         topUsersLimit: z.coerce.number().min(1).default(100),
     });
 

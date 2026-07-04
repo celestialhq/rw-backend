@@ -21,20 +21,15 @@ export namespace UpdateSubscriptionSettingsCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
 
         profileTitle: z.optional(z.string()),
         supportLink: z.optional(z.string()),
-        profileUpdateInterval: z.optional(z.number().int()),
+        profileUpdateInterval: z.optional(z.int()),
         isProfileWebpageUrlEnabled: z.optional(z.boolean()),
         serveJsonAtBaseSubscription: z.optional(z.boolean()),
 
-        happAnnounce: z.optional(
-            z
-                .string()
-                .max(200, { message: 'Announce must be less than 200 characters' })
-                .nullable(),
-        ),
+        happAnnounce: z.optional(z.string().max(200).nullable()),
         happRouting: z.optional(z.string().nullable()),
 
         isShowCustomRemarks: z.optional(z.boolean()),

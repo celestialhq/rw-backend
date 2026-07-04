@@ -16,17 +16,17 @@ export namespace UpdateSubscriptionTemplateCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
         name: z
             .string()
-            .min(2, 'Name must be at least 2 characters')
-            .max(255, 'Name must be less than 255 characters')
+            .min(2)
+            .max(255)
             .regex(
                 /^[A-Za-z0-9_\s-]+$/,
                 'Name can only contain letters, numbers, underscores, dashes and spaces',
             )
             .optional(),
-        templateJson: z.optional(z.object({}).passthrough()),
+        templateJson: z.optional(z.looseObject({})),
         encodedTemplateYaml: z.optional(z.string()),
     });
 

@@ -18,13 +18,13 @@ export namespace CreateInternalSquadCommand {
     export const RequestBodySchema = z.object({
         name: z
             .string()
-            .min(2, 'Name must be at least 2 characters')
-            .max(30, 'Name must be less than 30 characters')
+            .min(2)
+            .max(30)
             .regex(
                 /^[A-Za-z0-9_\s-]+$/,
                 'Name can only contain letters, numbers, underscores, dashes and spaces',
             ),
-        inbounds: z.array(z.string().uuid()),
+        inbounds: z.array(z.uuid()),
     });
 
     export const ResponseSchema = z.object({

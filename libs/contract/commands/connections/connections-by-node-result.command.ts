@@ -25,15 +25,14 @@ export namespace ConnectionsByNodeResultCommand {
             result: z
                 .object({
                     success: z.boolean(),
-                    nodeUuid: z.string().uuid(),
+                    nodeUuid: z.uuid(),
                     users: z.array(
                         z.object({
                             userId: z.string(),
                             ips: z.array(
                                 z.object({
                                     ip: z.string(),
-                                    lastSeen: z
-                                        .string()
+                                    lastSeen: z.iso
                                         .datetime({
                                             local: true,
                                             offset: true,

@@ -24,8 +24,8 @@ export namespace GetInfraBillingRecordsCommand {
             ),
         size: z.coerce
             .number()
-            .min(1, 'Size (limit) must be greater than 0')
-            .max(500, 'Size (limit) must be less than 500')
+            .min(1)
+            .max(500)
             .describe('Number of billing records to return, no more than 500')
             .default(50),
     });

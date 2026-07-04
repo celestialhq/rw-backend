@@ -16,12 +16,9 @@ export namespace UpdateInfraBillingNodeCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuids: z.array(z.string().uuid()),
-        nextBillingAt: z
-            .string({
-                invalid_type_error: 'Invalid date format',
-            })
-            .datetime({ message: 'Invalid date format', offset: true, local: true })
+        uuids: z.array(z.uuid()),
+        nextBillingAt: z.iso
+            .datetime({ offset: true, local: true })
             .transform((str) => new Date(str)),
     });
 

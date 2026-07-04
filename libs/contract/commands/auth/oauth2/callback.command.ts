@@ -15,7 +15,7 @@ export namespace OAuth2CallbackCommand {
     );
 
     export const RequestBodySchema = z.object({
-        provider: z.nativeEnum(OAUTH2_PROVIDERS),
+        provider: z.enum(OAUTH2_PROVIDERS),
         code: z.string(),
         state: z.string(),
     });

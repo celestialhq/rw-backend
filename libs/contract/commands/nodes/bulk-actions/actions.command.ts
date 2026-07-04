@@ -15,8 +15,8 @@ export namespace BulkNodesActionsCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuids: z.array(z.string().uuid()).min(1, 'Must be at least 1 Node UUID'),
-        action: z.nativeEnum(NODES_BULK_ACTIONS),
+        uuids: z.array(z.uuid()).min(1),
+        action: z.enum(NODES_BULK_ACTIONS),
     });
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;

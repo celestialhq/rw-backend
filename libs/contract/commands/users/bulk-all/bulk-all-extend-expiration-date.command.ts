@@ -15,7 +15,7 @@ export namespace BulkAllExtendExpirationDateCommand {
     );
 
     export const RequestBodySchema = z.object({
-        extendDays: z.number().int().min(1, 'Extend days must be greater than 0'),
+        extendDays: z.int().min(1),
     });
 
     export type RequestBody = z.infer<typeof RequestBodySchema>;

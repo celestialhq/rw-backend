@@ -15,7 +15,7 @@ export namespace DeleteConfigProfileCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the config profile'),
+        uuid: z.uuid().describe('UUID of the config profile'),
     });
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;

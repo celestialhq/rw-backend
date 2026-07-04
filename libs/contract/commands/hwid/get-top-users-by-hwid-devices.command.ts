@@ -31,7 +31,7 @@ export namespace GetTopUsersByHwidDevicesCommand {
         response: z.object({
             users: z.array(
                 z.object({
-                    userUuid: z.string().uuid(),
+                    userUuid: z.uuid(),
                     id: z.number(),
                     username: z.string(),
                     devicesCount: z.number(),

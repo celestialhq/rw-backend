@@ -15,7 +15,7 @@ export namespace AddUsersToExternalSquadCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the external squad'),
+        uuid: z.uuid().describe('UUID of the external squad'),
     });
 
     export type RequestParam = z.infer<typeof RequestParamSchema>;

@@ -16,7 +16,7 @@ export namespace GetUserByIdCommand {
     );
 
     export const RequestParamSchema = z.object({
-        id: z.coerce.bigint(),
+        id: z.string().transform(BigInt),
     });
 
     export const ResponseSchema = UserResponseSchema;

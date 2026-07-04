@@ -16,14 +16,10 @@ export namespace UpdateInfraProviderCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuid: z.string().uuid(),
-        name: z
-            .string()
-            .min(2, 'Name must be at least 2 characters')
-            .max(30, 'Name must be less than 30 characters')
-            .optional(),
-        faviconLink: z.optional(z.nullable(z.string().url())),
-        loginUrl: z.optional(z.nullable(z.string().url())),
+        uuid: z.uuid(),
+        name: z.string().min(2).max(30).optional(),
+        faviconLink: z.url().nullish(),
+        loginUrl: z.url().nullish(),
     });
 
     export const ResponseSchema = z.object({

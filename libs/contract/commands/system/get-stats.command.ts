@@ -32,10 +32,7 @@ export namespace GetStatsCommand {
             uptime: z.number(),
             timestamp: z.number(),
             users: z.object({
-                statusCounts: z.record(
-                    z.enum(Object.values(USERS_STATUS) as [string, ...string[]]),
-                    z.number(),
-                ),
+                statusCounts: z.record(z.enum(USERS_STATUS), z.number()),
                 totalUsers: z.number(),
             }),
             onlineStats: z.object({

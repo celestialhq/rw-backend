@@ -15,12 +15,12 @@ export namespace OAuth2AuthorizeCommand {
     );
 
     export const RequestBodySchema = z.object({
-        provider: z.nativeEnum(OAUTH2_PROVIDERS),
+        provider: z.enum(OAUTH2_PROVIDERS),
     });
 
     export const ResponseSchema = z.object({
         response: z.object({
-            authorizationUrl: z.nullable(z.string().url()),
+            authorizationUrl: z.nullable(z.url()),
         }),
     });
 

@@ -23,11 +23,11 @@ export namespace UpdateExternalSquadCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuid: z.string().uuid().describe('UUID of the external squad'),
+        uuid: z.uuid().describe('UUID of the external squad'),
         name: z
             .string()
-            .min(2, 'Name must be at least 2 characters')
-            .max(30, 'Name must be less than 30 characters')
+            .min(2)
+            .max(30)
             .regex(
                 /^[A-Za-z0-9_\s-]+$/,
                 'Name can only contain letters, numbers, underscores, dashes and spaces',
@@ -36,9 +36,9 @@ export namespace UpdateExternalSquadCommand {
         templates: z
             .array(
                 z.object({
-                    templateUuid: z.string().uuid().describe('UUID of the subscription template'),
+                    templateUuid: z.uuid().describe('UUID of the subscription template'),
                     templateType: z
-                        .nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE)
+                        .enum(SUBSCRIPTION_TEMPLATE_TYPE)
                         .describe('Type of the subscription template'),
                 }),
             )
@@ -46,9 +46,9 @@ export namespace UpdateExternalSquadCommand {
         subscriptionSettings: ExternalSquadSubscriptionSettingsSchema.optional(),
         hostOverrides: ExternalSquadHostOverridesSchema.optional(),
         responseHeaders: ExternalSquadResponseHeadersSchema.optional(),
-        hwidSettings: z.optional(z.nullable(HwidSettingsSchema)),
-        customRemarks: z.optional(z.nullable(CustomRemarksSchema)),
-        subpageConfigUuid: z.optional(z.nullable(z.string().uuid())),
+        hwidSettings: HwidSettingsSchema.nullish(),
+        customRemarks: CustomRemarksSchema.nullish(),
+        subpageConfigUuid: z.uuid().nullish(),
     });
 
     export const ResponseSchema = z.object({

@@ -16,7 +16,7 @@ export namespace GetUserHwidDevicesCommand {
     );
 
     export const RequestParamSchema = z.object({
-        userUuid: z.string().uuid(),
+        userUuid: z.uuid(),
     });
 
     export const ResponseSchema = z.object({

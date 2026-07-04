@@ -16,7 +16,7 @@ export namespace CloneNodePluginCommand {
     );
 
     export const RequestBodySchema = z.object({
-        cloneFromUuid: z.string().uuid(),
+        cloneFromUuid: z.uuid(),
     });
 
     export const ResponseSchema = z.object({

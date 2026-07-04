@@ -15,7 +15,7 @@ export namespace RestartNodeCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid(),
+        uuid: z.uuid(),
     });
 
     export const RequestBodySchema = z.object({

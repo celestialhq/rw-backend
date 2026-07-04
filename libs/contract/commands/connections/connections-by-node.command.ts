@@ -15,7 +15,7 @@ export namespace ConnectionsByNodeCommand {
     );
 
     export const RequestParamSchema = z.object({
-        nodeUuid: z.string().uuid().describe('Node UUID'),
+        nodeUuid: z.uuid().describe('Node UUID'),
     });
 
     export const ResponseSchema = z.object({

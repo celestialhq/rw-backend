@@ -18,13 +18,13 @@ export namespace CreateSubscriptionTemplateCommand {
     export const RequestBodySchema = z.object({
         name: z
             .string()
-            .min(2, 'Name must be at least 2 characters')
-            .max(255, 'Name must be less than 255 characters')
+            .min(2)
+            .max(255)
             .regex(
                 /^[A-Za-z0-9_\s-]+$/,
                 'Name can only contain letters, numbers, underscores, dashes and spaces',
             ),
-        templateType: z.nativeEnum(SUBSCRIPTION_TEMPLATE_TYPE),
+        templateType: z.enum(SUBSCRIPTION_TEMPLATE_TYPE),
     });
 
     export const ResponseSchema = z.object({

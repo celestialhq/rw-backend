@@ -16,7 +16,7 @@ export namespace GetSubscriptionByUuidCommand {
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.string().uuid().describe('User UUID'),
+        uuid: z.uuid().describe('User UUID'),
     });
 
     export const ResponseSchema = z.object({

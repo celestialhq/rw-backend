@@ -26,7 +26,7 @@ export namespace GetSubpageConfigByShortUuidCommand {
 
     export const ResponseSchema = z.object({
         response: z.object({
-            subpageConfigUuid: z.string().uuid().nullable(),
+            subpageConfigUuid: z.uuid().nullable(),
             webpageAllowed: z.boolean(),
         }),
     });

@@ -16,7 +16,7 @@ export namespace DeleteUserHwidDeviceCommand {
     );
 
     export const RequestBodySchema = z.object({
-        userUuid: z.string().uuid(),
+        userUuid: z.uuid(),
         hwid: z.string(),
     });
 

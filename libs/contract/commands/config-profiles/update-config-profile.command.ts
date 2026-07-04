@@ -16,7 +16,7 @@ export namespace UpdateConfigProfileCommand {
     );
 
     export const RequestBodySchema = z.object({
-        uuid: z.string().uuid('UUID must be a valid UUID'),
+        uuid: z.uuid('UUID must be a valid UUID'),
         name: z
             .string()
             .min(2, 'Name must be at least 2 characters')
@@ -26,7 +26,7 @@ export namespace UpdateConfigProfileCommand {
                 'Name can only contain letters, numbers, underscores, dashes and spaces',
             )
             .optional(),
-        config: z.object({}).passthrough().optional(),
+        config: z.looseObject({}).optional(),
     });
 
     export const ResponseSchema = z.object({

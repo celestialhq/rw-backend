@@ -16,13 +16,10 @@ export namespace CreateInfraBillingRecordCommand {
     );
 
     export const RequestBodySchema = z.object({
-        providerUuid: z.string().uuid(),
-        amount: z.number().min(0, 'Amount must be greater than 0'),
-        billedAt: z
-            .string({
-                invalid_type_error: 'Invalid date format',
-            })
-            .datetime({ message: 'Invalid date format', offset: true, local: true })
+        providerUuid: z.uuid(),
+        amount: z.number().min(0),
+        billedAt: z.iso
+            .datetime({ offset: true, local: true })
             .transform((str) => new Date(str))
             .describe('Billing date. Format: 2025-01-17T15:38:45.065Z'),
     });
