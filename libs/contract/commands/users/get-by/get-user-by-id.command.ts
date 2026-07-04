@@ -16,7 +16,7 @@ export namespace GetUserByIdCommand {
     );
 
     export const RequestParamSchema = z.object({
-        id: z.string().transform(BigInt),
+        id: z.string().transform(Number).pipe(z.number().nonnegative()),
     });
 
     export const ResponseSchema = UserResponseSchema;

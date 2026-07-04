@@ -271,7 +271,7 @@ export class UsersRepository {
             qb = qb.where('users.trafficLimitStrategy', '=', trafficLimitStrategy);
         }
         if (telegramId !== undefined) {
-            qb = qb.where('users.telegramId', '=', telegramId);
+            qb = qb.where('users.telegramId', '=', BigInt(telegramId));
         }
         if (email) {
             qb = qb.where('users.email', '=', email);
