@@ -29,9 +29,24 @@ jobs:
         working-directory: 'libs/contract'
         run: npm i && npm run prepublish
 
-      - name: Publish package on NPM
+      - name: Check published version
+        id: published
         working-directory: 'libs/contract'
-        run: npm publish
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is already published."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish package on NPM
+        if: steps.published.outputs.exists != 'true'
+        working-directory: 'libs/contract'
+        run: npm publish --access public --tag "${GITHUB_REF_NAME}"
 
       # - name: Install HashedSet dependencies and build
       #   working-directory: 'libs/hashed-set'
