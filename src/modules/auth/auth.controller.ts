@@ -108,6 +108,7 @@ export class AuthController {
     @Endpoint({
         command: CloudflareAccessCommand,
         httpCode: HttpStatus.OK,
+        type: CloudflareAccessResponseDto,
     })
     async cloudflareAccessLogin(
         @Headers('cf-access-jwt-assertion') assertion: string | undefined,
