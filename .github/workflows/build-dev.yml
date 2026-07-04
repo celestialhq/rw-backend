@@ -72,15 +72,13 @@ jobs:
         id: meta
         env:
           DOCKERHUB_BACKEND_IMAGE: ${{ vars.DOCKERHUB_BACKEND_IMAGE }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           FRONTEND_REPOSITORY: ${{ vars.FRONTEND_REPOSITORY }}
         run: |
           FRONTEND_REPOSITORY="${FRONTEND_REPOSITORY:-${GITHUB_REPOSITORY_OWNER}/rw-frontend}"
           GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
           IMAGE_NAMES="$GHCR_IMAGE"
 
-          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+          if [ -n "$DOCKERHUB_BACKEND_IMAGE" ]; then
             IMAGE_NAMES="${IMAGE_NAMES},${DOCKERHUB_BACKEND_IMAGE}"
           fi
 
