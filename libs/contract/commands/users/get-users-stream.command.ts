@@ -38,7 +38,8 @@ export namespace GetUsersStreamCommand {
             .describe('Traffic limit strategy to filter users by'),
         telegramId: z
             .string()
-            .transform(BigInt)
+            .transform(Number)
+            .pipe(z.number().nonnegative())
             .optional()
             .describe('Telegram ID to filter users by'),
         email: z.email().optional().describe('Email to filter users by'),
