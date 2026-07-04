@@ -10,11 +10,11 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { json } from 'express';
+import { json, NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
-import { patchNestJsSwagger, ZodValidationPipe } from 'nestjs-zod';
+import { ZodValidationPipe } from 'nestjs-zod';
 import { createLogger } from 'winston';
 import * as winston from 'winston';
 
@@ -32,8 +32,6 @@ import { AppModule } from './app.module';
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
 dayjs.extend(timezone);
-
-patchNestJsSwagger();
 
 // const levels = {
 //     error: 0,
@@ -79,23 +77,28 @@ async function bootstrap(): Promise<void> {
 
     const config = app.get(TypedConfigService);
 
+    const helmetMiddleware = helmet({
+        contentSecurityPolicy: {
+            useDefaults: true,
+            directives: {
+                'script-src': ["'self'", "'wasm-unsafe-eval'"],
+                'img-src': ["'self'", 'data:', 'https:'],
+                'connect-src': ["'self'", 'https://raw.githubusercontent.com', 'https://ungh.cc'],
+            },
+        },
+    });
+
+    const docsPaths: string[] = config.getOrThrow('IS_DOCS_ENABLED')
+        ? [config.getOrThrow('SWAGGER_PATH'), config.getOrThrow('SCALAR_PATH')]
+        : [];
+
     if (!isDevelopment()) {
-        app.use(
-            helmet({
-                contentSecurityPolicy: {
-                    useDefaults: true,
-                    directives: {
-                        'script-src': ["'self'", "'wasm-unsafe-eval'"],
-                        'img-src': ["'self'", 'data:', 'https:'],
-                        'connect-src': [
-                            "'self'",
-                            'https://raw.githubusercontent.com',
-                            'https://ungh.cc',
-                        ],
-                    },
-                },
-            }),
-        );
+        app.use((req: Request, res: Response, next: NextFunction) => {
+            if (docsPaths.some((path) => req.path === path || req.path.startsWith(`${path}/`))) {
+                return next();
+            }
+            return helmetMiddleware(req, res, next);
+        });
     }
 
     app.use(compression());
@@ -117,16 +120,6 @@ async function bootstrap(): Promise<void> {
     }
 
     app.use(noRobotsMiddleware, proxyCheckMiddleware);
-
-    // if (config.getOrThrow<boolean>('COOKIE_AUTH_ENABLED')) {
-    //     app.use(cookieParser());
-    //     app.use(
-    //         checkAuthCookieMiddleware(
-    //             config.getOrThrow<string>('JWT_AUTH_SECRET'),
-    //             config.getOrThrow<string>('COOKIE_AUTH_NONCE'),
-    //         ),
-    //     );
-    // }
 
     app.setGlobalPrefix(ROOT);
 

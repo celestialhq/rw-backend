@@ -1,12 +1,5 @@
 import { Controller, HttpStatus, Param, Query, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiParam,
-    ApiQuery,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -21,13 +14,13 @@ import { GetLegacyStatsUserUsageCommand, GetStatsUserUsageCommand } from '@libs/
 import { ROLE } from '@libs/contracts/constants';
 
 import {
-    GetStatsUserUsageRequestDto,
-    GetStatsUserUsageRequestQueryDto,
+    GetStatsUserUsageParamDto,
+    GetStatsUserUsageQueryDto,
     GetStatsUserUsageResponseDto,
 } from './dtos';
 import {
-    GetLegacyStatsUserUsageRequestDto,
-    GetLegacyStatsUserUsageRequestQueryDto,
+    GetLegacyStatsUserUsageParamDto,
+    GetLegacyStatsUserUsageQueryDto,
     GetLegacyStatsUserUsageResponseDto,
 } from './dtos/get-legacy-stats-users-usage.dto';
 import { GetLegacyStatsUserUsageResponseModel } from './models';
@@ -43,36 +36,17 @@ import { NodesUserUsageHistoryService } from './nodes-user-usage-history.service
 export class BandwidthStatsUsersController {
     constructor(private readonly nodesUserUsageHistoryService: NodesUserUsageHistoryService) {}
 
-    @ApiNotFoundResponse({
-        description: 'User not found',
-    })
-    @ApiOkResponse({
-        type: GetLegacyStatsUserUsageResponseDto,
-        description: 'User usage by range (legacy) fetched successfully',
-    })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
-    @ApiQuery({
-        name: 'end',
-        type: Date,
-        description: 'End date',
-        required: true,
-    })
-    @ApiQuery({
-        name: 'start',
-        type: Date,
-        description: 'Start date',
-        required: true,
-    })
     @Endpoint({
         command: GetLegacyStatsUserUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetLegacyStatsUserUsageResponseDto,
     })
     async getUserUsageByRange(
-        @Query() query: GetLegacyStatsUserUsageRequestQueryDto,
-        @Param() paramData: GetLegacyStatsUserUsageRequestDto,
+        @Query() query: GetLegacyStatsUserUsageQueryDto,
+        @Param() param: GetLegacyStatsUserUsageParamDto,
     ): Promise<GetLegacyStatsUserUsageResponseDto> {
         const result = await this.nodesUserUsageHistoryService.getLegacyStatsUserUsage(
-            paramData.uuid,
+            param.uuid,
             new Date(query.start),
             new Date(query.end),
         );
@@ -83,43 +57,17 @@ export class BandwidthStatsUsersController {
         };
     }
 
-    @ApiOkResponse({
-        type: GetStatsUserUsageResponseDto,
-        description: 'Stats user usage fetched successfully',
-    })
-    @ApiParam({ name: 'uuid', type: String, description: 'UUID of the user', required: true })
-    @ApiQuery({
-        name: 'end',
-        type: String,
-        description: 'End date (YYYY-MM-DD)',
-        required: true,
-        example: '2026-01-01',
-        format: 'date',
-    })
-    @ApiQuery({
-        name: 'start',
-        type: String,
-        description: 'Start date (YYYY-MM-DD)',
-        required: true,
-        example: '2026-01-31',
-        format: 'date',
-    })
-    @ApiQuery({
-        name: 'topNodesLimit',
-        type: Number,
-        description: 'Limit of top nodes to return',
-        required: true,
-    })
     @Endpoint({
         command: GetStatsUserUsageCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatsUserUsageResponseDto,
     })
     async getStatsNodesUsage(
-        @Query() query: GetStatsUserUsageRequestQueryDto,
-        @Param() paramData: GetStatsUserUsageRequestDto,
+        @Query() query: GetStatsUserUsageQueryDto,
+        @Param() param: GetStatsUserUsageParamDto,
     ): Promise<GetStatsUserUsageResponseDto> {
         const result = await this.nodesUserUsageHistoryService.getStatsUserUsage(
-            paramData.uuid,
+            param.uuid,
             query.start,
             query.end,
             query.topNodesLimit,

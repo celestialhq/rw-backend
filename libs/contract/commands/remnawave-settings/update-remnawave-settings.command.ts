@@ -22,7 +22,7 @@ export namespace UpdateRemnawaveSettingsCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         passkeySettings: PasskeySettingsSchema.optional(),
         oauth2Settings: Oauth2SettingsSchema.optional(),
         passwordSettings: PasswordAuthSettingsSchema.optional(),
@@ -30,11 +30,10 @@ export namespace UpdateRemnawaveSettingsCommand {
         brandingSettings: BrandingSettingsSchema.optional(),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: RemnawaveSettingsSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

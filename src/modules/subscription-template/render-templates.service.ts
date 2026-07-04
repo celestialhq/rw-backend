@@ -36,6 +36,7 @@ export class RenderTemplatesService {
             user,
             hostsOverrides,
             fallbackOptions,
+            excludeHostsByTags: srrContext.excludeHostsByTags,
         });
 
         switch (srrContext.matchedResponseType) {

@@ -27,13 +27,11 @@ export namespace GetTopUsersByHwidDevicesCommand {
             .default(5),
     });
 
-    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
-
     export const ResponseSchema = z.object({
         response: z.object({
             users: z.array(
                 z.object({
-                    userUuid: z.string().uuid(),
+                    userUuid: z.uuid(),
                     id: z.number(),
                     username: z.string(),
                     devicesCount: z.number(),
@@ -43,5 +41,6 @@ export namespace GetTopUsersByHwidDevicesCommand {
         }),
     });
 
+    export type RequestQuery = z.infer<typeof RequestQuerySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

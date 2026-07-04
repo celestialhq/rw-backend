@@ -25,7 +25,7 @@ const eventConfigSchema = z.object({
 
 const notificationsConfigSchema = z.object({
     events: z
-        .record(z.enum(ALL_EVENTS as [string, ...string[]]), eventConfigSchema)
+        .partialRecord(z.enum(ALL_EVENTS as [string, ...string[]]), eventConfigSchema)
         .nullable()
         .transform((val) => val ?? {}),
 });
@@ -38,7 +38,7 @@ function validateConfig(raw: unknown): NotificationsConfig {
         return notificationsConfigSchema.parse(raw);
     } catch (e) {
         if (e instanceof ZodError) {
-            const errors = e.errors
+            const errors = e.issues
                 .map((err) => `❌ ${err.path.join('.')}: ${err.message}`)
                 .join('\n');
 

@@ -127,22 +127,6 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.USERNAME(
                     username,
                 )}`,
-            SUBSCRIPTION_UUID: (subscriptionUuid: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.SUBSCRIPTION_UUID(
-                    subscriptionUuid,
-                )}`,
-            TELEGRAM_ID: (telegramId: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.TELEGRAM_ID(
-                    telegramId,
-                )}`,
-            EMAIL: (email: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.EMAIL(
-                    email,
-                )}`,
-            TAG: (tag: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.TAG(
-                    tag,
-                )}`,
         },
         RESOLVE: `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.RESOLVE}`,
         BULK: {
@@ -436,16 +420,16 @@ export const REST_API = {
             },
         },
     },
-    IP_CONTROL: {
-        FETCH_IPS: (uuid: string) =>
-            `${ROOT}/${CONTROLLERS.IP_CONTROL_CONTROLLER}/${CONTROLLERS.IP_CONTROL_ROUTES.FETCH_IPS(uuid)}`,
-        GET_FETCH_IPS_RESULT: (jobId: string) =>
-            `${ROOT}/${CONTROLLERS.IP_CONTROL_CONTROLLER}/${CONTROLLERS.IP_CONTROL_ROUTES.GET_FETCH_IPS_RESULT(jobId)}`,
-        DROP_CONNECTIONS: `${ROOT}/${CONTROLLERS.IP_CONTROL_CONTROLLER}/${CONTROLLERS.IP_CONTROL_ROUTES.DROP_CONNECTIONS}`,
-        FETCH_USERS_IPS: (nodeUuid: string) =>
-            `${ROOT}/${CONTROLLERS.IP_CONTROL_CONTROLLER}/${CONTROLLERS.IP_CONTROL_ROUTES.FETCH_USERS_IPS(nodeUuid)}`,
-        GET_FETCH_USERS_IPS_RESULT: (jobId: string) =>
-            `${ROOT}/${CONTROLLERS.IP_CONTROL_CONTROLLER}/${CONTROLLERS.IP_CONTROL_ROUTES.GET_FETCH_USERS_IPS_RESULT(jobId)}`,
+    CONNECTIONS: {
+        CONNECTIONS_BY_USER: (uuid: string) =>
+            `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_USER(uuid)}`,
+        CONNECTIONS_BY_USER_RESULT: (jobId: string) =>
+            `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_USER_RESULT(jobId)}`,
+        CONNECTIONS_BY_NODE: (uuid: string) =>
+            `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_NODE(uuid)}`,
+        CONNECTIONS_BY_NODE_RESULT: (jobId: string) =>
+            `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_NODE_RESULT(jobId)}`,
+        DROP_CONNECTIONS: `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.DROP_CONNECTIONS}`,
     },
     METADATA: {
         NODE: {

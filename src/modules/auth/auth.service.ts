@@ -42,7 +42,7 @@ import { GetPasskeysByAdminUuidQuery } from '@modules/admin/queries/get-passkeys
 import { RemnawaveSettingsEntity } from '@modules/remnawave-settings/entities';
 import { GetCachedRemnawaveSettingsQuery } from '@modules/remnawave-settings/queries/get-cached-remnawave-settings';
 
-import { VerifyPasskeyAuthenticationRequestDto } from './dtos';
+import { VerifyPasskeyAuthenticationBodyDto } from './dtos';
 import { ILogin, IRegister } from './interfaces';
 import {
     OAuth2AuthorizeResponseModel,
@@ -71,7 +71,7 @@ export class AuthService {
         private readonly httpService: HttpService,
         private readonly cloudflareAccessService: CloudflareAccessService,
     ) {
-        this.jwtSecret = this.configService.getOrThrow('JWT_AUTH_SECRET');
+        this.jwtSecret = this.configService.getOrThrow('APP_SECRET');
         this.jwtLifetime = this.configService.getOrThrow('JWT_AUTH_LIFETIME');
     }
 
@@ -1035,7 +1035,7 @@ export class AuthService {
     }
 
     public async verifyPasskeyAuthentication(
-        dto: VerifyPasskeyAuthenticationRequestDto,
+        dto: VerifyPasskeyAuthenticationBodyDto,
         remnawaveSettings: RemnawaveSettingsEntity,
         ip: string,
         userAgent: string,

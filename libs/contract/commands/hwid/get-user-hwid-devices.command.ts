@@ -15,11 +15,9 @@ export namespace GetUserHwidDevicesCommand {
         { scope: 'list-by-user', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
-        userUuid: z.string().uuid(),
+    export const RequestParamSchema = z.object({
+        userUuid: z.uuid(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -28,5 +26,6 @@ export namespace GetUserHwidDevicesCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

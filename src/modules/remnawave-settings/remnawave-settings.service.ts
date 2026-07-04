@@ -7,7 +7,7 @@ import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
 import { CACHE_KEYS, ERRORS } from '@libs/contracts/constants';
 
-import { UpdateRemnawaveSettingsRequestDto } from './dto';
+import { UpdateRemnawaveSettingsBodyDto } from './dto';
 import { RemnawaveSettingsEntity } from './entities';
 import { RemnawaveSettingsRepository } from './repositories/remnawave-settings.repository';
 
@@ -31,7 +31,7 @@ export class RemnawaveSettingsService {
     }
 
     public async updateSettingsFromController(
-        body: UpdateRemnawaveSettingsRequestDto,
+        body: UpdateRemnawaveSettingsBodyDto,
     ): Promise<TResult<RemnawaveSettingsEntity>> {
         try {
             const settings = await this.remnawaveSettingsRepository.getSettings();

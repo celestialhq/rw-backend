@@ -18,4 +18,5 @@ export interface ISRRContext {
     ignoreServeJsonAtBaseSubscription?: boolean;
     disableHwidCheck?: boolean;
     encryption?: TResponseRuleEncryption;
+    excludeHostsByTags?: Set<string>;
 }

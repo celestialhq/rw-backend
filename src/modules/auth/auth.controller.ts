@@ -30,17 +30,17 @@ import { RemnawaveSettingsEntity } from '@modules/remnawave-settings/entities';
 import { AuthService } from './auth.service';
 import {
     GetStatusResponseDto,
-    LoginRequestDto,
+    LoginBodyDto,
     LoginResponseDto,
-    RegisterRequestDto,
+    RegisterBodyDto,
     RegisterResponseDto,
     CloudflareAccessResponseDto,
     OAuth2AuthorizeResponseDto,
     OAuth2CallbackResponseDto,
-    OAuth2CallbackRequestDto,
-    OAuth2AuthorizeRequestDto,
+    OAuth2CallbackBodyDto,
+    OAuth2AuthorizeBodyDto,
     GetPasskeyAuthenticationOptionsResponseDto,
-    VerifyPasskeyAuthenticationRequestDto,
+    VerifyPasskeyAuthenticationBodyDto,
     VerifyPasskeyAuthenticationResponseDto,
 } from './dtos';
 import { AuthResponseModel } from './model/auth-response.model';
@@ -52,25 +52,13 @@ import { RegisterResponseModel } from './model/register.response.model';
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @ApiResponse({ type: LoginResponseDto, description: 'Access token for further requests' })
-    @ApiUnauthorizedResponse({
-        description: 'Unauthorized - Invalid credentials',
-        schema: {
-            type: 'object',
-            properties: {
-                statusCode: { type: 'number', example: 401 },
-                message: { type: 'string', example: 'Invalid credentials' },
-                error: { type: 'string', example: 'Unauthorized' },
-            },
-        },
-    })
     @Endpoint({
         command: LoginCommand,
         httpCode: HttpStatus.OK,
-        apiBody: LoginRequestDto,
+        type: LoginResponseDto,
     })
     async login(
-        @Body() body: LoginRequestDto,
+        @Body() body: LoginBodyDto,
         @IpAddress() ip: string,
         @UserAgent() userAgent: string,
     ): Promise<LoginResponseDto> {
@@ -82,24 +70,12 @@ export class AuthController {
         };
     }
 
-    @ApiForbiddenResponse({
-        description: 'Forbidden - Registration is not allowed',
-        schema: {
-            type: 'object',
-            properties: {
-                statusCode: { type: 'number', example: 403 },
-                message: { type: 'string', example: 'Registration is not allowed' },
-                error: { type: 'string', example: 'Forbidden' },
-            },
-        },
-    })
-    @ApiResponse({ type: RegisterResponseDto, description: 'Access token for further requests' })
     @Endpoint({
         command: RegisterCommand,
         httpCode: HttpStatus.CREATED,
-        apiBody: RegisterRequestDto,
+        type: RegisterResponseDto,
     })
-    async register(@Body() body: RegisterRequestDto): Promise<RegisterResponseDto> {
+    async register(@Body() body: RegisterBodyDto): Promise<RegisterResponseDto> {
         const result = await this.authService.register(body);
 
         const data = errorHandler(result);
@@ -108,10 +84,10 @@ export class AuthController {
         };
     }
 
-    @ApiResponse({ type: GetStatusResponseDto, description: 'Status of the system' })
     @Endpoint({
         command: GetStatusCommand,
         httpCode: HttpStatus.OK,
+        type: GetStatusResponseDto,
     })
     async getStatus(): Promise<GetStatusResponseDto> {
         const result = await this.authService.getStatus();
@@ -153,10 +129,10 @@ export class AuthController {
     @Endpoint({
         command: OAuth2AuthorizeCommand,
         httpCode: HttpStatus.OK,
-        apiBody: OAuth2AuthorizeRequestDto,
+        type: OAuth2AuthorizeResponseDto,
     })
     async oauth2Authorize(
-        @Body() body: OAuth2AuthorizeRequestDto,
+        @Body() body: OAuth2AuthorizeBodyDto,
     ): Promise<OAuth2AuthorizeResponseDto> {
         const result = await this.authService.oauth2Authorize(body.provider);
 
@@ -166,17 +142,13 @@ export class AuthController {
         };
     }
 
-    @ApiResponse({
-        type: OAuth2CallbackResponseDto,
-        description: 'Access token for further requests',
-    })
     @Endpoint({
         command: OAuth2CallbackCommand,
         httpCode: HttpStatus.OK,
-        apiBody: OAuth2CallbackRequestDto,
+        type: OAuth2CallbackResponseDto,
     })
     async oauth2Callback(
-        @Body() body: OAuth2CallbackRequestDto,
+        @Body() body: OAuth2CallbackBodyDto,
         @IpAddress() ip: string,
         @UserAgent() userAgent: string,
     ): Promise<OAuth2CallbackResponseDto> {
@@ -194,13 +166,10 @@ export class AuthController {
         };
     }
 
-    @ApiResponse({
-        type: GetPasskeyAuthenticationOptionsResponseDto,
-        description: 'Passkey authentication options',
-    })
     @Endpoint({
         command: GetPasskeyAuthenticationOptionsCommand,
         httpCode: HttpStatus.OK,
+        type: GetPasskeyAuthenticationOptionsResponseDto,
     })
     async passkeyAuthenticationOptions(
         @GetRemnawaveSettings() remnawaveSettings: RemnawaveSettingsEntity,
@@ -214,17 +183,13 @@ export class AuthController {
         };
     }
 
-    @ApiResponse({
-        type: VerifyPasskeyAuthenticationResponseDto,
-        description: 'JWT access token after successful passkey authentication',
-    })
     @Endpoint({
         command: VerifyPasskeyAuthenticationCommand,
         httpCode: HttpStatus.OK,
-        apiBody: VerifyPasskeyAuthenticationRequestDto,
+        type: VerifyPasskeyAuthenticationResponseDto,
     })
     async passkeyAuthenticationVerify(
-        @Body() body: VerifyPasskeyAuthenticationRequestDto,
+        @Body() body: VerifyPasskeyAuthenticationBodyDto,
         @GetRemnawaveSettings() remnawaveSettings: RemnawaveSettingsEntity,
         @IpAddress() ip: string,
         @UserAgent() userAgent: string,

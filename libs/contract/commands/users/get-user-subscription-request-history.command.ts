@@ -14,11 +14,9 @@ export namespace GetUserSubscriptionRequestHistoryCommand {
         { scope: 'subscription-request-history', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
-        uuid: z.string().uuid(),
+    export const RequestParamSchema = z.object({
+        uuid: z.uuid(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
@@ -27,9 +25,7 @@ export namespace GetUserSubscriptionRequestHistoryCommand {
                 z.object({
                     id: z.number(),
                     userId: z.number(),
-                    requestAt: z
-                        .string()
-                        .datetime()
+                    requestAt: z.iso.datetime()
                         .transform((str) => new Date(str)),
                     requestIp: z.string().optional().nullable(),
                     userAgent: z.string().optional().nullable(),
@@ -38,5 +34,6 @@ export namespace GetUserSubscriptionRequestHistoryCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

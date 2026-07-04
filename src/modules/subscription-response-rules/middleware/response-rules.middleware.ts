@@ -118,6 +118,10 @@ export class ResponseRulesMiddleware implements NestMiddleware {
                 if (mods.encryption) {
                     ssrContext.encryption = mods.encryption;
                 }
+
+                if (mods.excludeHostsByTags) {
+                    ssrContext.excludeHostsByTags = new Set(mods.excludeHostsByTags);
+                }
             }
 
             switch (ssrContext.matchedResponseType) {

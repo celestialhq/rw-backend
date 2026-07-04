@@ -1,10 +1,11 @@
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { cleanupOpenApiDoc } from 'nestjs-zod';
 import { readPackageJSON } from 'pkg-types';
 import { SwaggerThemeNameEnum } from 'swagger-themes';
 import { SwaggerTheme } from 'swagger-themes';
 
 import { INestApplication } from '@nestjs/common';
-import { DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, getSchemaPath } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 
 import { TypedConfigService } from '@common/config/app-config';
@@ -18,6 +19,10 @@ import {
     RemnawaveWebhookUserEventsDto,
     RemnawaveWebhookUserHwidDevicesEventsDto,
     RemnawaveWebhookTorrentBlockerEventsDto,
+    RemnawaveNotFoundErrorDto,
+    RemnawaveBadRequestErrorDto,
+    RemnawaveInternalServerErrorDto,
+    RemnawaveValidationErrorDto,
 } from './extra-models';
 
 const description = `
@@ -58,7 +63,42 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
             )
             .setDescription(description)
             .setVersion(pkg.version!)
-            .setLicense('AGPL-3.0', 'https://github.com/remnawave/panel?tab=AGPL-3.0-1-ov-file');
+            .setLicense('AGPL-3.0', 'https://github.com/remnawave/panel?tab=AGPL-3.0-1-ov-file')
+            .addGlobalResponse({
+                status: 404,
+                description: 'Resource not found',
+
+                content: {
+                    'application/json': {
+                        schema: { $ref: getSchemaPath(RemnawaveNotFoundErrorDto) },
+                    },
+                },
+            })
+            .addGlobalResponse({
+                status: 400,
+                description: 'Bad request / Validation error',
+
+                content: {
+                    'application/json': {
+                        schema: {
+                            oneOf: [
+                                { $ref: getSchemaPath(RemnawaveBadRequestErrorDto) },
+                                { $ref: getSchemaPath(RemnawaveValidationErrorDto) },
+                            ],
+                        },
+                    },
+                },
+            })
+            .addGlobalResponse({
+                status: 500,
+                description: 'Internal server error',
+
+                content: {
+                    'application/json': {
+                        schema: { $ref: getSchemaPath(RemnawaveInternalServerErrorDto) },
+                    },
+                },
+            });
 
         Object.values(CONTROLLERS_INFO).reduce((builder, { tag, description }) => {
             return builder.addTag(tag, description);
@@ -76,8 +116,14 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
                     RemnawaveWebhookErrorsEventsDto,
                     RemnawaveWebhookCrmEventsDto,
                     RemnawaveWebhookTorrentBlockerEventsDto,
+                    RemnawaveNotFoundErrorDto,
+                    RemnawaveBadRequestErrorDto,
+                    RemnawaveInternalServerErrorDto,
+                    RemnawaveValidationErrorDto,
                 ],
             });
+
+        const document = documentFactory();
 
         const theme = new SwaggerTheme();
         const options = {
@@ -89,7 +135,12 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
             },
         };
 
-        SwaggerModule.setup(config.getOrThrow('SWAGGER_PATH'), app, documentFactory, options);
+        SwaggerModule.setup(
+            config.getOrThrow('SWAGGER_PATH'),
+            app,
+            cleanupOpenApiDoc(document),
+            options,
+        );
 
         app.use(
             config.getOrThrow('SCALAR_PATH'),
@@ -132,7 +183,7 @@ export async function getDocs(app: INestApplication<unknown>, config: TypedConfi
                 },
                 telemetry: false,
 
-                content: documentFactory,
+                content: () => cleanupOpenApiDoc(document),
             }),
         );
     }

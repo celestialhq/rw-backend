@@ -28,6 +28,7 @@ import { SECURITY_LAYERS, USERS_STATUS } from '@libs/contracts/constants';
 
 import { ExternalSquadEntity } from '@modules/external-squads/entities';
 import { HostWithRawInbound } from '@modules/hosts/entities/host-with-inbound-tag.entity';
+import { ISRRContext } from '@modules/subscription-response-rules/interfaces';
 import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities/subscription-settings.entity';
 import { UserEntity } from '@modules/users/entities';
 
@@ -55,6 +56,7 @@ export interface IResolveProxyConfigOptions {
         showHwidMaxDeviceRemarks?: boolean;
         showHwidNotSupportedRemarks?: boolean;
     };
+    excludeHostsByTags?: ISRRContext['excludeHostsByTags'];
 }
 
 @Injectable()
@@ -72,10 +74,17 @@ export class ResolveProxyConfigService {
     public async resolveProxyConfig(
         options: IResolveProxyConfigOptions,
     ): Promise<ResolvedProxyConfig[]> {
-        const { user, hostsOverrides, subscriptionSettings, fallbackOptions } = options;
+        const { user, hostsOverrides, subscriptionSettings, fallbackOptions, excludeHostsByTags } =
+            options;
 
         if (subscriptionSettings === null) {
             return [];
+        }
+
+        if (excludeHostsByTags) {
+            options.hosts = options.hosts.filter(
+                (h) => !h.tags.some((tag) => excludeHostsByTags.has(tag)),
+            );
         }
 
         const earlyRemarks = this.resolveEarlyExitRemarks(
@@ -206,6 +215,7 @@ export class ResolveProxyConfigService {
                     streamSettings.hysteriaSettings,
                     authOptions.vlessUuid,
                     protocol,
+                    inputHost.vlessRouteId,
                 );
             default:
                 return {
@@ -339,12 +349,20 @@ export class ResolveProxyConfigService {
         settings: HysteriaConfig | undefined,
         vlessUuid: string,
         protocol: ProtocolVariant,
+        vlessRouteId: number | null,
     ): HysteriaTransport {
+        let auth: string = '';
+        if (protocol.protocol === 'hysteria') {
+            auth = setVlessRouteForUuid(vlessUuid, vlessRouteId);
+        } else if (settings?.auth) {
+            auth = settings.auth;
+        }
+
         return {
             transport: 'hysteria',
             transportOptions: {
                 version: 2,
-                auth: protocol.protocol !== 'hysteria' ? vlessUuid : (settings?.auth ?? vlessUuid),
+                auth,
             },
         };
     }

@@ -14,9 +14,9 @@ import { ERRORS, EVENTS } from '@libs/contracts/constants';
 import { ServiceEvent } from '@integration-modules/notifications/interfaces';
 
 import { SignApiTokenCommand } from '../auth/commands/sign-api-token/sign-api-token.command';
-import { CreateApiTokenRequestDto } from './dtos';
+import { CreateApiTokenBodyDto } from './dtos';
 import { ApiTokenEntity } from './entities/api-token.entity';
-import { IApiTokenDeleteResponse, IGroupedScopeCatalog } from './interfaces';
+import { IGroupedScopeCatalog } from './interfaces';
 import { CreateApiTokenResponseModel } from './models';
 import { FindAllApiTokensResponseModel } from './models/find.model';
 import { ApiTokensRepository } from './repositories/api-tokens.repository';
@@ -35,7 +35,7 @@ export class ApiTokensService {
     ) {}
 
     public async create(
-        body: CreateApiTokenRequestDto,
+        body: CreateApiTokenBodyDto,
     ): Promise<TResult<CreateApiTokenResponseModel>> {
         const { name, expiresInDays, scopes } = body;
 
@@ -87,7 +87,7 @@ export class ApiTokensService {
         }
     }
 
-    public async delete(uuid: string): Promise<TResult<IApiTokenDeleteResponse>> {
+    public async delete(uuid: string): Promise<TResult<boolean>> {
         try {
             const apiToken = await this.apiTokensRepository.findByUUID(uuid);
 
@@ -95,7 +95,7 @@ export class ApiTokensService {
                 return fail(ERRORS.REQUESTED_TOKEN_NOT_FOUND);
             }
 
-            const result = await this.apiTokensRepository.deleteByUUID(uuid);
+            await this.apiTokensRepository.deleteByUUID(uuid);
 
             await this.rawCacheService.del(`api:${uuid}`);
 
@@ -110,7 +110,7 @@ export class ApiTokensService {
                     },
                 }),
             );
-            return ok({ result });
+            return ok(true);
         } catch (error) {
             this.logger.error(JSON.stringify(error));
 
@@ -123,7 +123,7 @@ export class ApiTokensService {
         }
     }
 
-    public async findAll(): Promise<TResult<FindAllApiTokensResponseModel>> {
+    public async get(): Promise<TResult<FindAllApiTokensResponseModel>> {
         try {
             const result = await this.apiTokensRepository.findByCriteria({});
 

@@ -20,21 +20,16 @@ export namespace UpdateSubscriptionSettingsCommand {
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
-        uuid: z.string().uuid(),
+    export const RequestBodySchema = z.object({
+        uuid: z.uuid(),
 
         profileTitle: z.optional(z.string()),
         supportLink: z.optional(z.string()),
-        profileUpdateInterval: z.optional(z.number().int()),
+        profileUpdateInterval: z.optional(z.int()),
         isProfileWebpageUrlEnabled: z.optional(z.boolean()),
         serveJsonAtBaseSubscription: z.optional(z.boolean()),
 
-        happAnnounce: z.optional(
-            z
-                .string()
-                .max(200, { message: 'Announce must be less than 200 characters' })
-                .nullable(),
-        ),
+        happAnnounce: z.optional(z.string().max(200).nullable()),
         happRouting: z.optional(z.string().nullable()),
 
         isShowCustomRemarks: z.optional(z.boolean()),
@@ -58,11 +53,10 @@ export namespace UpdateSubscriptionSettingsCommand {
         hwidSettings: z.optional(HwidSettingsSchema),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: SubscriptionSettingsSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

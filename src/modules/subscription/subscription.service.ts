@@ -41,7 +41,7 @@ import { GetUsersWithPaginationQuery } from '@modules/users/queries/get-users-wi
 import { UsersQueuesService } from '@queue/_users/users-queues.service';
 
 import { GetHostsForUserQuery } from '../hosts/queries/get-hosts-for-user';
-import { GetAllSubscriptionsQueryDto } from './dto';
+import { GetSubscriptionsQueryDto } from './dto';
 import { ISubscriptionHeaders, IGetSubscriptionInfo, IHwidCheckupResult } from './interfaces';
 import {
     ConnectionKeysResponseModel,
@@ -534,7 +534,7 @@ export class SubscriptionService {
         });
     }
 
-    public async getAllSubscriptions(query: GetAllSubscriptionsQueryDto): Promise<
+    public async getAllSubscriptions(query: GetSubscriptionsQueryDto): Promise<
         TResult<{
             total: number;
             subscriptions: SubscriptionRawResponse[];
@@ -820,7 +820,7 @@ export class SubscriptionService {
                 });
             }
 
-            if (!result.response.created || !result.response.hwidUserDevice) {
+            if (!result.response.hwidDevice) {
                 return ok({
                     subscriptionAllowed: false,
                     maxDeviceReached: true,
@@ -833,7 +833,7 @@ export class SubscriptionService {
                 EVENTS.USER_HWID_DEVICES.ADDED,
                 new UserHwidDeviceEvent(
                     user,
-                    result.response.hwidUserDevice,
+                    result.response.hwidDevice,
                     EVENTS.USER_HWID_DEVICES.ADDED,
                 ),
             );

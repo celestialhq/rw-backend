@@ -14,21 +14,19 @@ export namespace GetUserAccessibleNodesCommand {
         { scope: 'accessible-nodes', kind: 'read' },
     );
 
-    export const RequestSchema = z.object({
-        uuid: z.string().uuid(),
+    export const RequestParamSchema = z.object({
+        uuid: z.uuid(),
     });
-
-    export type Request = z.infer<typeof RequestSchema>;
 
     export const ResponseSchema = z.object({
         response: z.object({
-            userUuid: z.string().uuid(),
+            userUuid: z.uuid(),
             activeNodes: z.array(
                 z.object({
-                    uuid: z.string().uuid(),
+                    uuid: z.uuid(),
                     nodeName: z.string(),
                     countryCode: z.string(),
-                    configProfileUuid: z.string().uuid(),
+                    configProfileUuid: z.uuid(),
                     configProfileName: z.string(),
                     activeSquads: z.array(
                         z.object({
@@ -41,5 +39,6 @@ export namespace GetUserAccessibleNodesCommand {
         }),
     });
 
+    export type RequestParam = z.infer<typeof RequestParamSchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }
