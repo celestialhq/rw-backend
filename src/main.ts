@@ -53,7 +53,7 @@ const logger = createLogger({
         }),
         // winston.format.ms(),
         winston.format.align(),
-        nestWinstonModuleUtilities.format.nestLike(`API Server: #${instanceId}`, {
+        nestWinstonModuleUtilities.format.nestLike(`rest-${instanceId}`, {
             colors: true,
             prettyPrint: true,
             processId: false,

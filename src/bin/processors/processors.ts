@@ -48,7 +48,7 @@ const logger = createLogger({
         }),
         // winston.format.ms(),
         winston.format.align(),
-        nestWinstonModuleUtilities.format.nestLike(`Processors: #${instanceId}`, {
+        nestWinstonModuleUtilities.format.nestLike(`work-${instanceId}`, {
             colors: true,
             prettyPrint: true,
             processId: false,
