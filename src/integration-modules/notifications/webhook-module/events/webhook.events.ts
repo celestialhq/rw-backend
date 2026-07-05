@@ -73,7 +73,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
@@ -106,7 +106,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
@@ -134,7 +134,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
@@ -162,7 +162,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
@@ -190,7 +190,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
@@ -221,7 +221,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
@@ -256,7 +256,7 @@ export class WebhookEvents {
                     payload: JSON.stringify(json),
                     timestamp: payload.timestamp,
                 },
-                this.webhookUrls,
+                [...this.webhookUrls, ...this.notificationsConfig.getWebhookUrls(event.eventName)],
             );
         } catch (error) {
             this.logger.error(`Error sending webhook event: ${error}`);
