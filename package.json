@@ -139,7 +139,6 @@
     "@swc/core": "^1.15.43",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.17.24",
     "@types/morgan": "^1.9.10",
     "@types/passport-http": "^0.3.11",
