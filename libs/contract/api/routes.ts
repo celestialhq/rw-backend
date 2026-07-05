@@ -3,7 +3,11 @@ import * as CONTROLLERS from './controllers';
 export const ROOT = '/api' as const;
 export const METRICS_ROOT = '/metrics' as const;
 export const HEALTH_ROOT = '/health' as const;
-export const BULLBOARD_ROOT = '/queues' as const;
+
+export const BACKEND_TOOLS_ROOT = '/backend-tools' as const;
+export const BULLBOARD_ROOT = '/backend-tools/queues' as const;
+export const SWAGGER_ROOT = '/backend-tools/swagger' as const;
+export const SCALAR_ROOT = '/backend-tools/scalar' as const;
 
 export const REST_API = {
     AUTH: {
@@ -36,6 +40,7 @@ export const REST_API = {
             )}`,
         GET: `${ROOT}/${CONTROLLERS.API_TOKENS_CONTROLLER}/${CONTROLLERS.API_TOKENS_ROUTES.GET}`,
         GET_SCOPES: `${ROOT}/${CONTROLLERS.API_TOKENS_CONTROLLER}/${CONTROLLERS.API_TOKENS_ROUTES.GET_SCOPES}`,
+        OTT: `${ROOT}/${CONTROLLERS.API_TOKENS_CONTROLLER}/${CONTROLLERS.API_TOKENS_ROUTES.OTT}`,
     },
     KEYGEN: {
         GET: `${ROOT}/${CONTROLLERS.KEYGEN_CONTROLLER}/${CONTROLLERS.KEYGEN_ROUTES.GET}`,

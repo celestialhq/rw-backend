@@ -4,7 +4,7 @@ import { ClsModule } from 'nestjs-cls';
 import { join } from 'node:path';
 
 import { Logger, Module, OnApplicationShutdown } from '@nestjs/common';
-import { ConditionalModule, ConfigModule, ConfigService } from '@nestjs/config';
+import { ConditionalModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
@@ -46,23 +46,13 @@ import { QueueModule } from '@queue/queue.module';
         IntegrationModules,
         RemnawaveModules,
         ConditionalModule.registerWhen(
-            ServeStaticModule.forRootAsync({
-                imports: [ConfigModule],
-                inject: [ConfigService],
-                useFactory: (configService: ConfigService) => [
-                    {
-                        rootPath: join(__dirname, '..', '..', 'frontend'),
-                        renderPath: '*splat',
-                        exclude: [
-                            '/api/*splat',
-                            configService.getOrThrow<string>('SWAGGER_PATH'),
-                            configService.getOrThrow<string>('SCALAR_PATH'),
-                        ],
-                        serveStaticOptions: {
-                            dotfiles: 'ignore',
-                        },
-                    },
-                ],
+            ServeStaticModule.forRoot({
+                rootPath: join(__dirname, '..', '..', 'frontend'),
+                renderPath: '*splat',
+                exclude: ['/api/*splat'],
+                serveStaticOptions: {
+                    dotfiles: 'ignore',
+                },
             }),
             () => !disableFrontend(),
         ),

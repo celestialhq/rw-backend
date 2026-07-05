@@ -4,7 +4,6 @@ process.env.FRONT_END_DOMAIN = 'mock';
 process.env.METRICS_USER = 'mock';
 process.env.METRICS_PASS = 'mock';
 process.env.SUB_PUBLIC_DOMAIN = 'mock';
-process.env.IS_DOCS_ENABLED = 'true';
 process.env.NODE_ENV = 'development';
 process.env.REDIS_HOST = 'localhost';
 process.env.REDIS_PORT = '6379';
