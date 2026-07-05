@@ -21,6 +21,7 @@ const ALL_EVENTS = [
 const eventConfigSchema = z.object({
     telegram: z.boolean(),
     webhook: z.boolean(),
+    additionalWebhookUrls: z.array(z.url()).optional(),
 });
 
 const notificationsConfigSchema = z.object({
