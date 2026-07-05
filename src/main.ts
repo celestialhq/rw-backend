@@ -4,7 +4,7 @@
 
 process.title = 'rw-api';
 
-import { ROOT } from '@contract/api';
+import { BACKEND_TOOLS_ROOT, ROOT } from '@contract/api';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
@@ -21,7 +21,12 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { TypedConfigService } from '@common/config/app-config/typed-config.service';
-import { proxyCheckMiddleware, getRealIp, noRobotsMiddleware } from '@common/middlewares';
+import {
+    proxyCheckMiddleware,
+    getRealIp,
+    noRobotsMiddleware,
+    toolsAuthMiddleware,
+} from '@common/middlewares';
 import { customLogFilter } from '@common/utils/filter-logs';
 import { getDocs, isDevelopment, isDevOrDebugLogsEnabled } from '@common/utils/startup-app';
 import { getStartMessage } from '@common/utils/startup-app/get-start-message';
@@ -87,13 +92,16 @@ async function bootstrap(): Promise<void> {
         },
     });
 
-    const docsPaths: string[] = config.getOrThrow('IS_DOCS_ENABLED')
-        ? [config.getOrThrow('SWAGGER_PATH'), config.getOrThrow('SCALAR_PATH')]
-        : [];
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        if (req.path.startsWith(`${ROOT}${BACKEND_TOOLS_ROOT}`)) {
+            return toolsAuthMiddleware(config.getOrThrow('APP_SECRET'))(req, res, next);
+        }
+        return next();
+    });
 
     if (!isDevelopment()) {
         app.use((req: Request, res: Response, next: NextFunction) => {
-            if (docsPaths.some((path) => req.path === path || req.path.startsWith(`${path}/`))) {
+            if (req.path.startsWith(`${ROOT}${BACKEND_TOOLS_ROOT}`)) {
                 return next();
             }
             return helmetMiddleware(req, res, next);
@@ -120,7 +128,7 @@ async function bootstrap(): Promise<void> {
 
     app.setGlobalPrefix(ROOT);
 
-    await getDocs(app, config);
+    await getDocs(app);
 
     app.enableCors({
         origin: isDevelopment() ? '*' : config.getOrThrow('FRONT_END_DOMAIN'),

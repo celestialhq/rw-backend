@@ -13,11 +13,13 @@ import { ERRORS, EVENTS } from '@libs/contracts/constants';
 
 import { ServiceEvent } from '@integration-modules/notifications/interfaces';
 
+import { SignOttTokenCommand } from '@modules/auth/commands/sign-ott-token/sign-ott-token.command';
+
 import { SignApiTokenCommand } from '../auth/commands/sign-api-token/sign-api-token.command';
 import { CreateApiTokenBodyDto } from './dtos';
 import { ApiTokenEntity } from './entities/api-token.entity';
 import { IGroupedScopeCatalog } from './interfaces';
-import { CreateApiTokenResponseModel } from './models';
+import { CreateApiTokenResponseModel, GetOttResponseModel } from './models';
 import { FindAllApiTokensResponseModel } from './models/find.model';
 import { ApiTokensRepository } from './repositories/api-tokens.repository';
 import { ScopeCatalogService } from './scope-catalog.service';
@@ -129,11 +131,6 @@ export class ApiTokensService {
 
             return ok({
                 tokens: result.map((item) => item),
-                docs: {
-                    enabled: this.configService.getOrThrow('IS_DOCS_ENABLED'),
-                    scalarPath: this.configService.get('SCALAR_PATH'),
-                    swaggerPath: this.configService.get('SWAGGER_PATH'),
-                },
             });
         } catch (error) {
             this.logger.error(error);
@@ -143,5 +140,20 @@ export class ApiTokensService {
 
     public getAvailableScopes(): TResult<IGroupedScopeCatalog> {
         return ok(this.scopeCatalogService.getGroupedCatalog());
+    }
+
+    public async getOtt(): Promise<TResult<GetOttResponseModel>> {
+        try {
+            const ott = await this.commandBus.execute(new SignOttTokenCommand());
+
+            if (!ott.isOk) {
+                return fail(ERRORS.INTERNAL_SERVER_ERROR);
+            }
+
+            return ok(new GetOttResponseModel(ott.response));
+        } catch (error) {
+            this.logger.error(error);
+            return fail(ERRORS.INTERNAL_SERVER_ERROR);
+        }
     }
 }
