@@ -5,7 +5,6 @@
 process.title = 'rw-api';
 
 import { ROOT } from '@contract/api';
-import compression from 'compression';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
@@ -100,8 +99,6 @@ async function bootstrap(): Promise<void> {
             return helmetMiddleware(req, res, next);
         });
     }
-
-    app.use(compression());
 
     app.use(getRealIp);
 

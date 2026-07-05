@@ -4,7 +4,6 @@
 
 process.title = 'rw-scheduler';
 
-import compression from 'compression';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
@@ -87,8 +86,6 @@ async function bootstrap(): Promise<void> {
             },
         }),
     );
-
-    app.use(compression());
 
     app.useGlobalFilters(new NotFoundExceptionFilter());
 
