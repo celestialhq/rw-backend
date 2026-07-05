@@ -52,7 +52,7 @@ const logger = createLogger({
         }),
         // winston.format.ms(),
         winston.format.align(),
-        nestWinstonModuleUtilities.format.nestLike(`Scheduler: #${instanedId}`, {
+        nestWinstonModuleUtilities.format.nestLike(`cron-${instanedId}`, {
             colors: true,
             prettyPrint: true,
             processId: false,
