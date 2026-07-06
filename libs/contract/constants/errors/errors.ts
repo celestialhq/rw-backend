@@ -1149,4 +1149,14 @@ export const ERRORS = {
         message: 'Either nodeUuid or name must be provided',
         httpCode: 400,
     },
+    CUSTOM_RAW_REMARK_VALIDATION_ERROR: {
+        code: 'A231',
+        message: 'Invalid custom raw remark',
+        httpCode: 500,
+        withMessage: (message: string) => ({
+            code: 'A231',
+            message,
+            httpCode: 500,
+        }),
+    },
 } as const;
