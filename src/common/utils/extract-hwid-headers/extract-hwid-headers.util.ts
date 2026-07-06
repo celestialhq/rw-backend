@@ -8,11 +8,13 @@ export interface HwidHeaders {
     userAgent?: string;
 }
 
+const HWID_REGEX = /^[a-zA-Z0-9=-]{10,64}$/;
+
 export function extractHwidHeaders(request: Request): HwidHeaders | null {
     const rawHwid = request.headers['x-hwid'];
-    const hwid = (Array.isArray(rawHwid) ? rawHwid[0] : rawHwid)?.trim();
+    const hwid = Array.isArray(rawHwid) ? rawHwid[0] : rawHwid;
 
-    if (!hwid || hwid.length < 6) {
+    if (!hwid || !HWID_REGEX.test(hwid)) {
         return null;
     }
 
