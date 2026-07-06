@@ -145,7 +145,7 @@ export class PasskeyService {
             const verification = await verifyRegistrationResponse({
                 response,
                 expectedChallenge,
-                expectedOrigin: passkeySettings.origin,
+                expectedOrigin: [passkeySettings.origin, `https://${passkeySettings.rpId}`],
                 expectedRPID: passkeySettings.rpId,
                 requireUserVerification: true,
             });
