@@ -346,7 +346,7 @@ model SubscriptionSettings {
 }
 
 model HwidUserDevices {
-  hwid        String  @map("hwid")
+  hwid        String  @map("hwid") @db.VarChar(64)
   userId      BigInt  @map("user_id")
   platform    String? @map("platform")
   osVersion   String? @map("os_version")
