@@ -281,7 +281,7 @@ export class SubscriptionService {
 
     public async getRawSubscriptionByShortUuid(
         shortUuid: string,
-        userAgent: string,
+        userAgent: string | undefined,
         withDisabledHosts: boolean,
         hwidHeaders: HwidHeaders | null,
         requestIp?: string,
@@ -319,7 +319,7 @@ export class SubscriptionService {
 
             const headers = this.getUserProfileHeadersInfo(
                 user,
-                userAgent.startsWith('Happ/'),
+                userAgent?.startsWith('Happ/') ?? false,
                 patchedSettingEntity,
             );
 
