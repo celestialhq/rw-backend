@@ -27,6 +27,18 @@ export class RawCacheService {
         }
     }
 
+    async setString(key: string, value: string, ttlSeconds?: number): Promise<void> {
+        if (ttlSeconds) {
+            await this.redis.set(key, value, 'EX', ttlSeconds);
+        } else {
+            await this.redis.set(key, value);
+        }
+    }
+
+    async getString(key: string): Promise<string | null> {
+        return await this.redis.get(key);
+    }
+
     async getNumber(key: string): Promise<number> {
         const raw = await this.redis.get(key);
         return raw ? Number(raw) : 0;

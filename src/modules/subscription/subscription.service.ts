@@ -19,7 +19,7 @@ import { UserHwidDeviceEvent } from '@integration-modules/notifications/interfac
 
 import { ExternalSquadEntity } from '@modules/external-squads/entities/external-squad.entity';
 import { GetCachedExternalSquadSettingsQuery } from '@modules/external-squads/queries/get-cached-external-squad-settings';
-import { GetTemplateNameQuery } from '@modules/external-squads/queries/get-template-name';
+import { GetCachedTemplateNameQuery } from '@modules/external-squads/queries/get-template-name';
 import { CreateWithAdvisoryLockCommand } from '@modules/hwid-user-devices/commands/create-with-advisory-lock';
 import { HwidUserDeviceEntity } from '@modules/hwid-user-devices/entities/hwid-user-device.entity';
 import { CheckHwidExistsQuery } from '@modules/hwid-user-devices/queries/check-hwid-exists';
@@ -122,7 +122,7 @@ export class SubscriptionService {
                     }
 
                     const templateName = await this.queryBus.execute(
-                        new GetTemplateNameQuery(
+                        new GetCachedTemplateNameQuery(
                             user.response.externalSquadUuid,
                             templateTypeMatcher,
                         ),
