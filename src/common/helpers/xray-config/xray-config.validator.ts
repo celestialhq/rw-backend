@@ -381,6 +381,10 @@ export class XRayConfig {
             throw new Error("Config doesn't have inbounds.");
         }
 
+        if (!this.config.outbounds || this.config.outbounds.length === 0) {
+            throw new Error("Config doesn't have outbounds.");
+        }
+
         const seenTags = new Set<string>();
 
         for (const inbound of this.config.inbounds) {
