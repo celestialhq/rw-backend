@@ -1,6 +1,6 @@
+import { load } from 'js-yaml';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import yaml from 'yaml';
 import { z, ZodError } from 'zod';
 
 import { registerAs } from '@nestjs/config';
@@ -79,7 +79,7 @@ export default registerAs('notifications', (): NotificationsConfig => {
     }
 
     const content = readFileSync(configPath, 'utf8');
-    const raw = yaml.parse(content);
+    const raw = load(content);
 
     return validateConfig(raw);
 });

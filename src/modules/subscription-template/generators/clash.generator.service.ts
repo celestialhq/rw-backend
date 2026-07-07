@@ -1,5 +1,5 @@
+import { dump } from 'js-yaml';
 import _ from 'lodash';
-import yaml from 'yaml';
 
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -294,7 +294,7 @@ export class ClashGeneratorService {
                 (group.proxies as string[]).push(...remarks);
             }
 
-            return yaml.stringify(yamlConfig);
+            return dump(yamlConfig);
         } catch (error) {
             this.logger.error('Error rendering yaml config:', error);
             return '';
