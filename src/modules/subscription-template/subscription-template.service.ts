@@ -1,5 +1,5 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import yaml from 'yaml';
+import { load } from 'js-yaml';
 
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -320,12 +320,14 @@ export class SubscriptionTemplateService {
 
             throw new Error('Template not found');
         }
-        let templateContent: object | null = null;
+        let templateContent: unknown | object | null = null;
         switch (template.templateType) {
             case 'MIHOMO':
             case 'STASH':
             case 'CLASH':
-                templateContent = yaml.parse(template.templateYaml!, { maxAliasCount: -1 });
+                templateContent = load(template.templateYaml!, {
+                    maxAliases: -1,
+                });
                 break;
             case 'SINGBOX':
             case 'XRAY_JSON':
