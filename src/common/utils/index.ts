@@ -7,3 +7,4 @@ export * from './md5';
 export * from './superjson';
 export * from './truncate-header.util';
 export * from './parse-int-range.util';
+export * from './yaml-merge-schema.util';
