@@ -658,7 +658,7 @@ export class SubscriptionService {
         subscriptionSettings: SubscriptionSettingsEntity;
         hostsOverrides: ExternalSquadEntity['hostOverrides'] | undefined;
     }> {
-        let patchedSubscriptionSettings: SubscriptionSettingsEntity = subscriptionSettings;
+        let patchedSubscriptionSettings = subscriptionSettings;
 
         try {
             let hostsOverrides: ExternalSquadEntity['hostOverrides'] | undefined = undefined;
@@ -669,6 +669,8 @@ export class SubscriptionService {
                 );
 
                 if (externalSquadSubscriptionSettings !== null) {
+                    patchedSubscriptionSettings = structuredClone(subscriptionSettings);
+
                     // Host overrides
                     if (hasContent(externalSquadSubscriptionSettings.hostOverrides)) {
                         hostsOverrides = externalSquadSubscriptionSettings.hostOverrides;
