@@ -5,6 +5,7 @@ import { z, ZodError } from 'zod';
 
 import { registerAs } from '@nestjs/config';
 
+import { YAML_MERGE_SCHEMA } from '@common/utils';
 import { isProduction } from '@common/utils/startup-app';
 import { EVENTS } from '@libs/contracts/constants';
 
@@ -79,7 +80,7 @@ export default registerAs('notifications', (): NotificationsConfig => {
     }
 
     const content = readFileSync(configPath, 'utf8');
-    const raw = load(content);
+    const raw = load(content, { schema: YAML_MERGE_SCHEMA });
 
     return validateConfig(raw);
 });

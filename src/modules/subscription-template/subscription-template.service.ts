@@ -5,6 +5,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
+import { YAML_MERGE_SCHEMA } from '@common/utils';
 import { CACHE_KEYS, ERRORS, TSubscriptionTemplateType } from '@libs/contracts/constants';
 import { RemnawaveInjectorSchema } from '@libs/contracts/models';
 
@@ -327,7 +328,9 @@ export class SubscriptionTemplateService {
             case 'STASH':
             case 'CLASH':
                 templateContent = load(template.templateYaml!, {
+                    schema: YAML_MERGE_SCHEMA,
                     maxAliases: -1,
+                    maxTotalMergeKeys: -1,
                 });
                 break;
             case 'SINGBOX':
