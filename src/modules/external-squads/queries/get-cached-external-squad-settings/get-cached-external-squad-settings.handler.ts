@@ -28,7 +28,7 @@ export class GetCachedExternalSquadSettingsHandler implements IQueryHandler<GetC
                     | 'hwidSettings'
                     | 'customRemarks'
                 >
-            >(CACHE_KEYS.EXTERNAL_SQUAD_SETTINGS(query.externalSquadUuid));
+            >(CACHE_KEYS.EXTERNAL_SQUAD_SETTINGS(query.externalSquadUuid), true);
 
             if (cached) {
                 return cached;

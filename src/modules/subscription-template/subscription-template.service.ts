@@ -301,6 +301,7 @@ export class SubscriptionTemplateService {
     ): Promise<object> {
         const cached = await this.rawCacheService.get<object>(
             CACHE_KEYS.SUBSCRIPTION_TEMPLATE(name, type),
+            true,
         );
 
         if (cached) {

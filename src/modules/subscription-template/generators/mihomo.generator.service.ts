@@ -117,6 +117,10 @@ const XMUX_FIELD_MAP: [string, string, boolean?][] = [
     ['hKeepAlivePeriod', 'h-keep-alive-period'],
 ];
 
+interface RemnawaveRootConfig {
+    includeHiddenHosts?: boolean;
+}
+
 @Injectable()
 export class MihomoGeneratorService {
     private readonly logger = new Logger(MihomoGeneratorService.name);
@@ -130,25 +134,24 @@ export class MihomoGeneratorService {
         overrideTemplateName?: string,
     ): Promise<string> {
         try {
+            const templateType = isStash ? 'STASH' : 'MIHOMO';
+
             const yamlConfigDb = await this.subscriptionTemplateService.getCachedTemplateByType(
-                isStash ? 'STASH' : 'MIHOMO',
+                templateType,
                 overrideTemplateName,
             );
 
             const yamlConfig = yamlConfigDb as Record<string, unknown>;
-
-            const { remnawave, ...cleanConfig } = yamlConfig ?? {};
-            const remnawaveConfig = remnawave as Record<string, unknown> | undefined;
-            const includeHidden = remnawaveConfig?.includeHiddenHosts ?? false;
+            const includeHidden =
+                (yamlConfig.remnawave as RemnawaveRootConfig | undefined)?.includeHiddenHosts ??
+                false;
 
             const data: MihomoData = { proxies: [], rules: [] };
             const proxyRemarks: string[] = [];
 
             for (const host of hosts) {
                 if (!includeHidden && host.metadata.isHidden) continue;
-
-                const subType = isStash ? 'STASH' : 'MIHOMO';
-                if (host.metadata.excludeFromSubscriptionTypes.includes(subType)) continue;
+                if (host.metadata.excludeFromSubscriptionTypes.includes(templateType)) continue;
 
                 if (UNSUPPORTED_TRANSPORTS.has(host.transport)) continue;
                 if (UNSUPPORTED_PROTOCOLS.has(host.protocol)) continue;
@@ -161,7 +164,7 @@ export class MihomoGeneratorService {
                 proxyRemarks.push(host.finalRemark);
             }
 
-            return await this.renderConfig(data, proxyRemarks, cleanConfig);
+            return await this.renderConfig(data, proxyRemarks, yamlConfig);
         } catch (error) {
             this.logger.error('Error generating clash config:', error);
             return '';
@@ -539,40 +542,56 @@ export class MihomoGeneratorService {
         yamlConfig: Record<string, unknown>,
     ): Promise<string> {
         try {
-            if (!Array.isArray(yamlConfig.proxies)) {
-                yamlConfig.proxies = [];
+            const { remnawave: _remnawave, ...templateConfig } = yamlConfig;
+
+            const sourceGroups = Array.isArray(templateConfig['proxy-groups'])
+                ? (templateConfig['proxy-groups'] as Record<string, unknown>[])
+                : [];
+
+            const finalConfig: Record<string, unknown> = {
+                ...templateConfig,
+                proxies: [
+                    ...(Array.isArray(yamlConfig.proxies)
+                        ? (yamlConfig.proxies as ProxyNode[])
+                        : []),
+                    ...data.proxies,
+                ],
+                'proxy-groups': sourceGroups.map((group) => {
+                    const remnawaveCustom = group.remnawave as Record<string, unknown> | undefined;
+                    const { remnawave: _remnawave, ...restGroup } = group;
+                    const cleanGroup = remnawaveCustom ? restGroup : group;
+
+                    const remarks = this.resolveGroupRemarks(remnawaveCustom, proxyRemarks);
+
+                    return {
+                        ...cleanGroup,
+                        proxies: [
+                            ...(Array.isArray(cleanGroup.proxies)
+                                ? (cleanGroup.proxies as string[])
+                                : []),
+                            ...remarks,
+                        ],
+                    };
+                }),
+            };
+
+            const providers = this.buildProxyProviders(yamlConfig, data);
+            if (providers) {
+                finalConfig['proxy-providers'] = providers;
             }
 
-            if (!Array.isArray(yamlConfig['proxy-groups'])) {
-                yamlConfig['proxy-groups'] = [];
-            }
-
-            (yamlConfig.proxies as ProxyNode[]).push(...data.proxies);
-
-            for (const group of yamlConfig['proxy-groups'] as Record<string, unknown>[]) {
-                if (!Array.isArray(group.proxies)) {
-                    group.proxies = [];
-                }
-
-                const remarks = this.resolveGroupRemarks(group, proxyRemarks);
-                (group.proxies as string[]).push(...remarks);
-            }
-
-            this.applyProxyProviders(yamlConfig, data);
-
-            return dump(yamlConfig);
+            return dump(finalConfig);
         } catch (error) {
             this.logger.error(`Error rendering yaml config: ${error}`);
             return '';
         }
     }
 
-    private resolveGroupRemarks(group: Record<string, unknown>, proxyRemarks: string[]): string[] {
-        const remnawaveCustom = group.remnawave as Record<string, unknown> | undefined;
-
-        if (remnawaveCustom) {
-            delete group.remnawave;
-        } else {
+    private resolveGroupRemarks(
+        remnawaveCustom: Record<string, unknown> | undefined,
+        proxyRemarks: string[],
+    ): string[] {
+        if (!remnawaveCustom) {
             return [...proxyRemarks];
         }
 
@@ -592,24 +611,31 @@ export class MihomoGeneratorService {
         return [...proxyRemarks];
     }
 
-    private applyProxyProviders(yamlConfig: Record<string, unknown>, data: MihomoData): void {
+    private buildProxyProviders(
+        yamlConfig: Record<string, unknown>,
+        data: MihomoData,
+    ): Record<string, Record<string, unknown>> | undefined {
         const providers = yamlConfig['proxy-providers'] as
             | Record<string, Record<string, unknown>>
             | undefined;
-        if (!providers) return;
+        if (!providers) return undefined;
 
-        for (const providerKey in providers) {
-            const provider = providers[providerKey];
+        return Object.fromEntries(
+            Object.entries(providers).map(([providerKey, provider]) => {
+                const remnawaveCustom = provider.remnawave as Record<string, unknown> | undefined;
+                if (!remnawaveCustom) {
+                    return [providerKey, provider];
+                }
 
-            const remnawaveCustom = provider.remnawave as Record<string, unknown> | undefined;
-            if (!remnawaveCustom) continue;
+                const { remnawave: _remnawave, ...cleanProvider } = provider;
 
-            delete provider.remnawave;
+                if (remnawaveCustom['include-proxies'] === true) {
+                    return [providerKey, { ...cleanProvider, payload: [...data.proxies] }];
+                }
 
-            if (remnawaveCustom['include-proxies'] === true) {
-                provider.payload = [...data.proxies];
-            }
-        }
+                return [providerKey, cleanProvider];
+            }),
+        );
     }
 
     private buildHysteria2Node(

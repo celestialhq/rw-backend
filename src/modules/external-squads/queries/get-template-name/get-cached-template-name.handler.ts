@@ -23,15 +23,15 @@ export class GetCachedTemplateNameHandler implements IQueryHandler<GetCachedTemp
                 return fail(ERRORS.TEMPLATE_TYPE_NOT_ALLOWED);
             }
 
-            const cached = await this.rawCacheService.getString(
-                CACHE_KEYS.EXTERNAL_SQUAD_TEMPLATE_NAME(
-                    query.externalSquadUuid,
-                    query.templateType,
-                ),
+            const cacheKey = CACHE_KEYS.EXTERNAL_SQUAD_TEMPLATE_NAME(
+                query.externalSquadUuid,
+                query.templateType,
             );
 
-            if (cached) {
-                return ok(cached);
+            const cached = await this.rawCacheService.getString(cacheKey, true);
+
+            if (cached !== null) {
+                return cached === '' ? fail(ERRORS.SUBSCRIPTION_TEMPLATE_NOT_FOUND) : ok(cached);
             }
 
             const result = await this.externalSquadRepository.getTemplateName(
@@ -39,18 +39,15 @@ export class GetCachedTemplateNameHandler implements IQueryHandler<GetCachedTemp
                 query.templateType,
             );
 
+            await this.rawCacheService.setString(
+                cacheKey,
+                result ?? '',
+                CACHE_KEYS_TTL.EXTERNAL_SQUAD_TEMPLATE_NAME,
+            );
+
             if (!result) {
                 return fail(ERRORS.SUBSCRIPTION_TEMPLATE_NOT_FOUND);
             }
-
-            await this.rawCacheService.setString(
-                CACHE_KEYS.EXTERNAL_SQUAD_TEMPLATE_NAME(
-                    query.externalSquadUuid,
-                    query.templateType,
-                ),
-                result,
-                CACHE_KEYS_TTL.EXTERNAL_SQUAD_TEMPLATE_NAME,
-            );
 
             return ok(result);
         } catch (error) {

@@ -3,13 +3,29 @@ import Redis, { ChainableCommander, ScanStream } from 'ioredis';
 
 import { Injectable } from '@nestjs/common';
 
+import { MemoryCacheService } from './memory-cache.service';
+
 @Injectable()
 export class RawCacheService {
-    constructor(@InjectRedis() private readonly redis: Redis) {}
+    constructor(
+        @InjectRedis() private readonly redis: Redis,
+        private readonly memoryCacheService: MemoryCacheService,
+    ) {}
 
-    async get<T>(key: string): Promise<T | null> {
+    async get<T>(key: string, memCache: boolean = false): Promise<T | null> {
+        if (memCache) {
+            const hit = this.memoryCacheService.get<T>(key);
+            if (hit !== undefined) return hit;
+        }
+
         const raw = await this.redis.get(key);
-        return raw ? JSON.parse(raw) : null;
+        const parsed = raw ? (JSON.parse(raw) as T) : null;
+
+        if (memCache && parsed !== null) {
+            this.memoryCacheService.set(key, parsed as object);
+        }
+
+        return parsed;
     }
 
     async mget<T>(keys: string[]): Promise<(T | null)[]> {
@@ -35,8 +51,18 @@ export class RawCacheService {
         }
     }
 
-    async getString(key: string): Promise<string | null> {
-        return await this.redis.get(key);
+    async getString(key: string, memCache: boolean = false): Promise<string | null> {
+        if (memCache) {
+            const hit = this.memoryCacheService.get<string>(key);
+            if (hit !== undefined) return hit;
+        }
+
+        const raw = await this.redis.get(key);
+        if (memCache && raw !== null) {
+            this.memoryCacheService.set(key, raw);
+        }
+
+        return raw;
     }
 
     async getNumber(key: string): Promise<number> {
@@ -54,6 +80,7 @@ export class RawCacheService {
 
     async del(key: string): Promise<void> {
         await this.redis.del(key);
+        await this.memoryCacheService.invalidate(key);
     }
 
     async delMany(keys: string[]): Promise<void> {
