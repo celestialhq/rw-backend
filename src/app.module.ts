@@ -35,8 +35,6 @@ import { QueueModule } from '@queue/queue.module';
                     }),
                 }),
             ],
-            global: true,
-            middleware: { mount: true },
         }),
         EventEmitterModule.forRoot({
             wildcard: true,
