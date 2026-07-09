@@ -1,3 +1,5 @@
+import type { INodeMetrics } from './node-metrics.message.interface';
+
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import { Counter } from 'prom-client';
 
@@ -6,8 +8,6 @@ import { EventPattern } from '@nestjs/microservices';
 
 import { MESSAGING_NAMES } from '@common/microservices';
 import { METRIC_NAMES } from '@libs/contracts/constants';
-
-import { INodeMetrics } from './node-metrics.message.interface';
 
 @Controller()
 export class NodesMetricMessageController {

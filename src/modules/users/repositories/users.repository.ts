@@ -1,3 +1,11 @@
+import type {
+    IGetUserAccessibleNodes,
+    IGetUserAccessibleNodesResponse,
+    IUpdateUserDto,
+    IUserOnlineStats,
+    IUserStats,
+} from '../interfaces';
+
 import { TResetPeriods, TUsersStatus, USERS_STATUS } from '@contract/constants';
 import { Transactional, TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
@@ -24,13 +32,6 @@ import {
     UserWithResolvedInboundEntity,
 } from '../entities';
 import { UserTrafficEntity } from '../entities/user-traffic.entity';
-import {
-    IGetUserAccessibleNodes,
-    IGetUserAccessibleNodesResponse,
-    IUpdateUserDto,
-    IUserOnlineStats,
-    IUserStats,
-} from '../interfaces';
 import { UserConverter } from '../users.converter';
 
 const USERS_FILTER_COLUMN_MAP = {

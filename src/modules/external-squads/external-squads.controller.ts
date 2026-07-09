@@ -1,11 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import {
-    ApiBearerAuth,
-    ApiConflictResponse,
-    ApiOkResponse,
-    ApiResponse,
-    ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConflictResponse, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';

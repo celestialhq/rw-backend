@@ -17,8 +17,8 @@ WORKDIR /opt/app
 
 COPY package*.json ./
 COPY prisma ./prisma
+COPY rspack.config.mjs ./
 COPY prisma.config.ts ./prisma.config.ts
-COPY patches ./patches
 COPY @types ./@types
 
 RUN npm ci --prefer-offline --no-audit --no-fund
@@ -83,7 +83,9 @@ ENV __RW_METADATA_BUILD_NUMBER=${__RW_METADATA_BUILD_NUMBER}
 
 COPY --from=backend-build /opt/app/dist ./dist
 COPY --from=frontend /opt/frontend/frontend_temp/dist ./frontend
-COPY --from=backend-build /opt/app/prisma ./prisma
+COPY --from=backend-build /opt/app/prisma/generated ./prisma/generated
+COPY --from=backend-build /opt/app/prisma/migrations ./prisma/migrations
+COPY --from=backend-build /opt/app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=backend-build /opt/app/node_modules ./node_modules
 
 COPY configs /var/lib/remnawave/configs
@@ -92,7 +94,7 @@ COPY prisma.config.ts ./prisma.config.ts
 COPY ecosystem.config.js ./
 COPY docker-entrypoint.sh ./
 
-RUN npm install -g pm2 && npm link --ignore-scripts \
+RUN npm install -g pm2 && ln -s /opt/app/dist/cli.js /usr/local/bin/cli \
     && rm -rf /usr/local/lib/node_modules/npm \
             /usr/local/lib/node_modules/corepack \
             /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
