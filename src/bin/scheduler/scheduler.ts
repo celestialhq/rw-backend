@@ -113,5 +113,10 @@ async function bootstrap(): Promise<void> {
     app.enableShutdownHooks();
 
     await app.listen(config.getOrThrow('METRICS_PORT'));
+
+    if (import.meta.webpackHot) {
+        import.meta.webpackHot.accept();
+        import.meta.webpackHot.dispose(() => app.close());
+    }
 }
 void bootstrap();

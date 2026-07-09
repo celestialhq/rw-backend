@@ -2,9 +2,8 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { SirvModule } from 'nest-sirv';
 import { ClsModule } from 'nestjs-cls';
-import { join } from 'node:path';
 
-import { Logger, Module, OnApplicationShutdown } from '@nestjs/common';
+import { Logger, Module, type OnApplicationShutdown } from '@nestjs/common';
 import { ConditionalModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
@@ -13,6 +12,7 @@ import { PrismaModule } from '@common/database';
 import { PrismaService } from '@common/database/prisma.service';
 import { RawCacheModule } from '@common/raw-cache/raw-cache.module';
 import { RuntimeMetricsModule } from '@common/runtime-metrics/runtime-metrics.module';
+import { getAssetsPath } from '@common/utils/get-assets-path';
 import { disableFrontend } from '@common/utils/startup-app/is-development';
 
 import { IntegrationModules } from '@integration-modules/integration-modules';
@@ -45,7 +45,7 @@ import { QueueModule } from '@queue/queue.module';
         RemnawaveModules,
         ConditionalModule.registerWhen(
             SirvModule.forRoot({
-                rootPath: join(__dirname, '..', '..', 'frontend'),
+                rootPath: getAssetsPath(),
                 exclude: ['/api'],
             }),
             () => !disableFrontend(),
@@ -59,6 +59,8 @@ export class AppModule implements OnApplicationShutdown {
     private readonly logger = new Logger(AppModule.name);
 
     async onApplicationShutdown(signal?: string): Promise<void> {
-        this.logger.log(`${signal} signal received, shutting down...`);
+        if (signal) {
+            this.logger.log(`${signal} signal received, shutting down...`);
+        }
     }
 }
