@@ -13,10 +13,6 @@
     "type": "git",
     "url": "git+https://github.com/remnawave/backend.git"
   },
-  "bin": {
-    "cli": "dist/src/bin/cli/cli.js",
-    "remnawave": "dist/src/bin/cli/cli.js"
-  },
   "type": "commonjs",
   "scripts": {
     "dev": "cross-env NODE_ENV=development INSTANCE_TYPE=api rspack --watch --mode development",
