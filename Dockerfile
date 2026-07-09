@@ -93,11 +93,15 @@ COPY prisma.config.ts ./prisma.config.ts
 COPY ecosystem.config.js ./
 COPY docker-entrypoint.sh ./
 
-RUN npm install -g pm2 && ln -s /opt/app/dist/cli.js /usr/local/bin/cli \
+RUN npm install -g pm2 \
+    && chmod +x /opt/app/dist/cli.js \
+    && ln -s /opt/app/dist/cli.js /usr/local/bin/cli \
     && rm -rf /usr/local/lib/node_modules/npm \
-            /usr/local/lib/node_modules/corepack \
-            /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
-            /usr/local/include/node
+        /usr/local/lib/node_modules/corepack \
+        /usr/local/bin/npm \
+        /usr/local/bin/npx \
+        /usr/local/bin/corepack \
+        /usr/local/include/node
 
 ENTRYPOINT [ "/bin/sh", "docker-entrypoint.sh" ]
 CMD [ "pm2-runtime", "start", "ecosystem.config.js", "--env", "production" ]
