@@ -1,12 +1,12 @@
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { SirvModule } from 'nest-sirv';
 import { ClsModule } from 'nestjs-cls';
 import { join } from 'node:path';
 
 import { Logger, Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConditionalModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { CommonConfigModule } from '@common/config/common-config/common-config.module';
 import { PrismaModule } from '@common/database';
@@ -44,13 +44,9 @@ import { QueueModule } from '@queue/queue.module';
         IntegrationModules,
         RemnawaveModules,
         ConditionalModule.registerWhen(
-            ServeStaticModule.forRoot({
+            SirvModule.forRoot({
                 rootPath: join(__dirname, '..', '..', 'frontend'),
-                renderPath: '*splat',
-                exclude: ['/api/*splat'],
-                serveStaticOptions: {
-                    dotfiles: 'ignore',
-                },
+                exclude: ['/api'],
             }),
             () => !disableFrontend(),
         ),
