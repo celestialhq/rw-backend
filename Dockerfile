@@ -24,7 +24,6 @@ COPY @types ./@types
 RUN npm ci --prefer-offline --no-audit --no-fund
 
 COPY tsconfig*.json ./
-COPY nest-cli.json ./
 COPY src ./src
 COPY libs ./libs
 

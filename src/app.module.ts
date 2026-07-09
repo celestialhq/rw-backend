@@ -21,6 +21,8 @@ import { RemnawaveModules } from '@modules/remnawave-backend.modules';
 
 import { QueueModule } from '@queue/queue.module';
 
+const HASHED = /-[A-Za-z0-9_-]{8,}\.[a-z0-9]+$/i;
+
 @Module({
     imports: [
         RawCacheModule,
@@ -47,6 +49,15 @@ import { QueueModule } from '@queue/queue.module';
             SirvModule.forRoot({
                 rootPath: getAssetsPath(),
                 exclude: ['/api'],
+                sirv: {
+                    setHeaders(res, pathname) {
+                        if (HASHED.test(pathname)) {
+                            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+                        } else {
+                            res.setHeader('Cache-Control', 'no-cache');
+                        }
+                    },
+                },
             }),
             () => !disableFrontend(),
         ),
