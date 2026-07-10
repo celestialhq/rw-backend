@@ -7,3 +7,4 @@ export * from './get-nodes-statistics.dto';
 export * from './get-recap.dto';
 export * from './get-remnawave-health.dto';
 export * from './get-stats.dto';
+export * from './get-http-stats.dto';

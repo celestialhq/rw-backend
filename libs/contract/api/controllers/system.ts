@@ -7,6 +7,7 @@ export const SYSTEM_ROUTES = {
         NODES_STATS: 'stats/nodes',
         RECAP: 'stats/recap',
         NODES_METRICS: 'nodes/metrics',
+        HTTP: 'stats/http',
     },
     TOOLS: {
         GENERATE_X25519: 'tools/x25519/generate',
