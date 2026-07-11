@@ -182,14 +182,13 @@ export class QueryNodesQueueProcessor extends WorkerHost {
                 };
             }
 
-            const collator = new Intl.Collator(undefined, { numeric: true });
-
             return {
                 success: true,
                 nodeUuid: job.data.nodeUuid,
-                users: result.response.response.users.sort((a, b) =>
-                    collator.compare(a.userId, b.userId),
-                ),
+                users: result.response.response.users
+                    .map((user) => ({ ...user, userId: Number(user.userId) }))
+                    .filter((user) => Number.isFinite(user.userId))
+                    .sort((a, b) => a.userId - b.userId),
             };
         } catch (error) {
             this.logger.error(`Failed to fetch users IPs list: ${error}`);
