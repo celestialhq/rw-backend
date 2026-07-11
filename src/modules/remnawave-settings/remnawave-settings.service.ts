@@ -25,7 +25,7 @@ export class RemnawaveSettingsService {
             return ok(settings);
         } catch (error) {
             this.logger.error(error);
-            return fail(ERRORS.GET_REMNAAWAVE_SETTINGS_ERROR);
+            return fail(ERRORS.GET_REMNAWAVE_SETTINGS_ERROR);
         }
     }
 
@@ -44,7 +44,7 @@ export class RemnawaveSettingsService {
 
             if (!validationResult.valid) {
                 return fail(
-                    ERRORS.VALIDATE_REMNAAWAVE_SETTINGS_ERROR.withMessage(validationResult.error!),
+                    ERRORS.VALIDATE_REMNAWAVE_SETTINGS_ERROR.withMessage(validationResult.error!),
                 );
             }
 
@@ -57,7 +57,7 @@ export class RemnawaveSettingsService {
             return await this.getSettingsFromController();
         } catch (error) {
             this.logger.error(error);
-            return fail(ERRORS.UPDATE_REMNAAWAVE_SETTINGS_ERROR);
+            return fail(ERRORS.UPDATE_REMNAWAVE_SETTINGS_ERROR);
         }
     }
 

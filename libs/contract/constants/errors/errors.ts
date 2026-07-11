@@ -934,12 +934,12 @@ export const ERRORS = {
         message: 'Passkey not found',
         httpCode: 404,
     },
-    GET_REMNAAWAVE_SETTINGS_ERROR: {
+    GET_REMNAWAVE_SETTINGS_ERROR: {
         code: 'A192',
         message: 'Get Remnawave settings error',
         httpCode: 500,
     },
-    UPDATE_REMNAAWAVE_SETTINGS_ERROR: {
+    UPDATE_REMNAWAVE_SETTINGS_ERROR: {
         code: 'A193',
         message: 'Update Remnawave settings error',
         httpCode: 500,
@@ -974,7 +974,7 @@ export const ERRORS = {
         message: 'Delete passkey error',
         httpCode: 500,
     },
-    VALIDATE_REMNAAWAVE_SETTINGS_ERROR: {
+    VALIDATE_REMNAWAVE_SETTINGS_ERROR: {
         code: 'A199',
         message: 'Validate Remnawave settings error',
         httpCode: 500,
