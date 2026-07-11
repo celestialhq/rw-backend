@@ -1,6 +1,5 @@
 import { Job } from 'bullmq';
 import ems from 'enhanced-ms';
-import { t } from 'try';
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
@@ -122,9 +121,9 @@ export class RecordUserUsageQueueProcessor extends WorkerHost {
             const pipeline = this.rawCacheService.createPipeline();
 
             response.response.users.forEach((user) => {
-                const { ok } = t(() => BigInt(user.username));
-
-                if (!ok) {
+                try {
+                    BigInt(user.username);
+                } catch {
                     return;
                 }
 
