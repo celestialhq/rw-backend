@@ -33,3 +33,4 @@ export * from './torrent-blocker-report.schema';
 export * from './users.schema';
 export * from './webhook';
 export * from './xray-json-advanced';
+export * from './path-params.schema';

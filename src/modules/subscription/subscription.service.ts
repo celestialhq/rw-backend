@@ -952,14 +952,14 @@ export class SubscriptionService {
         }
     }
 
-    public async getConnectionKeysByUuid(
-        uuid: string,
+    public async getConnectionKeysByUserId(
+        userId: number,
     ): Promise<TResult<ConnectionKeysResponseModel>> {
         try {
             const userResult = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        uuid,
+                        tId: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,

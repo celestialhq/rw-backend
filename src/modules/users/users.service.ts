@@ -77,7 +77,6 @@ export class UsersService {
                 description: dto.description,
                 hwidDeviceLimit: dto.hwidDeviceLimit,
                 tag: dto.tag,
-                uuid: dto.uuid,
                 externalSquadUuid: dto.externalSquadUuid,
             });
 
@@ -90,7 +89,7 @@ export class UsersService {
             const { response: user } = result;
 
             if (user.status === USERS_STATUS.ACTIVE) {
-                this.eventBus.publish(new AddUserToNodeEvent(user.uuid));
+                this.eventBus.publish(new AddUserToNodeEvent(user.tId));
             }
 
             this.eventEmitter.emit(
@@ -130,7 +129,7 @@ export class UsersService {
         try {
             const {
                 username,
-                uuid,
+                id,
                 trafficLimitBytes,
                 telegramId,
                 activeInternalSquads: newActiveInternalSquadsUuids,
@@ -138,11 +137,15 @@ export class UsersService {
                 ...rest
             } = dto;
 
-            const userCriteria = uuid ? { uuid } : { username };
-
-            const user = await this.userRepository.findUniqueByCriteria(userCriteria, {
-                activeInternalSquads: true,
-            });
+            const user = await this.userRepository.findUniqueByCriteria(
+                {
+                    username,
+                    tId: wrapBigInt(id),
+                },
+                {
+                    activeInternalSquads: true,
+                },
+            );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
@@ -221,7 +224,7 @@ export class UsersService {
             }
 
             if (updatedUser.status === USERS_STATUS.ACTIVE && addToNode && !removeFromNode) {
-                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.uuid));
+                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.tId));
             }
 
             if (removeFromNode) {
@@ -284,7 +287,6 @@ export class UsersService {
             const result = await this.userRepository.findUniqueByCriteria({
                 username: dto.username || undefined,
                 shortUuid: dto.shortUuid || undefined,
-                uuid: dto.uuid || undefined,
                 tId: dto.tId || undefined,
             });
 
@@ -298,13 +300,13 @@ export class UsersService {
     }
 
     public async revokeUserSubscription(
-        userUuid: string,
+        userId: number,
         dto?: RevokeUserSubscriptionBodyDto,
     ): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { uuid: userUuid },
-                ['uuid', 'vlessUuid', 'shortUuid'],
+                { tId: BigInt(userId) },
+                ['tId', 'vlessUuid', 'shortUuid'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -318,7 +320,7 @@ export class UsersService {
             }
 
             const updateResult = await this.userRepository.revokeUserSubscription({
-                uuid: user.uuid,
+                tId: user.tId,
                 shortUuid,
                 trojanPassword: this.createPassword(),
                 vlessUuid: this.createUuid(),
@@ -329,12 +331,12 @@ export class UsersService {
 
             if (!updateResult) return fail(ERRORS.REVOKE_USER_SUBSCRIPTION_ERROR);
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ uuid: user.uuid });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
             if (updatedUser.status === USERS_STATUS.ACTIVE) {
-                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.uuid, user.vlessUuid));
+                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.tId, user.vlessUuid));
             }
 
             this.eventEmitter.emit(
@@ -352,10 +354,10 @@ export class UsersService {
         }
     }
 
-    public async deleteUser(userUuid: string): Promise<TResult<boolean>> {
+    public async deleteUser(userId: number): Promise<TResult<boolean>> {
         try {
             const user = await this.userRepository.findUniqueByCriteria(
-                { uuid: userUuid },
+                { tId: BigInt(userId) },
                 {
                     activeInternalSquads: true,
                 },
@@ -363,7 +365,7 @@ export class UsersService {
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
-            await this.userRepository.deleteByUUID(user.uuid);
+            await this.userRepository.deleteById(user.tId);
 
             this.eventBus.publish(new RemoveUserFromNodeEvent(user.tId, user.vlessUuid));
 
@@ -381,11 +383,11 @@ export class UsersService {
         }
     }
 
-    public async disableUser(userUuid: string): Promise<TResult<UserEntity>> {
+    public async disableUser(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { uuid: userUuid },
-                ['uuid', 'status'],
+                { tId: BigInt(userId) },
+                ['tId', 'status'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -394,9 +396,9 @@ export class UsersService {
                 return fail(ERRORS.USER_ALREADY_DISABLED);
             }
 
-            await this.userRepository.updateUserStatus(user.uuid, USERS_STATUS.DISABLED);
+            await this.userRepository.updateUserStatus(user.tId, USERS_STATUS.DISABLED);
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ uuid: user.uuid });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
@@ -418,11 +420,11 @@ export class UsersService {
         }
     }
 
-    public async enableUser(userUuid: string): Promise<TResult<UserEntity>> {
+    public async enableUser(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { uuid: userUuid },
-                ['uuid', 'status'],
+                { tId: BigInt(userId) },
+                ['tId', 'status'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -431,13 +433,13 @@ export class UsersService {
                 return fail(ERRORS.USER_ALREADY_ENABLED);
             }
 
-            await this.userRepository.updateUserStatus(user.uuid, USERS_STATUS.ACTIVE);
+            await this.userRepository.updateUserStatus(user.tId, USERS_STATUS.ACTIVE);
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ uuid: user.uuid });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
-            this.eventBus.publish(new AddUserToNodeEvent(user.uuid));
+            this.eventBus.publish(new AddUserToNodeEvent(user.tId));
 
             this.eventEmitter.emit(
                 EVENTS.USER.ENABLED,
@@ -454,11 +456,11 @@ export class UsersService {
         }
     }
 
-    public async resetUserTraffic(userUuid: string): Promise<TResult<UserEntity>> {
+    public async resetUserTraffic(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { uuid: userUuid },
-                ['uuid', 'status', 'tId'],
+                { tId: BigInt(userId) },
+                ['tId', 'status'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -466,17 +468,17 @@ export class UsersService {
             let status = undefined;
             if (user.status === USERS_STATUS.LIMITED) {
                 status = USERS_STATUS.ACTIVE;
-                this.eventBus.publish(new AddUserToNodeEvent(user.uuid));
+                this.eventBus.publish(new AddUserToNodeEvent(user.tId));
             }
 
             await this.userRepository.updateStatusAndTrafficAndResetAt(
-                user.uuid,
+                user.tId,
                 new Date(),
                 status,
             );
 
             const newUser = await this.userRepository.findUniqueByCriteria(
-                { uuid: userUuid },
+                { tId: user.tId },
                 {
                     activeInternalSquads: true,
                 },
@@ -522,15 +524,15 @@ export class UsersService {
         }
     }
 
-    public async bulkDeleteUsersByUuid(uuids: string[]): Promise<TResult<boolean>> {
+    public async bulkDeleteUsersByUserId(userIds: number[]): Promise<TResult<boolean>> {
         try {
-            if (uuids.length === 0) {
+            if (userIds.length === 0) {
                 return ok(true);
             }
 
-            const usersIdsAndHashes = await this.userRepository.getIdsAndHashesByUserUuids(uuids);
+            const usersIdsAndHashes = await this.userRepository.getIdsAndHashesByUserIds(userIds);
 
-            await this.userRepository.deleteManyByUuid(uuids);
+            await this.userRepository.deleteManyByUserIds(userIds);
 
             await this.eventBus.publish(new RemoveUsersFromNodeEvent(usersIdsAndHashes));
 
@@ -541,10 +543,10 @@ export class UsersService {
         }
     }
 
-    public async bulkRevokeUsersSubscription(uuids: string[]): Promise<TResult<boolean>> {
+    public async bulkRevokeUsersSubscription(userIds: number[]): Promise<TResult<boolean>> {
         try {
             // handled one by one
-            await this.usersQueuesService.revokeUsersSubscriptionBulk(uuids);
+            await this.usersQueuesService.revokeUsersSubscriptionBulk(userIds);
 
             return ok(true);
         } catch (error) {
@@ -553,10 +555,10 @@ export class UsersService {
         }
     }
 
-    public async bulkResetUserTraffic(uuids: string[]): Promise<TResult<boolean>> {
+    public async bulkResetUserTraffic(userIds: number[]): Promise<TResult<boolean>> {
         try {
             // handled one by one
-            await this.usersQueuesService.resetUserTrafficBulk(uuids);
+            await this.usersQueuesService.resetUserTrafficBulk(userIds);
 
             return ok(true);
         } catch (error) {
@@ -576,7 +578,7 @@ export class UsersService {
 
             // handled one by one
             await this.usersQueuesService.updateUsersBulk({
-                uuids: dto.uuids,
+                userIds: dto.userIds,
                 fields: dto.fields,
             });
 
@@ -588,17 +590,20 @@ export class UsersService {
     }
 
     public async bulkUpdateUsersInternalSquads(
-        usersUuids: string[],
+        userIds: number[],
         internalSquadsUuids: string[],
     ): Promise<TResult<boolean>> {
         try {
-            const userIds = await this.userRepository.getUserIdsByUuids(usersUuids);
+            const validatedUserIds = await this.userRepository.validateUserIds(userIds);
 
-            await this.userRepository.removeUsersFromInternalSquads(userIds);
+            await this.userRepository.removeUsersFromInternalSquads(validatedUserIds);
 
-            await this.userRepository.addUsersToInternalSquads(userIds, internalSquadsUuids);
+            await this.userRepository.addUsersToInternalSquads(
+                validatedUserIds,
+                internalSquadsUuids,
+            );
 
-            await this.eventBus.publish(new AddUsersToNodeEvent(userIds));
+            await this.eventBus.publish(new AddUsersToNodeEvent(validatedUserIds));
 
             return ok(true);
         } catch (error) {
@@ -645,11 +650,11 @@ export class UsersService {
     }
 
     public async getUserAccessibleNodes(
-        userUuid: string,
+        userId: number,
     ): Promise<TResult<GetUserAccessibleNodesResponseModel>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { uuid: userUuid },
+                { tId: BigInt(userId) },
                 ['tId'],
             );
 
@@ -657,7 +662,7 @@ export class UsersService {
 
             const result = await this.userRepository.getUserAccessibleNodes(user.tId);
 
-            return ok(new GetUserAccessibleNodesResponseModel(result, userUuid));
+            return ok(new GetUserAccessibleNodesResponseModel(result, user.tId));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.GET_USER_ACCESSIBLE_NODES_ERROR);
@@ -665,11 +670,11 @@ export class UsersService {
     }
 
     public async getUserSubscriptionRequestHistory(
-        userUuid: string,
+        userId: number,
     ): Promise<TResult<GetUserSubscriptionRequestHistoryResponseModel>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { uuid: userUuid },
+                { tId: BigInt(userId) },
                 ['tId'],
             );
 
@@ -701,12 +706,12 @@ export class UsersService {
     }
 
     public async bulkExtendExpirationDate(dto: {
-        uuids: string[];
+        userIds: number[];
         extendDays: number;
     }): Promise<TResult<boolean>> {
         try {
-            const affectedRows = await this.userRepository.bulkExtendExpirationDateByUuids(
-                dto.uuids,
+            const affectedRows = await this.userRepository.bulkExtendExpirationDateByUserIds(
+                dto.userIds,
                 dto.extendDays,
             );
 
@@ -714,10 +719,10 @@ export class UsersService {
                 return ok(true);
             }
 
-            const uuids = await this.userRepository.bulkSyncExpiredUsersByUuids(dto.uuids);
+            const userIds = await this.userRepository.bulkSyncExpiredUsersByUserIds(dto.userIds);
 
-            for (const uuid of uuids) {
-                this.eventBus.publish(new AddUserToNodeEvent(uuid));
+            for (const userId of userIds) {
+                this.eventBus.publish(new AddUserToNodeEvent(userId));
             }
 
             return ok(true);

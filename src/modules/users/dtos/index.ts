@@ -7,7 +7,6 @@ export * from './get-user-accessible-nodes.dto';
 export * from './get-user-by-id.dto';
 export * from './get-user-by-short-uuid.dto';
 export * from './get-user-by-username.dto';
-export * from './get-user-by-uuid.dto';
 export * from './get-user-subscription-request-history.dto';
 export * from './get-users-stream.dto';
 export * from './get-users.dto';

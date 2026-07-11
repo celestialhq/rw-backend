@@ -5,19 +5,19 @@ import { fail, ok, TResult } from '@common/types';
 import { ERRORS } from '@libs/contracts/constants';
 
 import { UsersRepository } from '../../repositories/users.repository';
-import { GetUserIdsByUserUuidsQuery } from './get-user-ids-by-user-uuids.query';
+import { ValidateUserIdsQuery } from './validate-user-ids.query';
 
-@QueryHandler(GetUserIdsByUserUuidsQuery)
-export class GetUserIdsByUserUuidsHandler implements IQueryHandler<
-    GetUserIdsByUserUuidsQuery,
+@QueryHandler(ValidateUserIdsQuery)
+export class ValidateUserIdsHandler implements IQueryHandler<
+    ValidateUserIdsQuery,
     TResult<bigint[]>
 > {
-    private readonly logger = new Logger(GetUserIdsByUserUuidsHandler.name);
+    private readonly logger = new Logger(ValidateUserIdsHandler.name);
     constructor(private readonly usersRepository: UsersRepository) {}
 
-    async execute(query: GetUserIdsByUserUuidsQuery): Promise<TResult<bigint[]>> {
+    async execute(query: ValidateUserIdsQuery): Promise<TResult<bigint[]>> {
         try {
-            const userIds = await this.usersRepository.getUserIdsByUuids(query.userUuids);
+            const userIds = await this.usersRepository.validateUserIds(query.userIds);
 
             return ok(userIds);
         } catch (error) {

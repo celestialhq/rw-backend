@@ -1,6 +1,6 @@
 {
   "name": "@remnawave/backend",
-  "version": "2.9.0",
+  "version": "3.0.0",
   "private": false,
   "description": "Remnawave Panel Backend",
   "homepage": "https://github.com/remnawave",
@@ -73,7 +73,7 @@
     "age-encryption": "^0.3.0",
     "arctic": "^3.7.0",
     "axios": "^1.18.1",
-    "bullmq": "5.79.3",
+    "bullmq": "5.80.1",
     "chalk": "^5.6.2",
     "consola": "^3.4.2",
     "convert-units": "^3.0.0-beta.8",

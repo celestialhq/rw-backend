@@ -89,7 +89,7 @@ export class JwtDefaultGuard extends AuthGuard('registeredUserJWT') {
     }
 
     private async verifyApiToken(user: IJWTAuthPayload, apiTokenUuid: string): Promise<boolean> {
-        const cached = await this.rawCacheService.get<string[]>(`api:${apiTokenUuid}`);
+        const cached = await this.rawCacheService.get<string[]>(`api:${apiTokenUuid}`, true);
         if (cached) {
             user.scopes = cached;
             return true;

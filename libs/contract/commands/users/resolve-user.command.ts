@@ -12,11 +12,12 @@ export namespace ResolveUserCommand {
         'post',
         'Resolve a user',
         { scope: 'resolve', kind: 'read' },
+        'Resolve a user by ID, Short UUID or username. Exactly one of the fields must be provided.',
     );
 
     export const RequestBodySchema = z
         .object({
-            uuid: z.uuid().optional(),
+            uuid: z.uuid().optional().meta({ deprecated: true }),
             id: z.number().optional(),
             shortUuid: z.string().optional(),
             username: z.string().optional(),
@@ -29,16 +30,16 @@ export namespace ResolveUserCommand {
                 return provided.length === 1;
             },
             {
-                error: 'Exactly one of uuid, id, shortUuid, or username must be provided'
+                error: 'Exactly one of uuid, id, shortUuid, or username must be provided',
             },
         );
 
     export const ResponseSchema = z.object({
         response: z.object({
-            uuid: z.uuid(),
-            username: z.string(),
             id: z.number(),
+            username: z.string(),
             shortUuid: z.string(),
+            uuid: z.uuid().meta({ deprecated: true }),
         }),
     });
 
