@@ -1,19 +1,22 @@
-import type { INodeMetrics } from './node-metrics.message.interface';
-
+import { InjectRedis } from '@songkeys/nestjs-redis';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import Redis from 'ioredis';
 import { Counter } from 'prom-client';
 
-import { Controller, Logger } from '@nestjs/common';
-import { EventPattern } from '@nestjs/microservices';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 
-import { MESSAGING_NAMES } from '@common/microservices';
 import { METRIC_NAMES } from '@libs/contracts/constants';
 
-@Controller()
-export class NodesMetricMessageController {
-    private readonly logger = new Logger(NodesMetricMessageController.name);
+import { INodeMetrics, NODE_METRICS_MESSAGE_CHANNEL } from './node-metrics.message.interface';
+
+@Injectable()
+export class NodeMetricsSubscriber implements OnModuleInit, OnModuleDestroy {
+    private readonly logger = new Logger(NodeMetricsSubscriber.name);
+
+    private subscriber: Redis;
 
     constructor(
+        @InjectRedis() private readonly redis: Redis,
         @InjectMetric(METRIC_NAMES.NODE_INBOUND_UPLOAD_BYTES)
         public nodeInboundUploadBytes: Counter<string>,
         @InjectMetric(METRIC_NAMES.NODE_INBOUND_DOWNLOAD_BYTES)
@@ -24,10 +27,28 @@ export class NodesMetricMessageController {
         public nodeOutboundDownloadBytes: Counter<string>,
     ) {}
 
-    @EventPattern(MESSAGING_NAMES.NODE_METRICS)
-    async handleNodesMetricMessage(message: INodeMetrics) {
+    async onModuleInit() {
+        this.subscriber = this.redis.duplicate();
+
+        this.subscriber.on('error', (err) => {
+            this.logger.error(`Node metrics subscriber error: ${err.message}`);
+        });
+
+        this.subscriber.on('message', (_channel, message) => {
+            void this.handleNodeMetricsMessage(message);
+        });
+
+        const count = await this.subscriber.subscribe(NODE_METRICS_MESSAGE_CHANNEL);
+        this.logger.log(
+            `Subscribed to ${NODE_METRICS_MESSAGE_CHANNEL} (active subscriptions: ${count})`,
+        );
+    }
+
+    private handleNodeMetricsMessage(value: string) {
         try {
-            const { nodeUuid, inbounds, outbounds } = message;
+            const nodeMetrics = JSON.parse(value) as INodeMetrics;
+
+            const { nodeUuid, inbounds, outbounds } = nodeMetrics;
 
             inbounds.forEach((inbound) => {
                 this.nodeInboundUploadBytes.inc(
@@ -64,12 +85,12 @@ export class NodesMetricMessageController {
                     Number(outbound.downlink),
                 );
             });
-
-            return;
         } catch (error) {
-            this.logger.error(`Error in handle: ${error}`);
-
-            return;
+            this.logger.error(`Error handling node metrics message: ${error}`);
         }
+    }
+
+    async onModuleDestroy() {
+        await this.subscriber.quit();
     }
 }
