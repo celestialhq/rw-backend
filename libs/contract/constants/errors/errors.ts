@@ -453,11 +453,6 @@ export const ERRORS = {
         message: 'Activate all inbounds error',
         httpCode: 500,
     },
-    GET_NODES_USER_USAGE_BY_RANGE_ERROR: {
-        code: 'A094',
-        message: 'Get nodes user usage by range error',
-        httpCode: 500,
-    },
     CREATE_HWID_USER_DEVICE_ERROR: {
         code: 'A096',
         message: 'Create hwid user device error',
@@ -1158,5 +1153,20 @@ export const ERRORS = {
             message,
             httpCode: 500,
         }),
+    },
+    GET_INTERNAL_SQUAD_USAGE_ERROR: {
+        code: 'A232',
+        message: 'Get internal squad usage error',
+        httpCode: 500,
+    },
+    ADD_MANY_USERS_TO_INTERNAL_SQUAD_ERROR: {
+        code: 'A233',
+        message: 'Add many users to internal squad error',
+        httpCode: 500,
+    },
+    REMOVE_MANY_USERS_FROM_INTERNAL_SQUAD_ERROR: {
+        code: 'A234',
+        message: 'Remove many users from internal squad error',
+        httpCode: 500,
     },
 } as const;

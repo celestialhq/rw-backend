@@ -16,7 +16,8 @@ export class GetStatsNodesUsersUsageResponseModel {
         this.categories = data.categories;
         this.sparklineData = data.sparklineData;
         this.topUsers = data.topUsers.map((item) => ({
-            color: colorFromUuid(item.uuid),
+            color: colorFromUuid(item.userId.toString()),
+            userId: Number(item.userId),
             username: item.username,
             total: Number(item.total),
         }));

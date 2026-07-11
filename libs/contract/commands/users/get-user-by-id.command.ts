@@ -2,21 +2,22 @@ import { z } from 'zod';
 
 import { REST_API, USERS_ROUTES } from '../../api';
 import { getEndpointDetails } from '../../constants';
+import { numberParamSchema } from '../../models';
 import { UserResponseSchema } from './user.response';
 
-export namespace GetUserByUuidCommand {
-    export const url = REST_API.USERS.GET_BY_UUID;
-    export const TSQ_url = url(':uuid');
+export namespace GetUserByIdCommand {
+    export const url = REST_API.USERS.GET_BY_ID;
+    export const TSQ_url = url(':userId');
 
     export const endpointDetails = getEndpointDetails(
-        USERS_ROUTES.GET_BY_UUID(':uuid'),
+        USERS_ROUTES.GET_BY_ID(':userId'),
         'get',
-        'Get user by UUID',
-        { scope: 'by-uuid', kind: 'read' },
+        'Get user by ID',
+        { scope: 'by-id', kind: 'read' },
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.uuid(),
+        userId: numberParamSchema,
     });
 
     export const ResponseSchema = UserResponseSchema;

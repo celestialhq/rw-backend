@@ -11,6 +11,8 @@ const SCOPE_MIGRATION_MAP: [string, string][] = [
     ['ip-control:fetch-users-ips', 'connections:by-node'],
     ['ip-control:fetch-users-ips-result', 'connections:by-node-result'],
     ['ip-control:drop-connections', 'connections:drop'],
+    ['users:by-uuid', 'users:by-id'],
+    ['subscriptions:by-uuid', 'subscriptions:by-id'],
 ];
 
 export async function migrateScopes(prisma: PrismaClient) {

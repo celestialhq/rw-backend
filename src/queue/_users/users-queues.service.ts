@@ -84,30 +84,30 @@ export class UsersQueuesService implements OnApplicationBootstrap {
         );
     }
 
-    public async resetUserTrafficBulk(uuids: string[]) {
+    public async resetUserTrafficBulk(userIds: number[]) {
         return this.modifyManyUsersQueue.addBulk(
-            uuids.map((uuid) => ({
+            userIds.map((userId) => ({
                 name: USERS_JOB_NAMES.RESET_MANY_USERS_TRAFFIC,
-                data: { uuid },
+                data: { userId },
             })),
         );
     }
 
-    public async revokeUsersSubscriptionBulk(uuids: string[]) {
+    public async revokeUsersSubscriptionBulk(userIds: number[]) {
         return this.modifyManyUsersQueue.addBulk(
-            uuids.map((uuid) => ({
+            userIds.map((userId) => ({
                 name: USERS_JOB_NAMES.REVOKE_MANY_USERS_SUBSCRIPTION,
-                data: { uuid },
+                data: { userId },
             })),
         );
     }
 
     public async updateUsersBulk(dto: BulkUpdateUsersBodyDto) {
         return this.modifyManyUsersQueue.addBulk(
-            dto.uuids.map((uuid) => ({
+            dto.userIds.map((userId) => ({
                 name: USERS_JOB_NAMES.UPDATE_MANY_USERS,
                 data: {
-                    uuid,
+                    userId,
                     fields: {
                         ...dto.fields,
                         trafficLimitBytes:

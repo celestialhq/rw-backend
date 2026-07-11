@@ -229,6 +229,7 @@ model NodesUserUsageHistory {
   user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
 
   @@id([nodeId, createdAt, userId])
+  @@index([userId, createdAt])
   @@map("nodes_user_usage_history")
 }
 

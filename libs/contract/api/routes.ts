@@ -89,40 +89,37 @@ export const REST_API = {
         UPDATE: `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.UPDATE}`,
         GET: `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET}`,
         STREAM: `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.STREAM}`,
-        DELETE: (uuid: string) =>
-            `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.DELETE(uuid)}`,
+        DELETE: (userId: string) =>
+            `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.DELETE(userId)}`,
 
-        GET_BY_UUID: (uuid: string) =>
-            `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY_UUID(uuid)}`,
-        ACCESSIBLE_NODES: (uuid: string) =>
-            `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACCESSIBLE_NODES(uuid)}`,
-        SUBSCRIPTION_REQUEST_HISTORY: (uuid: string) =>
+        GET_BY_ID: (userId: string) =>
+            `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY_ID(userId)}`,
+        ACCESSIBLE_NODES: (userId: string) =>
+            `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACCESSIBLE_NODES(userId)}`,
+        SUBSCRIPTION_REQUEST_HISTORY: (userId: string) =>
             `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.SUBSCRIPTION_REQUEST_HISTORY(
-                uuid,
+                userId,
             )}`,
 
         ACTIONS: {
-            DISABLE: (uuid: string) =>
+            DISABLE: (userId: string) =>
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACTIONS.DISABLE(
-                    uuid,
+                    userId,
                 )}`,
-            ENABLE: (uuid: string) =>
+            ENABLE: (userId: string) =>
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACTIONS.ENABLE(
-                    uuid,
+                    userId,
                 )}`,
-            RESET_TRAFFIC: (uuid: string) =>
+            RESET_TRAFFIC: (userId: string) =>
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACTIONS.RESET_TRAFFIC(
-                    uuid,
+                    userId,
                 )}`,
-            REVOKE_SUBSCRIPTION: (uuid: string) =>
+            REVOKE_SUBSCRIPTION: (userId: string) =>
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACTIONS.REVOKE_SUBSCRIPTION(
-                    uuid,
+                    userId,
                 )}`,
         },
-
         GET_BY: {
-            ID: (id: string) =>
-                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.ID(id)}`,
             SHORT_UUID: (shortUuid: string) =>
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.GET_BY.SHORT_UUID(
                     shortUuid,
@@ -223,9 +220,9 @@ export const REST_API = {
     HWID: {
         GET_ALL_HWID_DEVICES: `${ROOT}/${CONTROLLERS.HWID_CONTROLLER}/${CONTROLLERS.HWID_ROUTES.GET_ALL_HWID_DEVICES}`,
         CREATE_USER_HWID_DEVICE: `${ROOT}/${CONTROLLERS.HWID_CONTROLLER}/${CONTROLLERS.HWID_ROUTES.CREATE_USER_HWID_DEVICE}`,
-        GET_USER_HWID_DEVICES: (userUuid: string) =>
+        GET_USER_HWID_DEVICES: (userId: string) =>
             `${ROOT}/${CONTROLLERS.HWID_CONTROLLER}/${CONTROLLERS.HWID_ROUTES.GET_USER_HWID_DEVICES(
-                userUuid,
+                userId,
             )}`,
         DELETE_USER_HWID_DEVICE: `${ROOT}/${CONTROLLERS.HWID_CONTROLLER}/${CONTROLLERS.HWID_ROUTES.DELETE_USER_HWID_DEVICE}`,
         DELETE_ALL_USER_HWID_DEVICES: `${ROOT}/${CONTROLLERS.HWID_CONTROLLER}/${CONTROLLERS.HWID_ROUTES.DELETE_ALL_USER_HWID_DEVICES}`,
@@ -239,10 +236,6 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_BY.USERNAME(
                     username,
                 )}`,
-            UUID: (uuid: string) =>
-                `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_BY.UUID(
-                    uuid,
-                )}`,
             SHORT_UUID: (shortUuid: string) =>
                 `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_BY.SHORT_UUID(
                     shortUuid,
@@ -251,6 +244,10 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_BY.SHORT_UUID_RAW(
                     shortUuid,
                 )}`,
+            ID: (userId: string) =>
+                `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_BY.ID(
+                    userId,
+                )}`,
         },
         SUBPAGE: {
             GET_CONFIG: (shortUuid: string) =>
@@ -258,9 +255,9 @@ export const REST_API = {
                     shortUuid,
                 )}`,
         },
-        GET_CONNECTION_KEYS_BY_UUID: (uuid: string) =>
-            `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_CONNECTION_KEYS_BY_UUID(
-                uuid,
+        GET_CONNECTION_KEYS_BY_USER_ID: (userId: string) =>
+            `${ROOT}/${CONTROLLERS.SUBSCRIPTIONS_CONTROLLER}/${CONTROLLERS.SUBSCRIPTIONS_ROUTES.GET_CONNECTION_KEYS_BY_USER_ID(
+                userId,
             )}`,
     },
     CONFIG_PROFILES: {
@@ -309,6 +306,10 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.INTERNAL_SQUADS_CONTROLLER}/${CONTROLLERS.INTERNAL_SQUADS_ROUTES.BULK_ACTIONS.ADD_USERS(uuid)}`,
             REMOVE_USERS: (uuid: string) =>
                 `${ROOT}/${CONTROLLERS.INTERNAL_SQUADS_CONTROLLER}/${CONTROLLERS.INTERNAL_SQUADS_ROUTES.BULK_ACTIONS.REMOVE_USERS(uuid)}`,
+            ADD_MANY_USERS: (uuid: string) =>
+                `${ROOT}/${CONTROLLERS.INTERNAL_SQUADS_CONTROLLER}/${CONTROLLERS.INTERNAL_SQUADS_ROUTES.BULK_ACTIONS.ADD_MANY_USERS(uuid)}`,
+            REMOVE_MANY_USERS: (uuid: string) =>
+                `${ROOT}/${CONTROLLERS.INTERNAL_SQUADS_CONTROLLER}/${CONTROLLERS.INTERNAL_SQUADS_ROUTES.BULK_ACTIONS.REMOVE_MANY_USERS(uuid)}`,
         },
         ACTIONS: {
             REORDER: `${ROOT}/${CONTROLLERS.INTERNAL_SQUADS_CONTROLLER}/${CONTROLLERS.INTERNAL_SQUADS_ROUTES.ACTIONS.REORDER}`,
@@ -409,25 +410,22 @@ export const REST_API = {
             GET_USERS: (uuid: string) =>
                 `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_NODES_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.NODES.GET_USERS(uuid)}`,
             GET_USERS_BY_NODES: `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_NODES_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.NODES.GET_USERS_BY_NODES}`,
+            GET_USAGE: `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_NODES_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.NODES.GET_USAGE}`,
         },
         USERS: {
-            GET_BY_UUID: (uuid: string) =>
-                `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_USERS_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.USERS.GET_BY_UUID(uuid)}`,
+            GET_BY_ID: (userId: string) =>
+                `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_USERS_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.USERS.GET_BY_ID(userId)}`,
         },
-        LEGACY: {
-            NODES: {
-                GET_USERS: (uuid: string) =>
-                    `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_NODES_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.LEGACY.NODES.GET_USERS(uuid)}`,
-            },
-            USERS: {
-                GET_BY_UUID: (uuid: string) =>
-                    `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_USERS_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.LEGACY.USERS.GET_BY_UUID(uuid)}`,
-            },
+        INTERNAL_SQUADS: {
+            GET_USAGE: (uuid: string) =>
+                `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_INTERNAL_SQUADS_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.INTERNAL_SQUADS.GET_USAGE(uuid)}`,
+            USER_USAGE: (squadUuid: string, userId: string) =>
+                `${ROOT}/${CONTROLLERS.BANDWIDTH_STATS_CONTROLLER}/${CONTROLLERS.BANDWIDTH_STATS_INTERNAL_SQUADS_ROUTE}/${CONTROLLERS.BANDWIDTH_STATS_ROUTES.INTERNAL_SQUADS.USER_USAGE(squadUuid, userId)}`,
         },
     },
     CONNECTIONS: {
-        CONNECTIONS_BY_USER: (uuid: string) =>
-            `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_USER(uuid)}`,
+        CONNECTIONS_BY_USER: (userId: string) =>
+            `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_USER(userId)}`,
         CONNECTIONS_BY_USER_RESULT: (jobId: string) =>
             `${ROOT}/${CONTROLLERS.CONNECTIONS_CONTROLLER}/${CONTROLLERS.CONNECTIONS_ROUTES.CONNECTIONS_BY_USER_RESULT(jobId)}`,
         CONNECTIONS_BY_NODE: (uuid: string) =>
@@ -444,10 +442,10 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.METADATA_CONTROLLER}/${CONTROLLERS.METADATA_ROUTES.NODE.UPSERT(uuid)}`,
         },
         USER: {
-            GET: (uuid: string) =>
-                `${ROOT}/${CONTROLLERS.METADATA_CONTROLLER}/${CONTROLLERS.METADATA_ROUTES.USER.GET(uuid)}`,
-            UPSERT: (uuid: string) =>
-                `${ROOT}/${CONTROLLERS.METADATA_CONTROLLER}/${CONTROLLERS.METADATA_ROUTES.USER.UPSERT(uuid)}`,
+            GET: (userId: string) =>
+                `${ROOT}/${CONTROLLERS.METADATA_CONTROLLER}/${CONTROLLERS.METADATA_ROUTES.USER.GET(userId)}`,
+            UPSERT: (userId: string) =>
+                `${ROOT}/${CONTROLLERS.METADATA_CONTROLLER}/${CONTROLLERS.METADATA_ROUTES.USER.UPSERT(userId)}`,
         },
     },
 } as const;

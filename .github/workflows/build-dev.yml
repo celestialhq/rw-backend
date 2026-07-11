@@ -10,7 +10,7 @@ on:
 env:
   REGISTRY_IMAGE: remnawave/backend
   GHCR_IMAGE: ghcr.io/remnawave/backend
-  IMAGE_TAG: dev
+  IMAGE_TAG: unstable
 
 jobs:
   send-tg-msg:

@@ -216,10 +216,7 @@ export class NodesQueuesService implements OnApplicationBootstrap {
         );
     }
 
-    public async connectionsByUser(payload: {
-        userId: string;
-        userUuid: string;
-    }): Promise<{ jobId: string } | null> {
+    public async connectionsByUser(payload: { userId: number }): Promise<{ jobId: string } | null> {
         const result = await this.queryNodesQueue.add(
             NODES_JOB_NAMES.CONNECTIONS_BY_USER,
             payload,

@@ -13,6 +13,7 @@ import { GetNodeByUuidQuery } from '@modules/nodes/queries/get-node-by-uuid';
 
 import { QUEUES_NAMES } from '../../queue.enum';
 import { NODES_JOB_NAMES } from '../constants';
+import { IGetIpsListResult } from '../interfaces';
 
 @Processor(
     {
@@ -47,7 +48,7 @@ export class QueryNodesQueueProcessor extends WorkerHost {
         }
     }
 
-    private async handleConnectionsByUser(job: Job<{ userId: string; userUuid: string }>) {
+    private async handleConnectionsByUser(job: Job<{ userId: number }>) {
         try {
             const findNodesByCriteriaResult = await this.queryBus.execute(
                 new FindNodesByCriteriaQuery({
@@ -61,7 +62,6 @@ export class QueryNodesQueueProcessor extends WorkerHost {
                 return {
                     success: false,
                     userId: job.data.userId,
-                    userUuid: job.data.userUuid,
                     nodes: [],
                 };
             }
@@ -72,7 +72,6 @@ export class QueryNodesQueueProcessor extends WorkerHost {
                 return {
                     success: true,
                     userId: job.data.userId,
-                    userUuid: job.data.userUuid,
                     nodes: [],
                 };
             }
@@ -82,7 +81,7 @@ export class QueryNodesQueueProcessor extends WorkerHost {
             const mapper = async (node: NodesEntity) => {
                 try {
                     const ipsListResponse = await this.axios.getIpsList(
-                        { userId: job.data.userId },
+                        { userId: job.data.userId.toString() },
                         {
                             address: node.address,
                             port: node.port,
@@ -136,15 +135,13 @@ export class QueryNodesQueueProcessor extends WorkerHost {
             return {
                 success: true,
                 userId: job.data.userId,
-                userUuid: job.data.userUuid,
                 nodes: result,
-            };
+            } satisfies IGetIpsListResult['result'];
         } catch (error) {
             this.logger.error(`Failed to fetch IPs list: ${error}`);
             return {
                 success: false,
                 userId: job.data.userId,
-                userUuid: job.data.userUuid,
                 nodes: [],
             };
         }

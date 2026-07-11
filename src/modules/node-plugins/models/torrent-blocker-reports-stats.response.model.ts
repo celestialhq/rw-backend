@@ -26,8 +26,8 @@ export class TorrentBlockerReportsStatsResponseModel {
     }) {
         this.stats = data.stats;
         this.topUsers = data.topUsers.map((item) => ({
-            uuid: item.uuid,
-            color: colorFromUuid(item.uuid),
+            userId: Number(item.userId),
+            color: colorFromUuid(item.userId.toString()),
             username: item.username,
             total: Number(item.total),
         }));

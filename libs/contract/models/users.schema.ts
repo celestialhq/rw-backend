@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { RESET_PERIODS, USERS_STATUS } from '../constants';
 
 export const UsersSchema = z.object({
-    uuid: z.uuid(),
     id: z.number(),
     shortUuid: z.string(),
     username: z.string(),
