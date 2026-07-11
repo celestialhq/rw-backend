@@ -1,12 +1,14 @@
 import { InjectRedis } from '@songkeys/nestjs-redis';
 import Redis, { ChainableCommander, ScanStream } from 'ioredis';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { MemoryCacheService } from './memory-cache.service';
 
 @Injectable()
 export class RawCacheService {
+    private readonly logger = new Logger(RawCacheService.name);
+
     constructor(
         @InjectRedis() private readonly redis: Redis,
         private readonly memoryCacheService: MemoryCacheService,
@@ -172,5 +174,11 @@ export class RawCacheService {
             rows.forEach((r) => result.set(opts.rowId(r), opts.toValue(r)));
         }
         return result;
+    }
+
+    publishSafe(channel: string, message: unknown): void {
+        void this.redis
+            .publish(channel, JSON.stringify(message))
+            .catch((e) => this.logger.error(`publish ${channel} failed: ${e}`));
     }
 }
