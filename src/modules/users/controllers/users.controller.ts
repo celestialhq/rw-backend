@@ -22,7 +22,6 @@ import {
     GetUserByIdCommand,
     GetUserByShortUuidCommand,
     GetUserByUsernameCommand,
-    GetUserByUuidCommand,
     GetUsersStreamCommand,
     GetUserSubscriptionRequestHistoryCommand,
     ResetUserTrafficCommand,
@@ -43,7 +42,6 @@ import {
     GetUserAccessibleNodesResponseDto,
     GetUserByShortUuidParamDto,
     GetUserByUsernameParamDto,
-    GetUserByUuidParamDto,
     GetUsersStreamQueryDto,
     GetUsersStreamResponseDto,
     GetUserSubscriptionRequestHistoryParamDto,
@@ -115,7 +113,7 @@ export class UsersController {
         httpCode: HttpStatus.NO_CONTENT,
     })
     async deleteUser(@Param() param: DeleteUserParamDto) {
-        const result = await this.usersService.deleteUser(param.uuid);
+        const result = await this.usersService.deleteUser(param.userId);
 
         errorHandler(result);
         return;
@@ -195,7 +193,7 @@ export class UsersController {
     async getUserAccessibleNodes(
         @Param() param: GetUserAccessibleNodesParamDto,
     ): Promise<GetUserAccessibleNodesResponseDto> {
-        const result = await this.usersService.getUserAccessibleNodes(param.uuid);
+        const result = await this.usersService.getUserAccessibleNodes(param.userId);
 
         const data = errorHandler(result);
         return {
@@ -211,7 +209,7 @@ export class UsersController {
     async getUserSubscriptionRequestHistory(
         @Param() param: GetUserSubscriptionRequestHistoryParamDto,
     ): Promise<GetUserSubscriptionRequestHistoryResponseDto> {
-        const result = await this.usersService.getUserSubscriptionRequestHistory(param.uuid);
+        const result = await this.usersService.getUserSubscriptionRequestHistory(param.userId);
 
         const data = errorHandler(result);
         return {
@@ -243,12 +241,14 @@ export class UsersController {
     }
 
     @Endpoint({
-        command: GetUserByUuidCommand,
+        command: GetUserByIdCommand,
         httpCode: HttpStatus.OK,
         type: UserResponseDto,
     })
-    async getUserByUuid(@Param() param: GetUserByUuidParamDto): Promise<UserResponseDto> {
-        const result = await this.usersService.getUserByUniqueFields({ uuid: param.uuid });
+    async getUserById(@Param() param: GetUserByIdParamDto): Promise<UserResponseDto> {
+        const result = await this.usersService.getUserByUniqueFields({
+            tId: BigInt(param.userId),
+        });
 
         const data = errorHandler(result);
         return {
@@ -272,25 +272,7 @@ export class UsersController {
         };
     }
 
-    @Endpoint({
-        command: GetUserByIdCommand,
-        httpCode: HttpStatus.OK,
-        type: UserResponseDto,
-    })
-    async getUserById(@Param() param: GetUserByIdParamDto): Promise<UserResponseDto> {
-        const result = await this.usersService.getUserByUniqueFields({
-            tId: BigInt(param.id),
-        });
-
-        const data = errorHandler(result);
-        return {
-            response: new GetFullUserResponseModel(data, this.subPublicDomain),
-        };
-    }
-
     /* actions methods
-
-
 
 
     */
@@ -304,7 +286,7 @@ export class UsersController {
         @Param() param: RevokeUserSubscriptionParamDto,
         @Body() body: RevokeUserSubscriptionBodyDto,
     ): Promise<UserResponseDto> {
-        const result = await this.usersService.revokeUserSubscription(param.uuid, body);
+        const result = await this.usersService.revokeUserSubscription(param.userId, body);
 
         const data = errorHandler(result);
         return {
@@ -318,7 +300,7 @@ export class UsersController {
         type: UserResponseDto,
     })
     async disableUser(@Param() param: DisableUserParamDto): Promise<UserResponseDto> {
-        const result = await this.usersService.disableUser(param.uuid);
+        const result = await this.usersService.disableUser(param.userId);
 
         const data = errorHandler(result);
         return {
@@ -332,7 +314,7 @@ export class UsersController {
         type: UserResponseDto,
     })
     async enableUser(@Param() param: EnableUserParamDto): Promise<UserResponseDto> {
-        const result = await this.usersService.enableUser(param.uuid);
+        const result = await this.usersService.enableUser(param.userId);
 
         const data = errorHandler(result);
         return {
@@ -346,7 +328,7 @@ export class UsersController {
         type: UserResponseDto,
     })
     async resetUserTraffic(@Param() param: ResetUserTrafficParamDto): Promise<UserResponseDto> {
-        const result = await this.usersService.resetUserTraffic(param.uuid);
+        const result = await this.usersService.resetUserTraffic(param.userId);
 
         const data = errorHandler(result);
         return {

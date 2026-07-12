@@ -7,6 +7,7 @@ import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
 import { CACHE_KEYS, TSubscriptionTemplateType } from '@libs/contracts/constants';
 import { ERRORS } from '@libs/contracts/constants/errors';
+import { ResolvedProxyConfigSchema } from '@libs/contracts/models';
 
 import { SquadsQueueService } from '@queue/_squads';
 
@@ -103,6 +104,24 @@ export class ExternalSquadService {
 
             if (!externalSquad) {
                 return fail(ERRORS.EXTERNAL_SQUAD_NOT_FOUND);
+            }
+
+            if (dto.customRemarks) {
+                for (const [status, remarks] of Object.entries(dto.customRemarks)) {
+                    for (const remark of remarks) {
+                        if (remark.trim().startsWith('{')) {
+                            try {
+                                ResolvedProxyConfigSchema.parse(JSON.parse(remark));
+                            } catch (error) {
+                                return fail(
+                                    ERRORS.CUSTOM_RAW_REMARK_VALIDATION_ERROR.withMessage(
+                                        `${status}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                                    ),
+                                );
+                            }
+                        }
+                    }
+                }
             }
 
             await this.externalSquadRepository.update({

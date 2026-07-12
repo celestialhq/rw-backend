@@ -19,11 +19,11 @@ import { UserHwidDeviceEvent } from '@integration-modules/notifications/interfac
 
 import { ExternalSquadEntity } from '@modules/external-squads/entities/external-squad.entity';
 import { GetCachedExternalSquadSettingsQuery } from '@modules/external-squads/queries/get-cached-external-squad-settings';
-import { GetTemplateNameQuery } from '@modules/external-squads/queries/get-template-name';
+import { GetCachedTemplateNameQuery } from '@modules/external-squads/queries/get-template-name';
 import { CreateWithAdvisoryLockCommand } from '@modules/hwid-user-devices/commands/create-with-advisory-lock';
 import { HwidUserDeviceEntity } from '@modules/hwid-user-devices/entities/hwid-user-device.entity';
 import { CheckHwidExistsQuery } from '@modules/hwid-user-devices/queries/check-hwid-exists';
-import { ISRRContext } from '@modules/subscription-response-rules/interfaces';
+import type { ISRRContext } from '@modules/subscription-response-rules/interfaces';
 import { ResponseRulesMatcherService } from '@modules/subscription-response-rules/services/response-rules-matcher.service';
 import { SubscriptionSettingsEntity } from '@modules/subscription-settings/entities/subscription-settings.entity';
 import { GetCachedSubscriptionSettingsQuery } from '@modules/subscription-settings/queries/get-cached-subscrtipion-settings';
@@ -122,7 +122,7 @@ export class SubscriptionService {
                     }
 
                     const templateName = await this.queryBus.execute(
-                        new GetTemplateNameQuery(
+                        new GetCachedTemplateNameQuery(
                             user.response.externalSquadUuid,
                             templateTypeMatcher,
                         ),
@@ -281,7 +281,7 @@ export class SubscriptionService {
 
     public async getRawSubscriptionByShortUuid(
         shortUuid: string,
-        userAgent: string,
+        userAgent: string | undefined,
         withDisabledHosts: boolean,
         hwidHeaders: HwidHeaders | null,
         requestIp?: string,
@@ -319,7 +319,7 @@ export class SubscriptionService {
 
             const headers = this.getUserProfileHeadersInfo(
                 user,
-                userAgent.startsWith('Happ/'),
+                userAgent?.startsWith('Happ/') ?? false,
                 patchedSettingEntity,
             );
 
@@ -658,7 +658,7 @@ export class SubscriptionService {
         subscriptionSettings: SubscriptionSettingsEntity;
         hostsOverrides: ExternalSquadEntity['hostOverrides'] | undefined;
     }> {
-        let patchedSubscriptionSettings: SubscriptionSettingsEntity = subscriptionSettings;
+        let patchedSubscriptionSettings = subscriptionSettings;
 
         try {
             let hostsOverrides: ExternalSquadEntity['hostOverrides'] | undefined = undefined;
@@ -669,6 +669,8 @@ export class SubscriptionService {
                 );
 
                 if (externalSquadSubscriptionSettings !== null) {
+                    patchedSubscriptionSettings = structuredClone(subscriptionSettings);
+
                     // Host overrides
                     if (hasContent(externalSquadSubscriptionSettings.hostOverrides)) {
                         hostsOverrides = externalSquadSubscriptionSettings.hostOverrides;
@@ -950,14 +952,14 @@ export class SubscriptionService {
         }
     }
 
-    public async getConnectionKeysByUuid(
-        uuid: string,
+    public async getConnectionKeysByUserId(
+        userId: number,
     ): Promise<TResult<ConnectionKeysResponseModel>> {
         try {
             const userResult = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        uuid,
+                        tId: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,

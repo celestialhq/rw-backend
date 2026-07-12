@@ -5,9 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
-  // previewFeatures = ["queryCompiler", "driverAdapters", "views"]
+  provider = "prisma-client-js"
 }
 
 generator kysely {
@@ -71,8 +69,8 @@ model Users {
   externalSquadUuid      String?   @map("external_squad_uuid") @db.Uuid
   lastTriggeredThreshold Int       @default(0) @map("last_triggered_threshold")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   nodesUserUsageHistory          NodesUserUsageHistory[]
   hwidUserDevices                HwidUserDevices[]
@@ -108,11 +106,11 @@ model UserTraffic {
 model ApiTokens {
   uuid     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name     String   @map("name")
-  expireAt DateTime @default(dbgenerated("now() + interval '99999 days'")) @map("expire_at")
+  expireAt DateTime @map("expire_at")
   scopes   String[] @default(["*"]) @map("scopes")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("api_tokens")
 }
@@ -123,8 +121,8 @@ model Admin {
   passwordHash String @map("password_hash")
   role         String @map("role")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   passkeys Passkeys[]
 
@@ -143,8 +141,8 @@ model Passkeys {
 
   admin Admin @relation(fields: [adminUuid], references: [uuid], onDelete: Cascade)
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@index([id])
   @@index([adminUuid])
@@ -160,8 +158,8 @@ model Keygen {
   clientCert String? @map("client_cert")
   clientKey  String? @map("client_key")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("keygen")
 }
@@ -200,8 +198,8 @@ model Nodes {
   countryCode  String   @default("XX") @map("country_code")
   tags         String[] @default([]) @map("tags")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   nodesUserUsageHistory        NodesUserUsageHistory[]
   nodesUsageHistory            NodesUsageHistory[]
@@ -227,12 +225,13 @@ model NodesUserUsageHistory {
   totalBytes BigInt @map("total_bytes")
 
   createdAt DateTime @default(dbgenerated("CURRENT_DATE")) @map("created_at") @db.Date
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   node Nodes @relation(fields: [nodeId], references: [id], onDelete: Cascade)
   user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
 
   @@id([nodeId, createdAt, userId])
+  @@index([userId, createdAt])
   @@map("nodes_user_usage_history")
 }
 
@@ -242,8 +241,8 @@ model NodesUsageHistory {
   uploadBytes   BigInt @map("upload_bytes")
   totalBytes    BigInt @map("total_bytes")
 
-  createdAt DateTime @default(dbgenerated("date_trunc('hour', now())")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(dbgenerated("date_trunc('hour'::text, now())")) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   node Nodes @relation(fields: [nodeUuid], references: [uuid], onDelete: Cascade)
 
@@ -317,8 +316,8 @@ model SubscriptionTemplate {
   templateYaml String? @map("template_yaml")
   templateJson Json?   @map("template_json")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   externalSquadsTemplates ExternalSquadsTemplates[]
   hosts                   Hosts[]
@@ -343,14 +342,14 @@ model SubscriptionSettings {
   responseRules               Json?   @map("response_rules")
   hwidSettings                Json?   @map("hwid_settings")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("subscription_settings")
 }
 
 model HwidUserDevices {
-  hwid        String  @map("hwid")
+  hwid        String  @map("hwid") @db.VarChar(64)
   userId      BigInt  @map("user_id")
   platform    String? @map("platform")
   osVersion   String? @map("os_version")
@@ -360,8 +359,8 @@ model HwidUserDevices {
 
   user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@id([hwid, userId])
   @@index([userId])
@@ -373,8 +372,8 @@ model InternalSquads {
   viewPosition Int    @default(autoincrement()) @map("view_position")
   name         String @unique @map("name")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   internalSquadMembers  InternalSquadMembers[]
   internalSquadInbounds InternalSquadInbounds[]
@@ -413,8 +412,8 @@ model ConfigProfiles {
   name         String @unique @map("name")
   config       Json   @map("config")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   nodes                 Nodes[]
   configProfileInbounds ConfigProfileInbounds[]
@@ -463,8 +462,8 @@ model InfraProviders {
   faviconLink String? @map("favicon_link")
   loginUrl    String? @map("login_url")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   infraBillingNodes   InfraBillingNodes[]
   infraBillingHistory InfraBillingHistory[]
@@ -485,8 +484,8 @@ model InfraBillingNodes {
   provider InfraProviders @relation(fields: [providerUuid], references: [uuid], onDelete: Cascade)
   node     Nodes?         @relation(fields: [nodeUuid], references: [uuid], onDelete: Cascade)
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@unique([nodeUuid, providerUuid])
   @@index([nextBillingAt])
@@ -510,7 +509,7 @@ model UserSubscriptionRequestHistory {
   userId    BigInt   @map("user_id")
   requestIp String?  @map("request_ip")
   userAgent String?  @map("user_agent")
-  requestAt DateTime @default(dbgenerated("now()")) @map("request_at")
+  requestAt DateTime @default(now()) @map("request_at")
 
   user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
 
@@ -533,7 +532,7 @@ model ConfigProfileSnippets {
   name    String @id @map("name") @db.VarChar(255)
   snippet Json   @map("snippet")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("config_profile_snippets")
 }
@@ -551,8 +550,8 @@ model ExternalSquads {
 
   subpageConfigUuid String? @map("subpage_config_uuid") @db.Uuid
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   externalSquadsTemplates ExternalSquadsTemplates[]
   users                   Users[]
@@ -579,8 +578,8 @@ model SubscriptionPageConfig {
   name         String @unique @map("name") @db.VarChar(30)
   config       Json   @map("config")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   externalSquads ExternalSquads[]
 
@@ -593,8 +592,8 @@ model NodePlugin {
   name         String @map("name") @db.VarChar(255)
   pluginConfig Json   @map("plugin_config")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
-  updatedAt DateTime @default(dbgenerated("now()")) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   nodes Nodes[]
 
@@ -627,7 +626,7 @@ model TorrentBlockerReports {
   nodeId BigInt @map("node_id")
   report Json   @map("report")
 
-  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
   user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
   node Nodes @relation(fields: [nodeId], references: [id], onDelete: Cascade)

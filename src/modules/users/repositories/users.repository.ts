@@ -1,3 +1,11 @@
+import type {
+    IGetUserAccessibleNodes,
+    IGetUserAccessibleNodesResponse,
+    IUpdateUserDto,
+    IUserOnlineStats,
+    IUserStats,
+} from '../interfaces';
+
 import { TResetPeriods, TUsersStatus, USERS_STATUS } from '@contract/constants';
 import { Transactional, TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
@@ -24,13 +32,6 @@ import {
     UserWithResolvedInboundEntity,
 } from '../entities';
 import { UserTrafficEntity } from '../entities/user-traffic.entity';
-import {
-    IGetUserAccessibleNodes,
-    IGetUserAccessibleNodesResponse,
-    IUpdateUserDto,
-    IUserOnlineStats,
-    IUserStats,
-} from '../interfaces';
 import { UserConverter } from '../users.converter';
 
 const USERS_FILTER_COLUMN_MAP = {
@@ -40,7 +41,6 @@ const USERS_FILTER_COLUMN_MAP = {
     lastTrafficResetAt: sql.ref('users.last_traffic_reset_at'),
     subRevokedAt: sql.ref('users.sub_revoked_at'),
     telegramId: sql.ref('users.telegram_id'),
-    uuid: sql.ref('users.uuid'),
     vlessUuid: sql.ref('users.vless_uuid'),
     trojanPassword: sql.ref('users.trojan_password'),
     externalSquadUuid: sql.ref('users.external_squad_uuid'),
@@ -122,12 +122,12 @@ export class UsersRepository {
     }
 
     public async updateStatusAndTrafficAndResetAt(
-        userUuid: string,
+        tId: bigint,
         lastResetAt: Date,
         status?: TUsersStatus,
     ): Promise<void> {
         await this.prisma.tx.users.update({
-            where: { uuid: userUuid },
+            where: { tId },
             data: {
                 status,
                 lastTrafficResetAt: lastResetAt,
@@ -344,11 +344,6 @@ export class UsersRepository {
                 continue;
             }
 
-            if (filter.id === 'uuid') {
-                qb = qb.where(sql`"uuid"::text`, 'ilike', `%${filter.value}%`);
-                continue;
-            }
-
             if (filter.id === 'vlessUuid') {
                 qb = qb.where(sql`"vless_uuid"::text`, 'ilike', `%${filter.value}%`);
                 continue;
@@ -478,11 +473,11 @@ export class UsersRepository {
         return await this.findUniqueByCriteria({ tId }, { activeInternalSquads: true });
     }
 
-    public async updateUserStatus(uuid: string, status: TUsersStatus): Promise<boolean> {
+    public async updateUserStatus(tId: bigint, status: TUsersStatus): Promise<boolean> {
         const result = await this.qb.kysely
             .updateTable('users')
             .set({ status })
-            .where('uuid', '=', getKyselyUuid(uuid))
+            .where('tId', '=', tId)
             .clearReturning()
             .executeTakeFirstOrThrow();
 
@@ -490,7 +485,7 @@ export class UsersRepository {
     }
 
     public async findUniqueByCriteria(
-        dto: Partial<Pick<BaseUserEntity, 'uuid' | 'shortUuid' | 'username' | 'tId'>>,
+        dto: Partial<Pick<BaseUserEntity, 'shortUuid' | 'username' | 'tId'>>,
         includeOptions: {
             activeInternalSquads: boolean;
         } = {
@@ -505,14 +500,11 @@ export class UsersRepository {
                 qb.select((eb) => this.includeActiveInternalSquads(eb)),
             )
             .where((eb) => {
-                const conditions = [];
+                if (dto.tId !== undefined) return eb('users.tId', '=', dto.tId);
+                if (dto.username !== undefined) return eb('username', '=', dto.username);
+                if (dto.shortUuid !== undefined) return eb('shortUuid', '=', dto.shortUuid);
 
-                if (dto.uuid) conditions.push(eb('uuid', '=', getKyselyUuid(dto.uuid)));
-                if (dto.shortUuid) conditions.push(eb('shortUuid', '=', dto.shortUuid));
-                if (dto.username) conditions.push(eb('username', '=', dto.username));
-                if (dto.tId) conditions.push(eb('users.tId', '=', dto.tId));
-
-                return eb.or(conditions);
+                throw new Error('findUniqueByCriteria: no criteria provided');
             })
             .executeTakeFirst();
 
@@ -535,8 +527,8 @@ export class UsersRepository {
         return this.userConverter.fromPrismaModelToEntity(result);
     }
 
-    public async deleteByUUID(uuid: string): Promise<boolean> {
-        const result = await this.prisma.tx.users.delete({ where: { uuid } });
+    public async deleteById(userId: bigint): Promise<boolean> {
+        const result = await this.prisma.tx.users.delete({ where: { tId: userId } });
         return !!result;
     }
 
@@ -804,8 +796,10 @@ export class UsersRepository {
         }
     }
 
-    public async deleteManyByUuid(uuids: string[]): Promise<number> {
-        const result = await this.prisma.tx.users.deleteMany({ where: { uuid: { in: uuids } } });
+    public async deleteManyByUserIds(userIds: number[]): Promise<number> {
+        const result = await this.prisma.tx.users.deleteMany({
+            where: { tId: { in: userIds.map((userId) => BigInt(userId)) } },
+        });
 
         return result.count;
     }
@@ -854,8 +848,8 @@ export class UsersRepository {
         return totalUpdated;
     }
 
-    public async bulkExtendExpirationDateByUuids(
-        uuids: string[],
+    public async bulkExtendExpirationDateByUserIds(
+        userIds: number[],
         extendDays: number,
     ): Promise<number> {
         const result = await this.qb.kysely
@@ -864,23 +858,23 @@ export class UsersRepository {
                 expireAt: sql`expire_at + (${extendDays}::int || ' days')::interval`,
             })
             .where(
-                'uuid',
+                'tId',
                 'in',
-                uuids.map((uuid) => getKyselyUuid(uuid)),
+                userIds.map((userId) => BigInt(userId)),
             )
             .executeTakeFirst();
 
         return Number(result?.numUpdatedRows ?? 0n);
     }
 
-    public async bulkSyncExpiredUsersByUuids(uuids: string[]): Promise<string[]> {
+    public async bulkSyncExpiredUsersByUserIds(userIds: number[]): Promise<bigint[]> {
         const result = await this.prisma.tx.users.updateManyAndReturn({
             select: {
-                uuid: true,
+                tId: true,
             },
             where: {
-                uuid: {
-                    in: uuids,
+                tId: {
+                    in: userIds.map((userId) => BigInt(userId)),
                 },
                 status: 'EXPIRED',
                 OR: [
@@ -896,7 +890,7 @@ export class UsersRepository {
             },
         });
 
-        return result.map((user) => user.uuid);
+        return result.map((user) => user.tId);
     }
 
     public async bulkUpdateAllUsersByRange({
@@ -975,18 +969,6 @@ export class UsersRepository {
         return result.count;
     }
 
-    public async bulkUpdateUsers(
-        uuids: string[],
-        fields: Partial<BaseUserEntity>,
-    ): Promise<number> {
-        const result = await this.prisma.tx.users.updateMany({
-            where: { uuid: { in: uuids } },
-            data: fields,
-        });
-
-        return result.count;
-    }
-
     public async getAllTags(): Promise<string[]> {
         const result = await this.qb.kysely
             .selectFrom('users')
@@ -1034,30 +1016,20 @@ export class UsersRepository {
             .execute();
     }
 
-    public async getUserIdsByUuids(uuids: string[]): Promise<bigint[]> {
+    public async validateUserIds(userIds: number[] | bigint[]): Promise<bigint[]> {
         const result = await this.qb.kysely
             .selectFrom('users')
             .select('tId')
-            .where('uuid', 'in', uuids.map(getKyselyUuid))
+            .where(
+                'tId',
+                'in',
+                userIds.map((userId) => BigInt(userId)),
+            )
             .execute();
         return result.map((user) => user.tId);
     }
 
-    public async getUserIdByUuid(uuid: string): Promise<bigint | null> {
-        const result = await this.qb.kysely
-            .selectFrom('users')
-            .select('tId')
-            .where('uuid', '=', getKyselyUuid(uuid))
-            .executeTakeFirst();
-
-        if (!result) {
-            return null;
-        }
-
-        return result.tId;
-    }
-
-    public async getIdsAndHashesByUserUuids(userUuids: string[]): Promise<
+    public async getIdsAndHashesByUserIds(userIds: number[]): Promise<
         {
             tId: bigint;
             vlessUuid: string;
@@ -1066,7 +1038,11 @@ export class UsersRepository {
         return await this.qb.kysely
             .selectFrom('users')
             .select(['tId', 'vlessUuid'])
-            .where('uuid', 'in', userUuids.map(getKyselyUuid))
+            .where(
+                'tId',
+                'in',
+                userIds.map((userId) => BigInt(userId)),
+            )
             .execute();
     }
 
@@ -1110,14 +1086,12 @@ export class UsersRepository {
             .selectFrom('users')
             .select(select)
             .where((eb) => {
-                const conditions = [];
+                if (dto.tId !== undefined) return eb('users.tId', '=', dto.tId);
+                if (dto.username !== undefined) return eb('username', '=', dto.username);
+                if (dto.shortUuid !== undefined) return eb('shortUuid', '=', dto.shortUuid);
+                if (dto.uuid !== undefined) return eb('uuid', '=', getKyselyUuid(dto.uuid));
 
-                if (dto.uuid) conditions.push(eb('uuid', '=', getKyselyUuid(dto.uuid)));
-                if (dto.shortUuid) conditions.push(eb('shortUuid', '=', dto.shortUuid));
-                if (dto.username) conditions.push(eb('username', '=', dto.username));
-                if (dto.tId) conditions.push(eb('tId', '=', dto.tId));
-
-                return eb.or(conditions);
+                throw new Error('findUniqueByCriteria: no criteria provided');
             })
             .executeTakeFirst();
 
@@ -1137,7 +1111,7 @@ export class UsersRepository {
     public async revokeUserSubscription(
         dto: Pick<
             BaseUserEntity,
-            | 'uuid'
+            | 'tId'
             | 'trojanPassword'
             | 'vlessUuid'
             | 'ssPassword'
@@ -1156,14 +1130,14 @@ export class UsersRepository {
                 shortUuid: dto.shortUuid,
                 updatedAt: dto.updatedAt,
             })
-            .where('uuid', '=', getKyselyUuid(dto.uuid))
+            .where('tId', '=', dto.tId)
             .executeTakeFirst();
 
         return !!result;
     }
 
     public async getUserWithResolvedInbounds(
-        userUuid: string,
+        tId: bigint,
     ): Promise<UserWithResolvedInboundEntity | null> {
         const result = await this.qb.kysely
             .selectFrom('users')
@@ -1205,7 +1179,7 @@ export class UsersRepository {
                     .$notNull()
                     .as('inbounds'),
             ])
-            .where('users.uuid', '=', getKyselyUuid(userUuid))
+            .where('users.tId', '=', tId)
             .executeTakeFirst();
 
         if (!result) {
@@ -1351,23 +1325,6 @@ export class UsersRepository {
                 .select(['internalSquads.uuid', 'internalSquads.name'])
                 .whereRef('internalSquadMembers.userId', '=', 'users.tId'),
         ).as('activeInternalSquads');
-    }
-
-    public async getUserUuidByUsername(
-        username: string,
-    ): Promise<{ uuid: string; tId: bigint } | null> {
-        const result = await this.qb.kysely
-            .selectFrom('users')
-            .select(['uuid'])
-            .select(sql.ref<bigint>('t_id').as('tId'))
-            .where('username', '=', username)
-            .executeTakeFirst();
-
-        if (!result) {
-            return null;
-        }
-
-        return { uuid: result.uuid, tId: result.tId };
     }
 
     public async findNotConnectedUsers(startDate: Date, endDate: Date): Promise<UserEntity[]> {

@@ -2,21 +2,22 @@ import { z } from 'zod';
 
 import { REST_API, USERS_ROUTES } from '../../../api';
 import { getEndpointDetails } from '../../../constants';
+import { numberParamSchema } from '../../../models';
 import { UserResponseSchema } from '../user.response';
 
 export namespace RevokeUserSubscriptionCommand {
     export const url = REST_API.USERS.ACTIONS.REVOKE_SUBSCRIPTION;
-    export const TSQ_url = url(':uuid');
+    export const TSQ_url = url(':userId');
 
     export const endpointDetails = getEndpointDetails(
-        USERS_ROUTES.ACTIONS.REVOKE_SUBSCRIPTION(':uuid'),
+        USERS_ROUTES.ACTIONS.REVOKE_SUBSCRIPTION(':userId'),
         'post',
         'Revoke user subscription',
         { scope: 'revoke-subscription', kind: 'write' },
     );
 
     export const RequestParamSchema = z.object({
-        uuid: z.uuid(),
+        userId: numberParamSchema,
     });
 
     export const RequestBodySchema = z.preprocess(

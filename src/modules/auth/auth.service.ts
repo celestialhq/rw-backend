@@ -1114,7 +1114,10 @@ export class AuthService {
             const verification = await verifyAuthenticationResponse({
                 response,
                 expectedChallenge,
-                expectedOrigin: remnawaveSettings.passkeySettings.origin,
+                expectedOrigin: [
+                    remnawaveSettings.passkeySettings.origin,
+                    `https://${remnawaveSettings.passkeySettings.rpId}`,
+                ],
                 expectedRPID: remnawaveSettings.passkeySettings.rpId,
                 credential: {
                     id: passkey.response.id,

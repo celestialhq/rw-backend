@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { REMNAAWAVE_SETTINGS_ROUTES, REST_API } from '../../api';
+import { REMNAWAVE_SETTINGS_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
 import {
     BrandingSettingsSchema,
@@ -16,7 +16,7 @@ export namespace UpdateRemnawaveSettingsCommand {
     export const TSQ_url = url;
 
     export const endpointDetails = getEndpointDetails(
-        REMNAAWAVE_SETTINGS_ROUTES.UPDATE,
+        REMNAWAVE_SETTINGS_ROUTES.UPDATE,
         'patch',
         'Update Remnawave settings',
         { scope: 'update', kind: 'write' },

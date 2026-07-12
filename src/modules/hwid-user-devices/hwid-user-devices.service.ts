@@ -34,7 +34,7 @@ export class HwidUserDevicesService {
             const user = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        uuid: dto.userUuid,
+                        tId: BigInt(dto.userId),
                     },
                     {
                         activeInternalSquads: false,
@@ -118,12 +118,12 @@ export class HwidUserDevicesService {
         }
     }
 
-    public async getUserHwidDevices(userUuid: string): Promise<TResult<HwidUserDeviceEntity[]>> {
+    public async getUserHwidDevices(userId: number): Promise<TResult<HwidUserDeviceEntity[]>> {
         try {
             const user = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        uuid: userUuid,
+                        tId: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,
@@ -148,13 +148,13 @@ export class HwidUserDevicesService {
 
     public async deleteUserHwidDevice(
         hwid: string,
-        userUuid: string,
+        userId: number,
     ): Promise<TResult<HwidUserDeviceEntity[]>> {
         try {
             const user = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        uuid: userUuid,
+                        tId: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,
@@ -198,13 +198,13 @@ export class HwidUserDevicesService {
     }
 
     public async deleteAllUserHwidDevices(
-        userUuid: string,
+        userId: number,
     ): Promise<TResult<HwidUserDeviceEntity[]>> {
         try {
             const user = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        uuid: userUuid,
+                        tId: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,

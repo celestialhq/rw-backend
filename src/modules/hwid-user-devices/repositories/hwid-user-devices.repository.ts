@@ -274,13 +274,8 @@ export class HwidUserDevicesRepository implements Omit<
         const query = this.qb.kysely
             .selectFrom('hwidUserDevices as d')
             .innerJoin('users as u', 'u.tId', 'd.userId')
-            .select([
-                'u.uuid as userUuid',
-                'u.tId as id',
-                'u.username',
-                (eb) => eb.fn.count('d.hwid').as('devicesCount'),
-            ])
-            .groupBy(['u.uuid', 'u.tId', 'u.username'])
+            .select(['u.tId as id', 'u.username', (eb) => eb.fn.count('d.hwid').as('devicesCount')])
+            .groupBy(['u.tId', 'u.username'])
             .orderBy('devicesCount', 'desc')
             .offset(start)
             .limit(size);
@@ -294,7 +289,7 @@ export class HwidUserDevicesRepository implements Omit<
 
         return {
             users: users.map((u) => ({
-                ...u,
+                username: u.username,
                 id: Number(u.id),
                 devicesCount: Number(u.devicesCount),
             })),

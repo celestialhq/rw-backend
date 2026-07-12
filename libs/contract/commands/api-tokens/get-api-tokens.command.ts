@@ -19,11 +19,6 @@ export namespace GetApiTokensCommand {
     export const ResponseSchema = z.object({
         response: z.object({
             tokens: z.array(ApiTokensSchema),
-            docs: z.object({
-                enabled: z.boolean(),
-                scalarPath: z.string().nullable(),
-                swaggerPath: z.string().nullable(),
-            }),
         }),
     });
 

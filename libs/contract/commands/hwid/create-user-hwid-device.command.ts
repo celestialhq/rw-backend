@@ -16,8 +16,8 @@ export namespace CreateUserHwidDeviceCommand {
     );
 
     export const RequestBodySchema = z.object({
-        hwid: z.string(),
-        userUuid: z.uuid(),
+        hwid: z.string().regex(/^[a-zA-Z0-9=-]{10,64}$/),
+        userId: z.number(),
         platform: z.optional(z.string()),
         osVersion: z.optional(z.string()),
         deviceModel: z.optional(z.string()),

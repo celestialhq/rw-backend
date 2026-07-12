@@ -31,7 +31,7 @@ export class AddUserToNodeHandler implements IEventHandler<AddUserToNodeEvent> {
     async handle(event: AddUserToNodeEvent) {
         try {
             const userEntity = await this.queryBus.execute(
-                new GetUserWithResolvedInboundsQuery(event.userUuid),
+                new GetUserWithResolvedInboundsQuery(event.userId),
             );
 
             if (!userEntity.isOk) {

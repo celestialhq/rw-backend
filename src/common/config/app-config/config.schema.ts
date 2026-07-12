@@ -62,9 +62,6 @@ export const configSchema = z
 
         FRONT_END_DOMAIN: z.string(),
         PANEL_DOMAIN: z.string().optional(),
-        IS_DOCS_ENABLED: booleanString('false'),
-        SCALAR_PATH: z.string().default('/scalar'),
-        SWAGGER_PATH: z.string().default('/docs'),
         METRICS_USER: z.string().min(1),
         METRICS_PASS: z.string().min(1),
         SUB_PUBLIC_DOMAIN: z.string(),
@@ -95,13 +92,6 @@ export const configSchema = z
         IS_HTTP_LOGGING_ENABLED: booleanString('false'),
         ENABLE_DEBUG_LOGS: booleanString('false'),
         REMNAWAVE_BRANCH: z.string().default('dev'),
-
-        // COOKIE_AUTH_ENABLED: z
-        //     .string()
-        //     .default('false')
-        //     .transform((val) => val === 'true'),
-        // COOKIE_AUTH_NONCE: z.optional(z.string()),
-
         SERVICE_CLEAN_USAGE_HISTORY: booleanString('false'),
         SERVICE_DISABLE_USER_USAGE_RECORDS: booleanString('false'),
         SERVICE_DISABLE_SRH_RECORDS: booleanString('false'),

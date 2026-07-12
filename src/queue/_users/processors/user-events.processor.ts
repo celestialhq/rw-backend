@@ -141,7 +141,7 @@ export class UserEventsQueueProcessor extends WorkerHost {
                         }),
                     );
 
-                    this.eventBus.publish(new AddUserToNodeEvent(user.uuid));
+                    this.eventBus.publish(new AddUserToNodeEvent(user.tId));
                     break;
                 default:
                     this.logger.warn(`User event "${userEvent}" is not implemented.`);

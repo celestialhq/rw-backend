@@ -42,19 +42,19 @@ export const TORRENT_BLOCKER_EVENTS_TEMPLATES: Record<
 
         return {
             message: lines.join('\n'),
-            keyboard: buildUserKeyboard(e.data.user.uuid, panelDomain),
+            keyboard: buildUserKeyboard(e.data.user.tId.toString(), panelDomain),
         };
     },
 };
 
 function buildUserKeyboard(
-    userUuid: string,
+    userId: string,
     panelDomain: string | undefined,
 ): IInlineKeyboard[] | undefined {
     if (!panelDomain) return undefined;
     return [
         {
-            url: PANEL_URLS.USER(panelDomain, userUuid),
+            url: PANEL_URLS.USER(panelDomain, userId.toString()),
             text: 'View user',
             customEmoji: '5282843764451195532',
             style: 'primary' as const,

@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, UseFilters, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { Roles } from '@common/decorators/roles/roles';
@@ -13,6 +13,7 @@ import {
     DeleteApiTokenCommand,
     GetApiTokensCommand,
     GetApiTokenScopesCommand,
+    GetOttCommand,
 } from '@libs/contracts/commands';
 import { ROLE } from '@libs/contracts/constants';
 
@@ -23,6 +24,7 @@ import {
     DeleteApiTokenParamDto,
     GetApiTokensResponseDto,
     GetApiTokenScopesResponseDto,
+    GetOttResponseDto,
 } from './dtos';
 
 @ApiBearerAuth('Authorization')
@@ -39,7 +41,7 @@ export class ApiTokensController {
         httpCode: HttpStatus.CREATED,
         type: CreateApiTokenResponseDto,
     })
-    async create(@Body() body: CreateApiTokenBodyDto): Promise<CreateApiTokenResponseDto> {
+    async createApiToken(@Body() body: CreateApiTokenBodyDto): Promise<CreateApiTokenResponseDto> {
         const result = await this.apiTokensService.create(body);
 
         const data = errorHandler(result);
@@ -52,9 +54,10 @@ export class ApiTokensController {
         command: DeleteApiTokenCommand,
         httpCode: HttpStatus.NO_CONTENT,
     })
-    async delete(@Param() paramData: DeleteApiTokenParamDto) {
-        errorHandler(await this.apiTokensService.delete(paramData.uuid));
+    async deleteApiToken(@Param() param: DeleteApiTokenParamDto) {
+        const result = await this.apiTokensService.delete(param.uuid);
 
+        errorHandler(result);
         return;
     }
 
@@ -78,6 +81,21 @@ export class ApiTokensController {
     })
     async getApiTokens(): Promise<GetApiTokensResponseDto> {
         const result = await this.apiTokensService.get();
+        const data = errorHandler(result);
+        return {
+            response: data,
+        };
+    }
+
+    @ApiExcludeEndpoint()
+    @Endpoint({
+        command: GetOttCommand,
+        httpCode: HttpStatus.OK,
+        type: GetOttResponseDto,
+    })
+    async getOtt(): Promise<GetOttResponseDto> {
+        const result = await this.apiTokensService.getOtt();
+
         const data = errorHandler(result);
         return {
             response: data,
