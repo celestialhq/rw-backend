@@ -71,7 +71,7 @@ export class AuthService {
         private readonly httpService: HttpService,
         private readonly cloudflareAccessService: CloudflareAccessService,
     ) {
-        this.jwtSecret = this.configService.getOrThrow('JWT_AUTH_SECRET');
+        this.jwtSecret = this.configService.getOrThrow('APP_SECRET');
         this.jwtLifetime = this.configService.getOrThrow('JWT_AUTH_LIFETIME');
     }
 
