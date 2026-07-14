@@ -212,6 +212,8 @@ export class HwidUserDevicesRepository implements Omit<
                 sql<string>`SPLIT_PART("user_agent", '/', 1)`.as('app'),
                 (eb) => eb.fn.count('hwid').as('count'),
             ])
+            .where('platform', 'is not', null)
+            .where('userAgent', 'is not', null)
             .groupBy(['platform', sql`SPLIT_PART("user_agent", '/', 1)`])
             .execute();
 
