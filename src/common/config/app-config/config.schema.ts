@@ -335,13 +335,13 @@ export const configSchema = z
 
                 if (
                     data.NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS.some(
-                        (t) => isNaN(t) || !Number.isInteger(t) || t < 1 || t > 168,
+                        (t) => isNaN(t) || !Number.isInteger(t) || t < 1 || t > 744,
                     )
                 ) {
                     ctx.issues.push({
                         input: data,
                         code: 'custom',
-                        message: 'All hours values must be integers between 1 and 168',
+                        message: 'All hours values must be integers between 1 and 744',
                         path: ['NOT_CONNECTED_USERS_NOTIFICATIONS_AFTER_HOURS'],
                     });
                 }
@@ -380,14 +380,14 @@ export const configSchema = z
             } else {
                 if (
                     data.EXPIRATION_NOTIFICATIONS.some(
-                        (t) => isNaN(t) || !Number.isInteger(t) || t === 0 || t < -168 || t > 168,
+                        (t) => isNaN(t) || !Number.isInteger(t) || t === 0 || t < -744 || t > 744,
                     )
                 ) {
                     ctx.issues.push({
                         input: data,
                         code: 'custom',
                         message:
-                            'All expiration values must be non-zero integers between -168 and 168',
+                            'All expiration values must be non-zero integers between -744 and 744',
                         path: ['EXPIRATION_NOTIFICATIONS'],
                     });
                 }
