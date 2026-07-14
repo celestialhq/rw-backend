@@ -456,6 +456,55 @@ export class UsersService {
         }
     }
 
+    public async extendUserExpirationDate(
+        userId: number,
+        days: number,
+    ): Promise<TResult<UserEntity>> {
+        try {
+            const user = await this.userRepository.getPartialUserByUniqueFields(
+                { tId: BigInt(userId) },
+                ['tId', 'status', 'expireAt'],
+            );
+
+            if (!user) return fail(ERRORS.USER_NOT_FOUND);
+
+            const now = dayjs.utc();
+            const currentExpire = dayjs.utc(user.expireAt);
+            const base = currentExpire.isAfter(now) ? currentExpire : now;
+            const newExpireDate = base.add(days, 'day').toDate();
+
+            const newStatus =
+                user.status === USERS_STATUS.EXPIRED ? USERS_STATUS.ACTIVE : user.status;
+
+            await this.userRepository.update({
+                tId: user.tId,
+                expireAt: newExpireDate,
+                status: newStatus,
+            });
+
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
+
+            if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
+
+            if (user.status === USERS_STATUS.EXPIRED && newStatus === USERS_STATUS.ACTIVE) {
+                this.eventBus.publish(new AddUserToNodeEvent(user.tId));
+            }
+
+            this.eventEmitter.emit(
+                EVENTS.USER.MODIFIED,
+                new UserEvent({
+                    user: updatedUser,
+                    event: EVENTS.USER.MODIFIED,
+                }),
+            );
+
+            return ok(updatedUser);
+        } catch (error) {
+            this.logger.error(error);
+            return fail(ERRORS.UPDATE_USER_ERROR);
+        }
+    }
+
     public async resetUserTraffic(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(

@@ -27,6 +27,7 @@ import {
     ResetUserTrafficCommand,
     ResolveUserCommand,
     RevokeUserSubscriptionCommand,
+    ExtendUserCommand,
     UpdateUserCommand,
 } from '@libs/contracts/commands';
 import { ROLE } from '@libs/contracts/constants';
@@ -55,6 +56,8 @@ import {
     GetUsersResponseDto,
     GetUserByIdParamDto,
     UserResponseDto,
+    ExtendUserBodyDto,
+    ExtendUserParamDto,
 } from '../dtos';
 import {
     GetAllTagsResponseModel,
@@ -329,6 +332,23 @@ export class UsersController {
     })
     async resetUserTraffic(@Param() param: ResetUserTrafficParamDto): Promise<UserResponseDto> {
         const result = await this.usersService.resetUserTraffic(param.userId);
+
+        const data = errorHandler(result);
+        return {
+            response: new GetFullUserResponseModel(data, this.subPublicDomain),
+        };
+    }
+
+    @Endpoint({
+        command: ExtendUserCommand,
+        httpCode: HttpStatus.OK,
+        type: UserResponseDto,
+    })
+    async extendUserExpirationDate(
+        @Param() param: ExtendUserParamDto,
+        @Body() body: ExtendUserBodyDto,
+    ): Promise<UserResponseDto> {
+        const result = await this.usersService.extendUserExpirationDate(param.userId, body.days);
 
         const data = errorHandler(result);
         return {

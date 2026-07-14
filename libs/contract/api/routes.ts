@@ -118,6 +118,10 @@ export const REST_API = {
                 `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACTIONS.REVOKE_SUBSCRIPTION(
                     userId,
                 )}`,
+            EXTEND_EXPIRATION_DATE: (userId: string) =>
+                `${ROOT}/${CONTROLLERS.USERS_CONTROLLER}/${CONTROLLERS.USERS_ROUTES.ACTIONS.EXTEND_EXPIRATION_DATE(
+                    userId,
+                )}`,
         },
         GET_BY: {
             SHORT_UUID: (shortUuid: string) =>

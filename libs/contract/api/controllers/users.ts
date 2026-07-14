@@ -16,6 +16,7 @@ export const USERS_ROUTES = {
         DISABLE: (userId: string) => `${userId}/${USERS_ACTIONS_ROUTE}/disable`,
         RESET_TRAFFIC: (userId: string) => `${userId}/${USERS_ACTIONS_ROUTE}/reset-traffic`,
         REVOKE_SUBSCRIPTION: (userId: string) => `${userId}/${USERS_ACTIONS_ROUTE}/revoke`,
+        EXTEND_EXPIRATION_DATE: (userId: string) => `${userId}/${USERS_ACTIONS_ROUTE}/extend`,
     },
     GET_BY: {
         SHORT_UUID: (shortUuid: string) => `by-short-uuid/${shortUuid}`,
