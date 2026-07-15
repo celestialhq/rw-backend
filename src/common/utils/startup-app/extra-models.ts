@@ -12,6 +12,7 @@ import {
     RemnawaveWebhookTorrentBlockerEvents,
     RemnawaveUserUsageStreamMessageSchema,
     RemnawaveSubscriptionRequestStreamMessageSchema,
+    RemnawaveNodeConnectionsStreamMessageSchema,
 } from '@libs/contracts/models';
 
 export class RemnawaveWebhookUserEventsDto extends createZodDto(RemnawaveWebhookUserEvents) {}
@@ -32,6 +33,10 @@ export class RemnawaveUserUsageStreamMessageDto extends createZodDto(
 
 export class RemnawaveSubscriptionRequestStreamMessageDto extends createZodDto(
     RemnawaveSubscriptionRequestStreamMessageSchema,
+) {}
+
+export class RemnawaveNodeConnectionsStreamMessageDto extends createZodDto(
+    RemnawaveNodeConnectionsStreamMessageSchema,
 ) {}
 
 const notFoundErrors = Object.values(ERRORS).filter(

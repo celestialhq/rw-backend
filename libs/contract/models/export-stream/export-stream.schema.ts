@@ -2,6 +2,7 @@ import z from 'zod';
 
 const USER_USAGE_STREAM_KEY = 'ioraw:export:user_usage';
 const SUBSCRIPTION_REQUESTS_STREAM_KEY = 'ioraw:export:subscription_requests';
+const NODE_CONNECTIONS_STREAM_KEY = 'ioraw:export:node_connections';
 
 export const USER_USAGE_STREAM_MESSAGE_VERSION = '1';
 
@@ -69,4 +70,62 @@ export const RemnawaveSubscriptionRequestStreamMessageSchema = z
 
 export type TRemnawaveSubscriptionRequestStreamMessage = z.infer<
     typeof RemnawaveSubscriptionRequestStreamMessageSchema
+>;
+
+export const NODE_CONNECTIONS_STREAM_MESSAGE_VERSION = '1';
+
+export const NodeConnectionUserSchema = z.object({
+    userId: z.string().regex(/^\d+$/).describe('User ID (bigint as string).'),
+    ips: z
+        .array(
+            z.object({
+                ip: z.string().describe('Client IP address.'),
+                lastSeen: z.iso
+                    .datetime()
+                    .transform((str) => new Date(str))
+                    .describe('Last time this IP was seen on the node (ISO 8601, UTC).'),
+            }),
+        )
+        .describe('IP addresses the user is connected from.'),
+});
+
+export const RemnawaveNodeConnectionsStreamMessageSchema = z
+    .object({
+        v: z.literal(NODE_CONNECTIONS_STREAM_MESSAGE_VERSION).describe('Message schema version.'),
+        nodeId: z
+            .string()
+            .regex(/^\d+$/)
+            .describe('Node ID the snapshot belongs to (bigint as string).'),
+        ts: z.iso
+            .datetime()
+            .transform((str) => new Date(str))
+            .describe('Time the snapshot was exported (ISO 8601, UTC).'),
+        users: z
+            .string()
+            .transform((raw, ctx) => {
+                try {
+                    return JSON.parse(raw);
+                } catch {
+                    ctx.addIssue({ code: 'custom', message: 'users must be a valid JSON array' });
+                    return z.NEVER;
+                }
+            })
+            .pipe(z.array(NodeConnectionUserSchema))
+            .describe(
+                [
+                    'JSON-encoded array of users connected to the node with their IPs.',
+                    'Example:',
+                    '```json',
+                    '[{ "userId": "42", "ips": [{ "ip": "1.2.3.4", "lastSeen": "2026-07-16T11:59:30.000Z" }] }]',
+                    '```',
+                ].join('\n'),
+            ),
+    })
+    .meta({
+        description: `A single message of the "${NODE_CONNECTIONS_STREAM_KEY}" Redis Stream (EXPORT_TO_STREAM_ENABLED). Snapshot of connections on one node; retention is time-based.`,
+    });
+
+export type TNodeConnectionUser = z.infer<typeof NodeConnectionUserSchema>;
+export type TRemnawaveNodeConnectionsStreamMessage = z.infer<
+    typeof RemnawaveNodeConnectionsStreamMessageSchema
 >;

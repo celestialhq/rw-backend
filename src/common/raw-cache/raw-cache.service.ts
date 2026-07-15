@@ -151,6 +151,21 @@ export class RawCacheService {
         );
     }
 
+    async xaddTrimmedByAge(
+        key: string,
+        maxAgeMs: number,
+        fields: Record<string, string>,
+    ): Promise<void> {
+        await this.redis.xadd(
+            key,
+            'MINID',
+            '~',
+            Date.now() - maxAgeMs,
+            '*',
+            ...Object.entries(fields).flat(),
+        );
+    }
+
     async exists(key: string): Promise<boolean> {
         return (await this.redis.exists(key)) === 1;
     }

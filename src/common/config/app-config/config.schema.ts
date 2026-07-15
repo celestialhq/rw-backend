@@ -98,7 +98,7 @@ export const configSchema = z
         EXPORT_TO_STREAM_ENABLED: booleanString('false'),
         EXPORT_TO_STREAM_MAXLEN: z
             .string()
-            .default('25000')
+            .default('3000')
             .transform((val) => parseInt(val, 10))
             .refine(
                 (val) => Number.isInteger(val) && val > 0,

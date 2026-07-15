@@ -48,4 +48,5 @@ export const EXPORT_TO_STREAM_KEYS = {
     PREFIX: 'ioraw:',
     USER_USAGE: 'export:user_usage',
     SUBSCRIPTION_REQUESTS: 'export:subscription_requests',
+    NODE_CONNECTIONS: 'export:node_connections',
 } as const;

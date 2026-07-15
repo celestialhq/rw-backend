@@ -22,6 +22,7 @@ import {
     RemnawaveNotFoundErrorDto,
     RemnawaveUserUsageStreamMessageDto,
     RemnawaveSubscriptionRequestStreamMessageDto,
+    RemnawaveNodeConnectionsStreamMessageDto,
 } from './extra-models';
 
 const description = `
@@ -118,6 +119,7 @@ export async function ghActionsDocs(app: INestApplication<unknown>) {
                 RemnawaveNotFoundErrorDto,
                 RemnawaveUserUsageStreamMessageDto,
                 RemnawaveSubscriptionRequestStreamMessageDto,
+                RemnawaveNodeConnectionsStreamMessageDto,
             ],
         });
 
