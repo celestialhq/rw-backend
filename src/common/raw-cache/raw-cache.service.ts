@@ -136,6 +136,21 @@ export class RawCacheService {
         return this.redis.hscanStream(key, options);
     }
 
+    async xaddTrimmed(
+        key: string,
+        maxLenApprox: number,
+        fields: Record<string, string>,
+    ): Promise<void> {
+        await this.redis.xadd(
+            key,
+            'MAXLEN',
+            '~',
+            maxLenApprox,
+            '*',
+            ...Object.entries(fields).flat(),
+        );
+    }
+
     async exists(key: string): Promise<boolean> {
         return (await this.redis.exists(key)) === 1;
     }

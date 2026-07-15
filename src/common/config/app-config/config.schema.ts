@@ -95,6 +95,15 @@ export const configSchema = z
         SERVICE_CLEAN_USAGE_HISTORY: booleanString('false'),
         SERVICE_DISABLE_USER_USAGE_RECORDS: booleanString('false'),
         SERVICE_DISABLE_SRH_RECORDS: booleanString('false'),
+        EXPORT_TO_STREAM_ENABLED: booleanString('false'),
+        EXPORT_TO_STREAM_MAXLEN: z
+            .string()
+            .default('25000')
+            .transform((val) => parseInt(val, 10))
+            .refine(
+                (val) => Number.isInteger(val) && val > 0,
+                'EXPORT_TO_STREAM_MAXLEN must be a positive integer',
+            ),
         BANDWIDTH_USAGE_NOTIFICATIONS_ENABLED: booleanString('false'),
         BANDWIDTH_USAGE_NOTIFICATIONS_THRESHOLD: z
             .string()

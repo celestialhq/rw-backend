@@ -20,6 +20,8 @@ import {
     RemnawaveValidationErrorDto,
     RemnawaveBadRequestErrorDto,
     RemnawaveNotFoundErrorDto,
+    RemnawaveUserUsageStreamMessageDto,
+    RemnawaveSubscriptionRequestStreamMessageDto,
 } from './extra-models';
 
 const description = `
@@ -114,6 +116,8 @@ export async function ghActionsDocs(app: INestApplication<unknown>) {
                 RemnawaveValidationErrorDto,
                 RemnawaveBadRequestErrorDto,
                 RemnawaveNotFoundErrorDto,
+                RemnawaveUserUsageStreamMessageDto,
+                RemnawaveSubscriptionRequestStreamMessageDto,
             ],
         });
 
