@@ -89,6 +89,12 @@ export class HwidUserDevicesRepository implements Omit<
         });
     }
 
+    public async countCreatedInRange(start: Date, endExclusive: Date): Promise<number> {
+        return await this.prisma.tx.hwidUserDevices.count({
+            where: { createdAt: { gte: start, lt: endExclusive } },
+        });
+    }
+
     public async checkHwidExists(hwid: string, userId: bigint): Promise<boolean> {
         const result = await this.qb.kysely
             .selectNoFrom((eb) =>

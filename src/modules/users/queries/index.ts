@@ -5,6 +5,7 @@ import { GetUserByUniqueFieldHandler } from './get-user-by-unique-field';
 import { GetUserSubpageConfigHandler } from './get-user-subpage-config';
 import { GetUserWithResolvedInboundsHandler } from './get-user-with-resolved-inbounds';
 import { GetUsersByExpireAtHandler } from './get-users-by-expire-at';
+import { GetUsersDigestHandler } from './get-users-digest';
 import { GetUsersRecapHandler } from './get-users-recap';
 import { GetUsersWithPaginationHandler } from './get-users-with-pagination';
 import { GetUsersWithResolvedInboundsHandler } from './get-users-with-resolved-inbounds';
@@ -22,4 +23,5 @@ export const QUERIES = [
     GetUsersWithResolvedInboundsHandler,
     ValidateUserIdsHandler,
     GetUsersRecapHandler,
+    GetUsersDigestHandler,
 ];

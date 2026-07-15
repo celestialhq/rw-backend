@@ -1169,4 +1169,14 @@ export const ERRORS = {
         message: 'Remove many users from internal squad error',
         httpCode: 500,
     },
+    GET_STATS_DIGEST_INVALID_RANGE: {
+        code: 'A235',
+        message: 'Start date must be before or equal to end date',
+        httpCode: 400,
+    },
+    GET_STATS_DIGEST_ERROR: {
+        code: 'A236',
+        message: 'Get stats digest error',
+        httpCode: 500,
+    },
 } as const;

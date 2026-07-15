@@ -1358,6 +1358,28 @@ export class UsersRepository {
         return result.subpageConfigUuid;
     }
 
+    public async getUsersDigestByRange(
+        start: Date,
+        endExclusive: Date,
+    ): Promise<{ createdCount: number; expiredCount: number }> {
+        const result = await this.qb.kysely
+            .selectFrom('users')
+            .select([
+                sql<number>`count(*) filter (where created_at >= ${start} and created_at < ${endExclusive})::int`.as(
+                    'createdCount',
+                ),
+                sql<number>`count(*) filter (where expire_at >= ${start} and expire_at < ${endExclusive})::int`.as(
+                    'expiredCount',
+                ),
+            ])
+            .executeTakeFirstOrThrow();
+
+        return {
+            createdCount: Number(result.createdCount),
+            expiredCount: Number(result.expiredCount),
+        };
+    }
+
     public async getUsersRecap(): Promise<{ total: number; newUsersThisMonth: number }> {
         const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 

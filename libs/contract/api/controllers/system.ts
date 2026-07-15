@@ -6,6 +6,7 @@ export const SYSTEM_ROUTES = {
         BANDWIDTH_STATS: 'stats/bandwidth',
         NODES_STATS: 'stats/nodes',
         RECAP: 'stats/recap',
+        DIGEST: 'stats/digest',
         NODES_METRICS: 'nodes/metrics',
         HTTP: 'stats/http',
     },

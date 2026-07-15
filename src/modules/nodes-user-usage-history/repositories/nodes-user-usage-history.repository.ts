@@ -1,6 +1,7 @@
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Prisma } from '@prisma/client';
+import { sql } from 'kysely';
 
 import { Injectable } from '@nestjs/common';
 
@@ -186,6 +187,24 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
 
         const result = await this.prisma.tx.$queryRaw<Array<{ value: bigint }>>(query);
         return result.map((item) => Number(item.value));
+    }
+
+    public async getNewUsersTrafficByRange(start: Date, endExclusive: Date): Promise<bigint> {
+        const result = await this.qb.kysely
+            .selectFrom('nodesUserUsageHistory as nuh')
+            .select([sql<bigint>`coalesce(sum(nuh.total_bytes), 0)`.as('totalBytes')])
+            .where('nuh.createdAt', '>=', start)
+            .where('nuh.createdAt', '<', endExclusive)
+            .where('nuh.userId', 'in', (eb) =>
+                eb
+                    .selectFrom('users')
+                    .select('users.tId')
+                    .where('users.createdAt', '>=', start)
+                    .where('users.createdAt', '<', endExclusive),
+            )
+            .executeTakeFirstOrThrow();
+
+        return BigInt(result.totalBytes);
     }
 
     public async getTopNodeUsersByTraffic(
