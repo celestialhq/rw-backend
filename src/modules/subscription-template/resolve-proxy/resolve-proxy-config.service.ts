@@ -415,6 +415,7 @@ export class ResolveProxyConfigService {
                         ),
                         echConfigList: tls?.echConfigList || null,
                         echForceQuery: tls?.echForceQuery || null,
+                        echSockopt: toNonEmptyRecord(tls?.echSockopt),
                         pinnedPeerCertSha256: inputHost.pinnedPeerCertSha256,
                         verifyPeerCertByName: inputHost.verifyPeerCertByName,
                     },
