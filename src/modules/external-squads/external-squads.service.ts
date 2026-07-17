@@ -93,7 +93,8 @@ export class ExternalSquadService {
             templates,
             subscriptionSettings,
             hostOverrides,
-            responseHeaders,
+            responseHeadersAdd,
+            responseHeadersRemove,
             hwidSettings,
             customRemarks,
             subpageConfigUuid,
@@ -129,7 +130,18 @@ export class ExternalSquadService {
                 name: name,
                 subscriptionSettings: subscriptionSettings,
                 hostOverrides: hostOverrides,
-                responseHeaders: responseHeaders,
+                responseHeadersAdd: responseHeadersAdd
+                    ? Object.fromEntries(
+                          Object.entries(responseHeadersAdd).map(([key, value]) => [
+                              key.toLowerCase(),
+                              value,
+                          ]),
+                      )
+                    : responseHeadersAdd,
+
+                responseHeadersRemove: responseHeadersRemove
+                    ? responseHeadersRemove.map((header) => header.toLowerCase())
+                    : responseHeadersRemove,
                 hwidSettings: hwidSettings,
                 customRemarks: customRemarks,
                 subpageConfigUuid: subpageConfigUuid,

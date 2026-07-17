@@ -684,10 +684,23 @@ export class SubscriptionService {
                         };
                     }
 
+                    if (externalSquadSubscriptionSettings.responseHeadersRemove.length > 0) {
+                        const headersToRemove = new Set(
+                            externalSquadSubscriptionSettings.responseHeadersRemove,
+                        );
+                        patchedSubscriptionSettings.customResponseHeaders = Object.fromEntries(
+                            Object.entries(
+                                patchedSubscriptionSettings.customResponseHeaders ?? {},
+                            ).filter(([key]) => !headersToRemove.has(key)),
+                        );
+                    }
+
                     // Response headers override
-                    if (hasContent(externalSquadSubscriptionSettings.responseHeaders)) {
-                        patchedSubscriptionSettings.customResponseHeaders =
-                            externalSquadSubscriptionSettings.responseHeaders;
+                    if (hasContent(externalSquadSubscriptionSettings.responseHeadersAdd)) {
+                        patchedSubscriptionSettings.customResponseHeaders = {
+                            ...patchedSubscriptionSettings.customResponseHeaders,
+                            ...externalSquadSubscriptionSettings.responseHeadersAdd,
+                        };
                     }
 
                     // HWID settings override

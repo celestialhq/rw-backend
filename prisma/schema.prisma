@@ -536,12 +536,13 @@ model ConfigProfileSnippets {
 }
 
 model ExternalSquads {
-  uuid                 String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  viewPosition         Int    @default(autoincrement()) @map("view_position")
-  name                 String @unique @map("name") @db.VarChar(30)
-  subscriptionSettings Json?  @map("subscription_settings")
-  hostOverrides        Json?  @map("host_overrides")
-  responseHeaders      Json?  @map("response_headers")
+  uuid                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  viewPosition          Int      @default(autoincrement()) @map("view_position")
+  name                  String   @unique @map("name") @db.VarChar(30)
+  subscriptionSettings  Json?    @map("subscription_settings")
+  hostOverrides         Json?    @map("host_overrides")
+  responseHeadersAdd    Json     @default("{}") @map("response_headers_add")
+  responseHeadersRemove String[] @default([]) @map("response_headers_remove")
 
   hwidSettings  Json? @map("hwid_settings")
   customRemarks Json? @map("custom_remarks")

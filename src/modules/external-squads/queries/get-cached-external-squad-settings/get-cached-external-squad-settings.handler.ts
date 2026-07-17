@@ -24,7 +24,8 @@ export class GetCachedExternalSquadSettingsHandler implements IQueryHandler<GetC
                     ExternalSquadEntity,
                     | 'subscriptionSettings'
                     | 'hostOverrides'
-                    | 'responseHeaders'
+                    | 'responseHeadersAdd'
+                    | 'responseHeadersRemove'
                     | 'hwidSettings'
                     | 'customRemarks'
                 >
