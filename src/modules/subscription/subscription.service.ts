@@ -165,7 +165,6 @@ export class SubscriptionService {
                     const response = new SubscriptionWithConfigResponse({
                         headers: this.getUserProfileHeadersInfo(
                             user.response,
-                            userAgent.startsWith('Happ/'),
                             subscriptionSettings,
                         ),
                         body: '',
@@ -266,7 +265,6 @@ export class SubscriptionService {
             return new SubscriptionWithConfigResponse({
                 headers: this.getUserProfileHeadersInfo(
                     user.response,
-                    userAgent.startsWith('Happ/'),
                     subscriptionSettings,
                     hwidCheckup !== null && !hwidCheckup.limitBypassed,
                 ),
@@ -281,7 +279,6 @@ export class SubscriptionService {
 
     public async getRawSubscriptionByShortUuid(
         shortUuid: string,
-        userAgent: string | undefined,
         withDisabledHosts: boolean,
         hwidHeaders: HwidHeaders | null,
         requestIp?: string,
@@ -317,11 +314,7 @@ export class SubscriptionService {
 
             let hwidCheckup: null | IHwidCheckupResult = null;
 
-            const headers = this.getUserProfileHeadersInfo(
-                user,
-                userAgent?.startsWith('Happ/') ?? false,
-                patchedSettingEntity,
-            );
+            const headers = this.getUserProfileHeadersInfo(user, patchedSettingEntity);
 
             if (patchedSettingEntity.hwidSettings.enabled) {
                 const hwidCheckupResult = await this.checkHwidDeviceLimit(
@@ -587,45 +580,15 @@ export class SubscriptionService {
 
     private getUserProfileHeadersInfo(
         user: UserEntity,
-        isHapp: boolean,
         settings: SubscriptionSettingsEntity,
         hwidLimit: boolean = false,
     ): ISubscriptionHeaders {
         const headers: ISubscriptionHeaders = {
             'content-disposition': `attachment; filename=${user.username}`,
-            'support-url': settings.supportLink,
-            'profile-title': `base64:${Buffer.from(
-                TemplateEngine.formatWithUser(
-                    settings.profileTitle,
-                    user,
-                    settings,
-                    this.subPublicDomain,
-                ),
-            ).toString('base64')}`,
-            'profile-update-interval': settings.profileUpdateInterval.toString(),
             'subscription-userinfo': Object.entries(getSubscriptionUserInfo(user))
                 .map(([key, val]) => `${key}=${val}`)
                 .join('; '),
         };
-
-        if (settings.happAnnounce) {
-            headers.announce = `base64:${Buffer.from(
-                TemplateEngine.formatWithUser(
-                    settings.happAnnounce,
-                    user,
-                    settings,
-                    this.subPublicDomain,
-                ),
-            ).toString('base64')}`;
-        }
-
-        if (isHapp && settings.happRouting) {
-            headers.routing = settings.happRouting;
-        }
-
-        if (settings.isProfileWebpageUrlEnabled) {
-            headers['profile-web-page-url'] = this.resolveSubscriptionUrl(user.shortUuid);
-        }
 
         const refillDate = getSubscriptionRefillDate(user.trafficLimitStrategy);
         if (refillDate) {
