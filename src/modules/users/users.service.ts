@@ -80,16 +80,16 @@ export class UsersService {
                 externalSquadUuid: dto.externalSquadUuid,
             });
 
-            const { tId } = await this.userRepository.create(userEntity, dto.activeInternalSquads);
+            const { id } = await this.userRepository.create(userEntity, dto.activeInternalSquads);
 
-            const result = await this.getUserByUniqueFields({ tId });
+            const result = await this.getUserByUniqueFields({ id });
 
             if (!result.isOk) return fail(ERRORS.CREATE_USER_ERROR);
 
             const { response: user } = result;
 
             if (user.status === USERS_STATUS.ACTIVE) {
-                this.eventBus.publish(new AddUserToNodeEvent(user.tId));
+                this.eventBus.publish(new AddUserToNodeEvent(user.id));
             }
 
             this.eventEmitter.emit(
@@ -140,7 +140,7 @@ export class UsersService {
             const user = await this.userRepository.findUniqueByCriteria(
                 {
                     username,
-                    tId: wrapBigInt(id),
+                    id: wrapBigInt(id),
                 },
                 {
                     activeInternalSquads: true,
@@ -151,7 +151,7 @@ export class UsersService {
 
             const newUserEntity = new BaseUserEntity({
                 ...rest,
-                tId: user.tId,
+                id: user.id,
                 trafficLimitBytes: wrapBigInt(trafficLimitBytes),
                 telegramId: wrapBigIntNullable(telegramId),
                 lastTriggeredThreshold: trafficLimitBytes !== undefined ? 0 : undefined,
@@ -224,12 +224,12 @@ export class UsersService {
             }
 
             if (updatedUser.status === USERS_STATUS.ACTIVE && addToNode && !removeFromNode) {
-                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.tId));
+                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.id));
             }
 
             if (removeFromNode) {
                 this.eventBus.publish(
-                    new RemoveUserFromNodeEvent(updatedUser.tId, updatedUser.vlessUuid),
+                    new RemoveUserFromNodeEvent(updatedUser.id, updatedUser.vlessUuid),
                 );
             }
 
@@ -287,7 +287,7 @@ export class UsersService {
             const result = await this.userRepository.findUniqueByCriteria({
                 username: dto.username || undefined,
                 shortUuid: dto.shortUuid || undefined,
-                tId: dto.tId || undefined,
+                id: dto.id || undefined,
             });
 
             if (!result) return fail(ERRORS.GET_USER_BY_UNIQUE_FIELDS_NOT_FOUND);
@@ -305,8 +305,8 @@ export class UsersService {
     ): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId', 'vlessUuid', 'shortUuid'],
+                { id: BigInt(userId) },
+                ['id', 'vlessUuid', 'shortUuid'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -320,7 +320,7 @@ export class UsersService {
             }
 
             const updateResult = await this.userRepository.revokeUserSubscription({
-                tId: user.tId,
+                id: user.id,
                 shortUuid,
                 trojanPassword: this.createPassword(),
                 vlessUuid: this.createUuid(),
@@ -331,12 +331,12 @@ export class UsersService {
 
             if (!updateResult) return fail(ERRORS.REVOKE_USER_SUBSCRIPTION_ERROR);
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ id: user.id });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
             if (updatedUser.status === USERS_STATUS.ACTIVE) {
-                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.tId, user.vlessUuid));
+                this.eventBus.publish(new AddUserToNodeEvent(updatedUser.id, user.vlessUuid));
             }
 
             this.eventEmitter.emit(
@@ -357,7 +357,7 @@ export class UsersService {
     public async deleteUser(userId: number): Promise<TResult<boolean>> {
         try {
             const user = await this.userRepository.findUniqueByCriteria(
-                { tId: BigInt(userId) },
+                { id: BigInt(userId) },
                 {
                     activeInternalSquads: true,
                 },
@@ -365,9 +365,9 @@ export class UsersService {
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
-            await this.userRepository.deleteById(user.tId);
+            await this.userRepository.deleteById(user.id);
 
-            this.eventBus.publish(new RemoveUserFromNodeEvent(user.tId, user.vlessUuid));
+            this.eventBus.publish(new RemoveUserFromNodeEvent(user.id, user.vlessUuid));
 
             this.eventEmitter.emit(
                 EVENTS.USER.DELETED,
@@ -386,8 +386,8 @@ export class UsersService {
     public async disableUser(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId', 'status'],
+                { id: BigInt(userId) },
+                ['id', 'status'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -396,14 +396,14 @@ export class UsersService {
                 return fail(ERRORS.USER_ALREADY_DISABLED);
             }
 
-            await this.userRepository.updateUserStatus(user.tId, USERS_STATUS.DISABLED);
+            await this.userRepository.updateUserStatus(user.id, USERS_STATUS.DISABLED);
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ id: user.id });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
             this.eventBus.publish(
-                new RemoveUserFromNodeEvent(updatedUser.tId, updatedUser.vlessUuid),
+                new RemoveUserFromNodeEvent(updatedUser.id, updatedUser.vlessUuid),
             );
             this.eventEmitter.emit(
                 EVENTS.USER.DISABLED,
@@ -423,8 +423,8 @@ export class UsersService {
     public async enableUser(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId', 'status'],
+                { id: BigInt(userId) },
+                ['id', 'status'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -433,13 +433,13 @@ export class UsersService {
                 return fail(ERRORS.USER_ALREADY_ENABLED);
             }
 
-            await this.userRepository.updateUserStatus(user.tId, USERS_STATUS.ACTIVE);
+            await this.userRepository.updateUserStatus(user.id, USERS_STATUS.ACTIVE);
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ id: user.id });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
-            this.eventBus.publish(new AddUserToNodeEvent(user.tId));
+            this.eventBus.publish(new AddUserToNodeEvent(user.id));
 
             this.eventEmitter.emit(
                 EVENTS.USER.ENABLED,
@@ -462,8 +462,8 @@ export class UsersService {
     ): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId', 'status', 'expireAt'],
+                { id: BigInt(userId) },
+                ['id', 'status', 'expireAt'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -477,17 +477,17 @@ export class UsersService {
                 user.status === USERS_STATUS.EXPIRED ? USERS_STATUS.ACTIVE : user.status;
 
             await this.userRepository.update({
-                tId: user.tId,
+                id: user.id,
                 expireAt: newExpireDate,
                 status: newStatus,
             });
 
-            const updatedUser = await this.userRepository.findUniqueByCriteria({ tId: user.tId });
+            const updatedUser = await this.userRepository.findUniqueByCriteria({ id: user.id });
 
             if (!updatedUser) return fail(ERRORS.USER_NOT_FOUND);
 
             if (user.status === USERS_STATUS.EXPIRED && newStatus === USERS_STATUS.ACTIVE) {
-                this.eventBus.publish(new AddUserToNodeEvent(user.tId));
+                this.eventBus.publish(new AddUserToNodeEvent(user.id));
             }
 
             this.eventEmitter.emit(
@@ -508,8 +508,8 @@ export class UsersService {
     public async resetUserTraffic(userId: number): Promise<TResult<UserEntity>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId', 'status'],
+                { id: BigInt(userId) },
+                ['id', 'status'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
@@ -517,17 +517,13 @@ export class UsersService {
             let status = undefined;
             if (user.status === USERS_STATUS.LIMITED) {
                 status = USERS_STATUS.ACTIVE;
-                this.eventBus.publish(new AddUserToNodeEvent(user.tId));
+                this.eventBus.publish(new AddUserToNodeEvent(user.id));
             }
 
-            await this.userRepository.updateStatusAndTrafficAndResetAt(
-                user.tId,
-                new Date(),
-                status,
-            );
+            await this.userRepository.updateStatusAndTrafficAndResetAt(user.id, new Date(), status);
 
             const newUser = await this.userRepository.findUniqueByCriteria(
-                { tId: user.tId },
+                { id: user.id },
                 {
                     activeInternalSquads: true,
                 },
@@ -703,15 +699,15 @@ export class UsersService {
     ): Promise<TResult<GetUserAccessibleNodesResponseModel>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId'],
+                { id: BigInt(userId) },
+                ['id'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
-            const result = await this.userRepository.getUserAccessibleNodes(user.tId);
+            const result = await this.userRepository.getUserAccessibleNodes(user.id);
 
-            return ok(new GetUserAccessibleNodesResponseModel(result, user.tId));
+            return ok(new GetUserAccessibleNodesResponseModel(result, user.id));
         } catch (error) {
             this.logger.error(error);
             return fail(ERRORS.GET_USER_ACCESSIBLE_NODES_ERROR);
@@ -723,14 +719,14 @@ export class UsersService {
     ): Promise<TResult<GetUserSubscriptionRequestHistoryResponseModel>> {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
-                { tId: BigInt(userId) },
-                ['tId'],
+                { id: BigInt(userId) },
+                ['id'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
             const requestHistory = await this.queryBus.execute(
-                new GetUserSubscriptionRequestHistoryQuery(user.tId),
+                new GetUserSubscriptionRequestHistoryQuery(user.id),
             );
 
             if (!requestHistory.isOk) {
@@ -796,20 +792,18 @@ export class UsersService {
         try {
             const user = await this.userRepository.getPartialUserByUniqueFields(
                 {
-                    uuid: dto.uuid,
-                    tId: mapDefined(dto.id, (id) => wrapBigInt(id)),
+                    id: mapDefined(dto.id, (id) => wrapBigInt(id)),
                     shortUuid: dto.shortUuid,
                     username: dto.username,
                 },
-                ['uuid', 'tId', 'shortUuid', 'username'],
+                ['id', 'shortUuid', 'username'],
             );
 
             if (!user) return fail(ERRORS.USER_NOT_FOUND);
 
             return ok(
                 new ResolveUserResponseModel({
-                    uuid: user.uuid,
-                    id: Number(user.tId),
+                    id: Number(user.id),
                     shortUuid: user.shortUuid,
                     username: user.username,
                 }),

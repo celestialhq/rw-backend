@@ -281,9 +281,9 @@ export class HwidUserDevicesRepository implements Omit<
     public async getTopUsersByHwidDevices({ start, size }: { start: number; size: number }) {
         const query = this.qb.kysely
             .selectFrom('hwidUserDevices as d')
-            .innerJoin('users as u', 'u.tId', 'd.userId')
-            .select(['u.tId as id', 'u.username', (eb) => eb.fn.count('d.hwid').as('devicesCount')])
-            .groupBy(['u.tId', 'u.username'])
+            .innerJoin('users as u', 'u.id', 'd.userId')
+            .select(['u.id as id', 'u.username', (eb) => eb.fn.count('d.hwid').as('devicesCount')])
+            .groupBy(['u.id', 'u.username'])
             .orderBy('devicesCount', 'desc')
             .offset(start)
             .limit(size);

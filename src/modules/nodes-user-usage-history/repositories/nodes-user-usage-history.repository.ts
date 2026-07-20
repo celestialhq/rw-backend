@@ -198,7 +198,7 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
             .where('nuh.userId', 'in', (eb) =>
                 eb
                     .selectFrom('users')
-                    .select('users.tId')
+                    .select('users.id')
                     .where('users.createdAt', '>=', start)
                     .where('users.createdAt', '<', endExclusive),
             )
@@ -215,16 +215,16 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
     ): Promise<IGetUniversalTopUser[]> {
         return await this.qb.kysely
             .selectFrom('users as u')
-            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.tId')
+            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.id')
             .select([
-                'u.tId as userId',
+                'u.id as userId',
                 'u.username',
                 (eb) => eb.fn.sum<bigint>('nuh.totalBytes').as('total'),
             ])
             .where('nuh.nodeId', '=', nodeId)
             .where('nuh.createdAt', '>=', start)
             .where('nuh.createdAt', '<=', end)
-            .groupBy(['u.tId', 'u.username'])
+            .groupBy(['u.id', 'u.username'])
             .orderBy((eb) => eb.fn.sum<bigint>('nuh.totalBytes'), 'desc')
             .limit(limit)
             .execute();
@@ -296,16 +296,16 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
     ): Promise<IGetUniversalTopUser[]> {
         return await this.qb.kysely
             .selectFrom('users as u')
-            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.tId')
+            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.id')
             .select([
-                'u.tId as userId',
+                'u.id as userId',
                 'u.username',
                 (eb) => eb.fn.sum<bigint>('nuh.totalBytes').as('total'),
             ])
             .where('nuh.nodeId', 'in', nodeIds)
             .where('nuh.createdAt', '>=', start)
             .where('nuh.createdAt', '<=', end)
-            .groupBy(['u.tId', 'u.username'])
+            .groupBy(['u.id', 'u.username'])
             .orderBy((eb) => eb.fn.sum<bigint>('nuh.totalBytes'), 'desc')
             .limit(limit)
             .execute();

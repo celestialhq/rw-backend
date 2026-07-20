@@ -238,7 +238,7 @@ export class XRayConfig {
                 for (const user of users) {
                     inbound.settings.clients.push({
                         password: user.trojanPassword,
-                        email: user.tId.toString(),
+                        email: user.id.toString(),
                         id: user.vlessUuid,
                     });
                 }
@@ -253,7 +253,7 @@ export class XRayConfig {
                 for (const user of users) {
                     inbound.settings.clients.push({
                         id: user.vlessUuid,
-                        email: user.tId.toString(),
+                        email: user.id.toString(),
                     });
                 }
                 break;
@@ -268,7 +268,7 @@ export class XRayConfig {
                     inbound.settings.clients.push({
                         id: user.vlessUuid,
                         auth: user.vlessUuid,
-                        email: user.tId.toString(),
+                        email: user.id.toString(),
                     });
                 }
                 break;
@@ -286,7 +286,7 @@ export class XRayConfig {
                     inbound.settings.clients.push({
                         password: getSsPassword(user.ssPassword, isSS2022),
                         ...(!isSS2022 && { method: method || 'chacha20-ietf-poly1305' }),
-                        email: user.tId.toString(),
+                        email: user.id.toString(),
                         id: user.vlessUuid,
                     });
                 }

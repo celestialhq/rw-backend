@@ -49,7 +49,7 @@ export class GetFullUserResponseModel {
     };
 
     constructor(entity: UserEntity, subPublicDomain: string) {
-        this.id = Number(entity.tId);
+        this.id = Number(entity.id);
         this.shortUuid = entity.shortUuid;
         this.username = entity.username;
 

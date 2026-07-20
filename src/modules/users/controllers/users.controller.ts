@@ -250,7 +250,7 @@ export class UsersController {
     })
     async getUserById(@Param() param: GetUserByIdParamDto): Promise<UserResponseDto> {
         const result = await this.usersService.getUserByUniqueFields({
-            tId: BigInt(param.userId),
+            id: BigInt(param.userId),
         });
 
         const data = errorHandler(result);

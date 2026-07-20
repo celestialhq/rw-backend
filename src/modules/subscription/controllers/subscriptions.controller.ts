@@ -150,7 +150,7 @@ export class SubscriptionsController {
         const result = await this.subscriptionService.getSubscriptionInfo({
             searchBy: {
                 uniqueField: BigInt(userId),
-                uniqueFieldKey: 'tId',
+                uniqueFieldKey: 'id',
             },
             authenticated: true,
         });

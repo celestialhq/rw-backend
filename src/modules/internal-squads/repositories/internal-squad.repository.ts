@@ -272,7 +272,7 @@ export class InternalSquadRepository implements ICrud<InternalSquadEntity> {
                     .selectFrom('users')
                     .select([
                         eb.val(getKyselyUuid(internalSquadUuid)).as('internalSquadUuid'),
-                        'tId',
+                        'id',
                     ]),
             )
             .onConflict((oc) => oc.doNothing())

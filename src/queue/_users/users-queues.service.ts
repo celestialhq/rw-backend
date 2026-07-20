@@ -254,7 +254,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
                 batch.map((user) => ({
                     name: USERS_JOB_NAMES.FIRE_USER_EVENT,
                     data: {
-                        tId: user.tId.toString(),
+                        id: user.id.toString(),
                         meta: payload.meta,
                         userEvent: payload.userEvent,
                         skipTelegramNotification: payload.skipTelegramNotification,

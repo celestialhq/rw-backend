@@ -44,8 +44,7 @@ model RemnawaveSettings {
 }
 
 model Users {
-  tId                    BigInt    @id @default(autoincrement()) @map("t_id")
-  uuid                   String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                     BigInt    @id @default(autoincrement()) @map("id")
   shortUuid              String    @unique @map("short_uuid")
   username               String    @unique @map("username")
   /// @kyselyType('ACTIVE' | 'DISABLED' | 'LIMITED' | 'EXPIRED')
@@ -85,7 +84,7 @@ model Users {
 }
 
 model UserTraffic {
-  tId BigInt @id @map("t_id")
+  id BigInt @id @map("id")
 
   usedTrafficBytes         BigInt @default(0) @map("used_traffic_bytes")
   lifetimeUsedTrafficBytes BigInt @default(0) @map("lifetime_used_traffic_bytes")
@@ -95,7 +94,7 @@ model UserTraffic {
 
   firstConnectedAt DateTime? @map("first_connected_at")
 
-  user              Users  @relation(fields: [tId], references: [tId], onDelete: Cascade)
+  user              Users  @relation(fields: [id], references: [id], onDelete: Cascade)
   lastConnectedNode Nodes? @relation(fields: [lastConnectedNodeUuid], references: [uuid], onDelete: SetNull)
 
   @@map("user_traffic")
@@ -226,7 +225,7 @@ model NodesUserUsageHistory {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   node Nodes @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([nodeId, createdAt, userId])
   @@index([userId, createdAt])
@@ -349,7 +348,7 @@ model HwidUserDevices {
   userAgent   String? @map("user_agent")
   requestIp   String? @map("request_ip")
 
-  user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -379,7 +378,7 @@ model InternalSquadMembers {
   userId            BigInt @map("user_id")
 
   internalSquad InternalSquads @relation(fields: [internalSquadUuid], references: [uuid], onDelete: Cascade)
-  user          Users          @relation(fields: [userId], references: [tId], onDelete: Cascade)
+  user          Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([internalSquadUuid, userId])
   @@index([internalSquadUuid])
@@ -503,7 +502,7 @@ model UserSubscriptionRequestHistory {
   userAgent String?  @map("user_agent")
   requestAt DateTime @default(now()) @map("request_at")
 
-  user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("user_subscription_request_history")
@@ -597,7 +596,7 @@ model UserMeta {
   userId   BigInt @map("user_id")
   metadata Json   @map("metadata")
 
-  user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId])
   @@map("user_meta")
@@ -621,7 +620,7 @@ model TorrentBlockerReports {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  user Users @relation(fields: [userId], references: [tId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
   node Nodes @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   @@map("torrent_blocker_reports")

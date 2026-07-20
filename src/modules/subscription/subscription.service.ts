@@ -236,7 +236,7 @@ export class SubscriptionService {
 
             const hosts = await this.queryBus.execute(
                 new GetHostsForUserQuery(
-                    user.response.tId,
+                    user.response.id,
                     false,
                     srrContext.matchedResponseType === 'XRAY_JSON' ||
                         srrContext.matchedResponseType === 'MIHOMO',
@@ -248,7 +248,7 @@ export class SubscriptionService {
             }
 
             void this.updateAndReportSubscriptionRequest(
-                user.response.tId,
+                user.response.id,
                 userAgent,
                 srrContext.ip,
             );
@@ -360,7 +360,7 @@ export class SubscriptionService {
 
             if (!hwidCheckup || hwidCheckup.subscriptionAllowed) {
                 const hosts = await this.queryBus.execute(
-                    new GetHostsForUserQuery(user.tId, withDisabledHosts, true),
+                    new GetHostsForUserQuery(user.id, withDisabledHosts, true),
                 );
 
                 if (!hosts.isOk) {
@@ -479,7 +479,7 @@ export class SubscriptionService {
 
             if (!settings.hwidSettings.enabled || authenticated) {
                 const hostsResponse = await this.queryBus.execute(
-                    new GetHostsForUserQuery(userEntity.tId, false, false),
+                    new GetHostsForUserQuery(userEntity.id, false, false),
                 );
 
                 formattedHosts = await this.resolveProxyConfigService.resolveProxyConfig({
@@ -721,7 +721,7 @@ export class SubscriptionService {
                 if (hwidHeaders !== null) {
                     await this.usersQueuesService.checkAndUpsertHwidDevice({
                         hwid: hwidHeaders.hwid,
-                        userId: user.tId.toString(),
+                        userId: user.id.toString(),
                         platform: hwidHeaders.platform,
                         osVersion: hwidHeaders.osVersion,
                         deviceModel: hwidHeaders.deviceModel,
@@ -748,13 +748,13 @@ export class SubscriptionService {
 
             const isDeviceExists = await this.checkHwidDeviceExists({
                 hwid: hwidHeaders.hwid,
-                userId: user.tId,
+                userId: user.id,
             });
 
             if (isDeviceExists.isOk && isDeviceExists.response.exists) {
                 await this.usersQueuesService.checkAndUpsertHwidDevice({
                     hwid: hwidHeaders.hwid,
-                    userId: user.tId.toString(),
+                    userId: user.id.toString(),
                     platform: hwidHeaders.platform,
                     osVersion: hwidHeaders.osVersion,
                     deviceModel: hwidHeaders.deviceModel,
@@ -776,7 +776,7 @@ export class SubscriptionService {
                 new CreateWithAdvisoryLockCommand(
                     new HwidUserDeviceEntity({
                         hwid: hwidHeaders.hwid,
-                        userId: user.tId,
+                        userId: user.id,
                         platform: hwidHeaders.platform,
                         osVersion: hwidHeaders.osVersion,
                         deviceModel: hwidHeaders.deviceModel,
@@ -845,7 +845,7 @@ export class SubscriptionService {
 
             await this.usersQueuesService.checkAndUpsertHwidDevice({
                 hwid: hwidHeaders.hwid,
-                userId: user.tId.toString(),
+                userId: user.id.toString(),
                 platform: hwidHeaders.platform,
                 osVersion: hwidHeaders.osVersion,
                 deviceModel: hwidHeaders.deviceModel,
@@ -935,7 +935,7 @@ export class SubscriptionService {
             const userResult = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        tId: BigInt(userId),
+                        id: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,
@@ -974,7 +974,7 @@ export class SubscriptionService {
             }
 
             const allHostsResult = await this.queryBus.execute(
-                new GetHostsForUserQuery(userEntity.tId, true, true),
+                new GetHostsForUserQuery(userEntity.id, true, true),
             );
 
             const allHosts = allHostsResult.isOk ? allHostsResult.response : [];

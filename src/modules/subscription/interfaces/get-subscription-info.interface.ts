@@ -6,7 +6,7 @@ export interface IGetSubscriptionInfo {
     userEntity?: UserEntity;
     searchBy?: {
         uniqueField: string | bigint;
-        uniqueFieldKey: 'username' | 'shortUuid' | 'tId';
+        uniqueFieldKey: 'username' | 'shortUuid' | 'id';
     };
     authenticated?: boolean;
     subscriptionSettingsRaw?: SubscriptionSettingsEntity;

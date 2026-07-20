@@ -91,7 +91,7 @@ export class TemplateEngine {
             TAG: () => user.tag || '',
             EXPIRE_UNIX: () => dayjs(user.expireAt).unix(),
             SHORT_UUID: () => user.shortUuid,
-            ID: () => user.tId.toString(),
+            ID: () => user.id.toString(),
             TRAFFIC_USED_BYTES: () => user.userTraffic.usedTrafficBytes.toString(),
             TRAFFIC_LEFT_BYTES: () => trafficLeft().toString(),
             TOTAL_TRAFFIC_BYTES: () => user.trafficLimitBytes.toString(),

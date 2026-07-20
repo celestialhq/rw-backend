@@ -17,20 +17,19 @@ export namespace ResolveUserCommand {
 
     export const RequestBodySchema = z
         .object({
-            uuid: z.uuid().optional().meta({ deprecated: true }),
             id: z.number().optional(),
             shortUuid: z.string().optional(),
             username: z.string().optional(),
         })
         .refine(
             (data) => {
-                const provided = [data.uuid, data.id, data.shortUuid, data.username].filter(
+                const provided = [data.id, data.shortUuid, data.username].filter(
                     (v) => v !== undefined,
                 );
                 return provided.length === 1;
             },
             {
-                error: 'Exactly one of uuid, id, shortUuid, or username must be provided',
+                error: 'Exactly one of id, shortUuid, or username must be provided',
             },
         );
 
@@ -39,7 +38,6 @@ export namespace ResolveUserCommand {
             id: z.number(),
             username: z.string(),
             shortUuid: z.string(),
-            uuid: z.uuid().meta({ deprecated: true }),
         }),
     });
 
