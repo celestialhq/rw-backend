@@ -34,12 +34,7 @@ export const configSchema = z
             .transform((port) => parseInt(port, 10)),
         APP_SECRET: z
             .string()
-            .optional()
             .refine((val) => val !== 'change_me', 'APP_SECRET cannot be set to "change_me"'),
-        JWT_AUTH_SECRET: z
-            .string()
-            .optional()
-            .refine((val) => val !== 'change_me', 'JWT_AUTH_SECRET cannot be set to "change_me"'),
         JWT_AUTH_LIFETIME: z
             .string()
             .default('12')
@@ -155,15 +150,6 @@ export const configSchema = z
             .pipe(z.array(z.number()).optional()),
     })
     .superRefine((data, ctx) => {
-        if (!data.APP_SECRET && !data.JWT_AUTH_SECRET) {
-            ctx.issues.push({
-                input: data,
-                code: 'custom',
-                message: 'APP_SECRET is required.',
-                path: ['APP_SECRET'],
-            });
-        }
-
         if (!data.REDIS_SOCKET && (!data.REDIS_HOST || !data.REDIS_PORT)) {
             ctx.issues.push({
                 input: data,
@@ -466,23 +452,6 @@ export const configSchema = z
                 path: ['REMNAWAVE_BRANCH'],
             });
         }
-    })
-    .transform((data) => {
-        if (!data.APP_SECRET && data.JWT_AUTH_SECRET) {
-            // oxlint-disable-next-line
-            console.warn(
-                '[DEPRECATION] The "JWT_AUTH_SECRET" environment variable is deprecated and ' +
-                    'will be removed in the next minor release. Rename it to "APP_SECRET" in your ' +
-                    '.env file – the value stays exactly the same, only the key changes.',
-            );
-        }
-
-        const appSecret = (data.APP_SECRET ?? data.JWT_AUTH_SECRET)!;
-
-        return {
-            ...data,
-            APP_SECRET: appSecret,
-        };
     });
 
 export type ConfigSchema = z.infer<typeof configSchema>;
