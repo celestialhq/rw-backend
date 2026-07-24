@@ -99,6 +99,7 @@ export const TlsSecurityOptionsSchema = z.object({
     serverName: z.string().nullable(),
     echConfigList: z.string().nullable(),
     echForceQuery: z.string().nullable(),
+    echSockopt: z.nullable(z.unknown()),
 });
 
 export const RealitySecurityOptionsSchema = z.object({

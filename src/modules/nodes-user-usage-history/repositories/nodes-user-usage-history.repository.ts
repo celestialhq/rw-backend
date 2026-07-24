@@ -1,6 +1,7 @@
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Prisma } from '@prisma/client';
+import { sql } from 'kysely';
 
 import { Injectable } from '@nestjs/common';
 
@@ -188,6 +189,24 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
         return result.map((item) => Number(item.value));
     }
 
+    public async getNewUsersTrafficByRange(start: Date, endExclusive: Date): Promise<bigint> {
+        const result = await this.qb.kysely
+            .selectFrom('nodesUserUsageHistory as nuh')
+            .select([sql<bigint>`coalesce(sum(nuh.total_bytes), 0)`.as('totalBytes')])
+            .where('nuh.createdAt', '>=', start)
+            .where('nuh.createdAt', '<', endExclusive)
+            .where('nuh.userId', 'in', (eb) =>
+                eb
+                    .selectFrom('users')
+                    .select('users.id')
+                    .where('users.createdAt', '>=', start)
+                    .where('users.createdAt', '<', endExclusive),
+            )
+            .executeTakeFirstOrThrow();
+
+        return BigInt(result.totalBytes);
+    }
+
     public async getTopNodeUsersByTraffic(
         nodeId: bigint,
         start: Date,
@@ -196,16 +215,16 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
     ): Promise<IGetUniversalTopUser[]> {
         return await this.qb.kysely
             .selectFrom('users as u')
-            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.tId')
+            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.id')
             .select([
-                'u.tId as userId',
+                'u.id as userId',
                 'u.username',
                 (eb) => eb.fn.sum<bigint>('nuh.totalBytes').as('total'),
             ])
             .where('nuh.nodeId', '=', nodeId)
             .where('nuh.createdAt', '>=', start)
             .where('nuh.createdAt', '<=', end)
-            .groupBy(['u.tId', 'u.username'])
+            .groupBy(['u.id', 'u.username'])
             .orderBy((eb) => eb.fn.sum<bigint>('nuh.totalBytes'), 'desc')
             .limit(limit)
             .execute();
@@ -277,16 +296,16 @@ export class NodesUserUsageHistoryRepository implements ICrudHistoricalRecords<N
     ): Promise<IGetUniversalTopUser[]> {
         return await this.qb.kysely
             .selectFrom('users as u')
-            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.tId')
+            .innerJoin('nodesUserUsageHistory as nuh', 'nuh.userId', 'u.id')
             .select([
-                'u.tId as userId',
+                'u.id as userId',
                 'u.username',
                 (eb) => eb.fn.sum<bigint>('nuh.totalBytes').as('total'),
             ])
             .where('nuh.nodeId', 'in', nodeIds)
             .where('nuh.createdAt', '>=', start)
             .where('nuh.createdAt', '<=', end)
-            .groupBy(['u.tId', 'u.username'])
+            .groupBy(['u.id', 'u.username'])
             .orderBy((eb) => eb.fn.sum<bigint>('nuh.totalBytes'), 'desc')
             .limit(limit)
             .execute();

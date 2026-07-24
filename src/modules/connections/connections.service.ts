@@ -31,14 +31,14 @@ export class ConnectionsService {
     ): Promise<TResult<ConnectionsByUserResponseModel>> {
         try {
             const user = await this.queryBus.execute(
-                new GetUserByUniqueFieldQuery({ tId: BigInt(userId) }),
+                new GetUserByUniqueFieldQuery({ id: BigInt(userId) }),
             );
             if (!user.isOk) {
                 return fail(ERRORS.USER_NOT_FOUND);
             }
 
             const result = await this.nodesQueuesService.connectionsByUser({
-                userId: Number(user.response.tId),
+                userId: Number(user.response.id),
             });
 
             if (!result) {

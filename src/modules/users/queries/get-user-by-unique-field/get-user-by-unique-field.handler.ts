@@ -23,7 +23,7 @@ export class GetUserByUniqueFieldHandler implements IQueryHandler<
                 {
                     username: query.field.username,
                     shortUuid: query.field.shortUuid,
-                    tId: query.field.tId,
+                    id: query.field.id,
                 },
                 query.includeOptions,
             );

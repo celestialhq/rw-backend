@@ -165,7 +165,6 @@ export class SubscriptionService {
                     const response = new SubscriptionWithConfigResponse({
                         headers: this.getUserProfileHeadersInfo(
                             user.response,
-                            userAgent.startsWith('Happ/'),
                             subscriptionSettings,
                         ),
                         body: '',
@@ -237,7 +236,7 @@ export class SubscriptionService {
 
             const hosts = await this.queryBus.execute(
                 new GetHostsForUserQuery(
-                    user.response.tId,
+                    user.response.id,
                     false,
                     srrContext.matchedResponseType === 'XRAY_JSON' ||
                         srrContext.matchedResponseType === 'MIHOMO',
@@ -249,7 +248,7 @@ export class SubscriptionService {
             }
 
             void this.updateAndReportSubscriptionRequest(
-                user.response.tId,
+                user.response.id,
                 userAgent,
                 srrContext.ip,
             );
@@ -266,7 +265,6 @@ export class SubscriptionService {
             return new SubscriptionWithConfigResponse({
                 headers: this.getUserProfileHeadersInfo(
                     user.response,
-                    userAgent.startsWith('Happ/'),
                     subscriptionSettings,
                     hwidCheckup !== null && !hwidCheckup.limitBypassed,
                 ),
@@ -281,7 +279,6 @@ export class SubscriptionService {
 
     public async getRawSubscriptionByShortUuid(
         shortUuid: string,
-        userAgent: string | undefined,
         withDisabledHosts: boolean,
         hwidHeaders: HwidHeaders | null,
         requestIp?: string,
@@ -317,11 +314,7 @@ export class SubscriptionService {
 
             let hwidCheckup: null | IHwidCheckupResult = null;
 
-            const headers = this.getUserProfileHeadersInfo(
-                user,
-                userAgent?.startsWith('Happ/') ?? false,
-                patchedSettingEntity,
-            );
+            const headers = this.getUserProfileHeadersInfo(user, patchedSettingEntity);
 
             if (patchedSettingEntity.hwidSettings.enabled) {
                 const hwidCheckupResult = await this.checkHwidDeviceLimit(
@@ -367,7 +360,7 @@ export class SubscriptionService {
 
             if (!hwidCheckup || hwidCheckup.subscriptionAllowed) {
                 const hosts = await this.queryBus.execute(
-                    new GetHostsForUserQuery(user.tId, withDisabledHosts, true),
+                    new GetHostsForUserQuery(user.id, withDisabledHosts, true),
                 );
 
                 if (!hosts.isOk) {
@@ -486,7 +479,7 @@ export class SubscriptionService {
 
             if (!settings.hwidSettings.enabled || authenticated) {
                 const hostsResponse = await this.queryBus.execute(
-                    new GetHostsForUserQuery(userEntity.tId, false, false),
+                    new GetHostsForUserQuery(userEntity.id, false, false),
                 );
 
                 formattedHosts = await this.resolveProxyConfigService.resolveProxyConfig({
@@ -587,45 +580,15 @@ export class SubscriptionService {
 
     private getUserProfileHeadersInfo(
         user: UserEntity,
-        isHapp: boolean,
         settings: SubscriptionSettingsEntity,
         hwidLimit: boolean = false,
     ): ISubscriptionHeaders {
         const headers: ISubscriptionHeaders = {
             'content-disposition': `attachment; filename=${user.username}`,
-            'support-url': settings.supportLink,
-            'profile-title': `base64:${Buffer.from(
-                TemplateEngine.formatWithUser(
-                    settings.profileTitle,
-                    user,
-                    settings,
-                    this.subPublicDomain,
-                ),
-            ).toString('base64')}`,
-            'profile-update-interval': settings.profileUpdateInterval.toString(),
             'subscription-userinfo': Object.entries(getSubscriptionUserInfo(user))
                 .map(([key, val]) => `${key}=${val}`)
                 .join('; '),
         };
-
-        if (settings.happAnnounce) {
-            headers.announce = `base64:${Buffer.from(
-                TemplateEngine.formatWithUser(
-                    settings.happAnnounce,
-                    user,
-                    settings,
-                    this.subPublicDomain,
-                ),
-            ).toString('base64')}`;
-        }
-
-        if (isHapp && settings.happRouting) {
-            headers.routing = settings.happRouting;
-        }
-
-        if (settings.isProfileWebpageUrlEnabled) {
-            headers['profile-web-page-url'] = this.resolveSubscriptionUrl(user.shortUuid);
-        }
 
         const refillDate = getSubscriptionRefillDate(user.trafficLimitStrategy);
         if (refillDate) {
@@ -684,10 +647,23 @@ export class SubscriptionService {
                         };
                     }
 
+                    if (externalSquadSubscriptionSettings.responseHeadersRemove.length > 0) {
+                        const headersToRemove = new Set(
+                            externalSquadSubscriptionSettings.responseHeadersRemove,
+                        );
+                        patchedSubscriptionSettings.customResponseHeaders = Object.fromEntries(
+                            Object.entries(
+                                patchedSubscriptionSettings.customResponseHeaders ?? {},
+                            ).filter(([key]) => !headersToRemove.has(key)),
+                        );
+                    }
+
                     // Response headers override
-                    if (hasContent(externalSquadSubscriptionSettings.responseHeaders)) {
-                        patchedSubscriptionSettings.customResponseHeaders =
-                            externalSquadSubscriptionSettings.responseHeaders;
+                    if (hasContent(externalSquadSubscriptionSettings.responseHeadersAdd)) {
+                        patchedSubscriptionSettings.customResponseHeaders = {
+                            ...patchedSubscriptionSettings.customResponseHeaders,
+                            ...externalSquadSubscriptionSettings.responseHeadersAdd,
+                        };
                     }
 
                     // HWID settings override
@@ -745,7 +721,7 @@ export class SubscriptionService {
                 if (hwidHeaders !== null) {
                     await this.usersQueuesService.checkAndUpsertHwidDevice({
                         hwid: hwidHeaders.hwid,
-                        userId: user.tId.toString(),
+                        userId: user.id.toString(),
                         platform: hwidHeaders.platform,
                         osVersion: hwidHeaders.osVersion,
                         deviceModel: hwidHeaders.deviceModel,
@@ -772,13 +748,13 @@ export class SubscriptionService {
 
             const isDeviceExists = await this.checkHwidDeviceExists({
                 hwid: hwidHeaders.hwid,
-                userId: user.tId,
+                userId: user.id,
             });
 
             if (isDeviceExists.isOk && isDeviceExists.response.exists) {
                 await this.usersQueuesService.checkAndUpsertHwidDevice({
                     hwid: hwidHeaders.hwid,
-                    userId: user.tId.toString(),
+                    userId: user.id.toString(),
                     platform: hwidHeaders.platform,
                     osVersion: hwidHeaders.osVersion,
                     deviceModel: hwidHeaders.deviceModel,
@@ -800,7 +776,7 @@ export class SubscriptionService {
                 new CreateWithAdvisoryLockCommand(
                     new HwidUserDeviceEntity({
                         hwid: hwidHeaders.hwid,
-                        userId: user.tId,
+                        userId: user.id,
                         platform: hwidHeaders.platform,
                         osVersion: hwidHeaders.osVersion,
                         deviceModel: hwidHeaders.deviceModel,
@@ -869,7 +845,7 @@ export class SubscriptionService {
 
             await this.usersQueuesService.checkAndUpsertHwidDevice({
                 hwid: hwidHeaders.hwid,
-                userId: user.tId.toString(),
+                userId: user.id.toString(),
                 platform: hwidHeaders.platform,
                 osVersion: hwidHeaders.osVersion,
                 deviceModel: hwidHeaders.deviceModel,
@@ -959,7 +935,7 @@ export class SubscriptionService {
             const userResult = await this.queryBus.execute(
                 new GetUserByUniqueFieldQuery(
                     {
-                        tId: BigInt(userId),
+                        id: BigInt(userId),
                     },
                     {
                         activeInternalSquads: false,
@@ -998,7 +974,7 @@ export class SubscriptionService {
             }
 
             const allHostsResult = await this.queryBus.execute(
-                new GetHostsForUserQuery(userEntity.tId, true, true),
+                new GetHostsForUserQuery(userEntity.id, true, true),
             );
 
             const allHosts = allHostsResult.isOk ? allHostsResult.response : [];

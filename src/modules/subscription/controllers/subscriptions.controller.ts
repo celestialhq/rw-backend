@@ -22,7 +22,6 @@ import { RolesGuard } from '@common/guards/roles';
 import { ScopesGuard } from '@common/guards/scopes';
 import { errorHandler } from '@common/helpers/error-handler.helper';
 import { extractHwidHeaders } from '@common/utils/extract-hwid-headers';
-import { truncateHeader } from '@common/utils/truncate-header.util';
 import { CONTROLLERS_INFO, SUBSCRIPTIONS_CONTROLLER } from '@libs/contracts/api';
 import {
     GetConnectionKeysByUserIdCommand,
@@ -151,7 +150,7 @@ export class SubscriptionsController {
         const result = await this.subscriptionService.getSubscriptionInfo({
             searchBy: {
                 uniqueField: BigInt(userId),
-                uniqueFieldKey: 'tId',
+                uniqueFieldKey: 'id',
             },
             authenticated: true,
         });
@@ -176,7 +175,6 @@ export class SubscriptionsController {
     ): Promise<GetRawSubscriptionByShortUuidResponseDto> {
         const result = await this.subscriptionService.getRawSubscriptionByShortUuid(
             shortUuid,
-            truncateHeader(request.headers['user-agent']),
             withDisabledHosts,
             extractHwidHeaders(request),
             ip,

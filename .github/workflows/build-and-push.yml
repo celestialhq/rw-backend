@@ -171,11 +171,12 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           GHCR_IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+          MAJOR_VERSION="${GITHUB_REF_NAME%%.*}"
 
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             GHCR_TAGS=(-t "${GHCR_IMAGE}:latest" -t "${GHCR_IMAGE}:${GITHUB_REF_NAME}")
-            if [[ "$GITHUB_REF_NAME" == 2.* ]]; then
-              GHCR_TAGS+=(-t "${GHCR_IMAGE}:2")
+            if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]]; then
+              GHCR_TAGS+=(-t "${GHCR_IMAGE}:${MAJOR_VERSION}")
             fi
           else
             GHCR_TAGS=(-t "${GHCR_IMAGE}:main")
@@ -187,8 +188,8 @@ jobs:
           if [ -n "$DOCKERHUB_BACKEND_IMAGE" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
             if [ "$GITHUB_REF_TYPE" = "tag" ]; then
               DOCKERHUB_TAGS=(-t "${DOCKERHUB_BACKEND_IMAGE}:latest" -t "${DOCKERHUB_BACKEND_IMAGE}:${GITHUB_REF_NAME}")
-              if [[ "$GITHUB_REF_NAME" == 2.* ]]; then
-                DOCKERHUB_TAGS+=(-t "${DOCKERHUB_BACKEND_IMAGE}:2")
+              if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]]; then
+                DOCKERHUB_TAGS+=(-t "${DOCKERHUB_BACKEND_IMAGE}:${MAJOR_VERSION}")
               fi
             else
               DOCKERHUB_TAGS=(-t "${DOCKERHUB_BACKEND_IMAGE}:main")

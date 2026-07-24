@@ -1,10 +1,5 @@
 import { Body, Controller, Headers, HttpStatus, UseFilters } from '@nestjs/common';
-import {
-    ApiForbiddenResponse,
-    ApiResponse,
-    ApiTags,
-    ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { Endpoint } from '@common/decorators/base-endpoint';
 import { IpAddress } from '@common/decorators/get-ip/get-ip';

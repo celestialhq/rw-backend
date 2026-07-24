@@ -24,7 +24,7 @@ import {
 @Injectable()
 export class UsersQueuesService implements OnApplicationBootstrap {
     protected readonly logger: Logger = new Logger(UsersQueuesService.name);
-    private readonly disableSrhRecords: boolean;
+
     constructor(
         private readonly configService: TypedConfigService,
         @InjectQueue(QUEUES_NAMES.USERS.MODIFY_MANY) private readonly modifyManyUsersQueue: Queue,
@@ -40,9 +40,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
         private readonly userEventsQueue: Queue,
         @InjectQueue(QUEUES_NAMES.USERS.UPDATE_USERS_USAGE)
         private readonly updateUsersUsageQueue: Queue,
-    ) {
-        this.disableSrhRecords = this.configService.getOrThrow('SERVICE_DISABLE_SRH_RECORDS');
-    }
+    ) {}
 
     get queues() {
         return {
@@ -140,10 +138,6 @@ export class UsersQueuesService implements OnApplicationBootstrap {
     }
 
     public async addSubscriptionRequestRecord(payload: IAddUserSubscriptionRequestHistoryPayload) {
-        if (this.disableSrhRecords) {
-            return;
-        }
-
         return this.subscriptionRequestsQueue.add(
             USERS_JOB_NAMES.ADD_SUBSCRIPTION_REQUEST_RECORD,
             payload,
@@ -260,7 +254,7 @@ export class UsersQueuesService implements OnApplicationBootstrap {
                 batch.map((user) => ({
                     name: USERS_JOB_NAMES.FIRE_USER_EVENT,
                     data: {
-                        tId: user.tId.toString(),
+                        id: user.id.toString(),
                         meta: payload.meta,
                         userEvent: payload.userEvent,
                         skipTelegramNotification: payload.skipTelegramNotification,

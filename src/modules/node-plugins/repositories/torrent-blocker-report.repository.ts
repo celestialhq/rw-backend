@@ -31,7 +31,7 @@ const FILTER_COLUMN_MAP = {
 } as const;
 
 const SORT_COLUMN_MAP: Record<string, string> = {
-    userId: 'users.tId',
+    userId: 'users.id',
     'user.username': 'users.username',
     'node.uuid': 'nodes.uuid',
     'node.name': 'nodes.name',
@@ -52,7 +52,7 @@ export class TorrentBlockerReportsRepository {
     private get baseQb() {
         return this.qb.kysely
             .selectFrom('torrentBlockerReports')
-            .innerJoin('users', 'users.tId', 'torrentBlockerReports.userId')
+            .innerJoin('users', 'users.id', 'torrentBlockerReports.userId')
             .innerJoin('nodes', 'nodes.id', 'torrentBlockerReports.nodeId')
             .select([
                 'torrentBlockerReports.id',
@@ -220,9 +220,9 @@ export class TorrentBlockerReportsRepository {
     public async getTopTorrentBlockerUsers(): Promise<IGetTopTorrentBlockerUser[]> {
         return await this.qb.kysely
             .selectFrom('torrentBlockerReports')
-            .innerJoin('users', 'users.tId', 'torrentBlockerReports.userId')
-            .select(['users.tId as userId', 'users.username', sql<bigint>`COUNT(*)`.as('total')])
-            .groupBy(['users.tId', 'users.username'])
+            .innerJoin('users', 'users.id', 'torrentBlockerReports.userId')
+            .select(['users.id as userId', 'users.username', sql<bigint>`COUNT(*)`.as('total')])
+            .groupBy(['users.id', 'users.username'])
             .orderBy('total', 'desc')
             .limit(150)
             .execute();

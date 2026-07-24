@@ -1,6 +1,6 @@
 {
   "exclude": ["node_modules", "dist", "samples"],
-  "include": ["src/**/*", "@types/prismaJson.d.ts", "@types/types.d.ts"],
+  "include": ["src/**/*", "@types/prismaJson.d.ts", "@types/types.d.ts", "prisma/seed/**/*"],
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",

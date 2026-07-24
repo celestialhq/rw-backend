@@ -7,7 +7,8 @@ export class GetCachedExternalSquadSettingsQuery extends Query<Readonly<
         ExternalSquadEntity,
         | 'subscriptionSettings'
         | 'hostOverrides'
-        | 'responseHeaders'
+        | 'responseHeadersAdd'
+        | 'responseHeadersRemove'
         | 'hwidSettings'
         | 'customRemarks'
     >

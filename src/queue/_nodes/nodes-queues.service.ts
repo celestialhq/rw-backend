@@ -308,6 +308,22 @@ export class NodesQueuesService implements OnApplicationBootstrap {
         };
     }
 
+    public async exportNodeConnectionsBulk(payload: { nodeUuid: string }[]) {
+        return this.queryNodesQueue.addBulk(
+            payload.map((node) => {
+                return {
+                    name: NODES_JOB_NAMES.EXPORT_NODE_CONNECTIONS,
+                    data: node,
+                    opts: {
+                        jobId: `${NODES_JOB_NAMES.EXPORT_NODE_CONNECTIONS}-${node.nodeUuid}`,
+                        removeOnComplete: true,
+                        removeOnFail: true,
+                    },
+                };
+            }),
+        );
+    }
+
     public async dropUsersConnections(payload: IDropUsersConnectionsPayload) {
         return this.nodeBulkUsersQueue.add(NODES_JOB_NAMES.DROP_USERS_CONNECTIONS, payload);
     }

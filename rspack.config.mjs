@@ -6,8 +6,6 @@ import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import { TsCheckerRspackPlugin } from 'ts-checker-rspack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
-import pkg from './package.json' with { type: 'json' };
-
 const isDev = process.env.NODE_ENV !== 'production';
 const isGenDoc = process.env.BUILD_GEN_DOC === '1';
 const isSeed = process.env.BUILD_SEED === '1';
@@ -117,9 +115,6 @@ export default defineConfig({
                   new rspack.HotModuleReplacementPlugin(),
               ]
             : []),
-        new rspack.DefinePlugin({
-            __RWNODE_VERSION__: JSON.stringify(pkg.version),
-        }),
         ...(isDev
             ? []
             : [

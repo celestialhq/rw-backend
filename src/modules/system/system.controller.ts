@@ -30,6 +30,7 @@ import {
     GetRecapCommand,
     GetRemnawaveHealthCommand,
     GetStatsCommand,
+    GetStatsDigestCommand,
     GetHttpStatsCommand,
     TestSrrMatcherCommand,
 } from '@libs/contracts/commands';
@@ -48,6 +49,8 @@ import {
     GetMetadataResponseDto,
     GetRecapResponseDto,
     GetHttpStatsResponseDto,
+    GetStatsDigestQueryDto,
+    GetStatsDigestResponseDto,
 } from './dtos';
 import { RouteCounterService } from './route-counter.service';
 import { SystemService } from './system.service';
@@ -185,6 +188,22 @@ export class SystemController {
     })
     async getRecap(): Promise<GetRecapResponseDto> {
         const result = await this.systemService.getRecap();
+
+        const data = errorHandler(result);
+        return {
+            response: data,
+        };
+    }
+
+    @Endpoint({
+        command: GetStatsDigestCommand,
+        httpCode: HttpStatus.OK,
+        type: GetStatsDigestResponseDto,
+    })
+    async getStatsDigest(
+        @Query() query: GetStatsDigestQueryDto,
+    ): Promise<GetStatsDigestResponseDto> {
+        const result = await this.systemService.getStatsDigest(query);
 
         const data = errorHandler(result);
         return {

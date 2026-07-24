@@ -34,8 +34,6 @@ import { RemnawaveModules } from '@modules/remnawave-backend.modules';
                     }),
                 }),
             ],
-            global: true,
-            middleware: { mount: true },
         }),
         EventEmitterModule.forRoot({
             wildcard: true,

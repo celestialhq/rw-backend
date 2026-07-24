@@ -1,5 +1,5 @@
 export interface IGetUserByUnique {
-    tId?: bigint;
+    id?: bigint;
     username?: string;
     shortUuid?: string;
 }
