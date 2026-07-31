@@ -1,5 +1,6 @@
 import isEmail from 'validator/lib/isEmail';
 import isFQDN from 'validator/lib/isFQDN';
+import z from 'zod';
 
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -7,7 +8,7 @@ import { RawCacheService } from '@common/raw-cache';
 import { fail, ok, TResult } from '@common/types';
 import { CACHE_KEYS, ERRORS } from '@libs/contracts/constants';
 
-import { UpdateRemnawaveSettingsRequestDto } from './dto';
+import { UpdateRemnawaveSettingsBodyDto } from './dto';
 import { RemnawaveSettingsEntity } from './entities';
 import { RemnawaveSettingsRepository } from './repositories/remnawave-settings.repository';
 
@@ -26,12 +27,12 @@ export class RemnawaveSettingsService {
             return ok(settings);
         } catch (error) {
             this.logger.error(error);
-            return fail(ERRORS.GET_REMNAAWAVE_SETTINGS_ERROR);
+            return fail(ERRORS.GET_REMNAWAVE_SETTINGS_ERROR);
         }
     }
 
     public async updateSettingsFromController(
-        body: UpdateRemnawaveSettingsRequestDto,
+        body: UpdateRemnawaveSettingsBodyDto,
     ): Promise<TResult<RemnawaveSettingsEntity>> {
         try {
             const settings = await this.remnawaveSettingsRepository.getSettings();
@@ -45,7 +46,7 @@ export class RemnawaveSettingsService {
 
             if (!validationResult.valid) {
                 return fail(
-                    ERRORS.VALIDATE_REMNAAWAVE_SETTINGS_ERROR.withMessage(validationResult.error!),
+                    ERRORS.VALIDATE_REMNAWAVE_SETTINGS_ERROR.withMessage(validationResult.error!),
                 );
             }
 
@@ -58,7 +59,7 @@ export class RemnawaveSettingsService {
             return await this.getSettingsFromController();
         } catch (error) {
             this.logger.error(error);
-            return fail(ERRORS.UPDATE_REMNAAWAVE_SETTINGS_ERROR);
+            return fail(ERRORS.UPDATE_REMNAWAVE_SETTINGS_ERROR);
         }
     }
 
@@ -134,11 +135,12 @@ export class RemnawaveSettingsService {
             // Test 4: Check up required fields for PocketID authentication
             if (
                 settings.oauth2Settings.pocketid.enabled &&
-                !settings.oauth2Settings.pocketid.plainDomain
+                (!settings.oauth2Settings.pocketid.plainDomain ||
+                    !settings.oauth2Settings.pocketid.frontendDomain)
             ) {
                 return {
                     valid: false,
-                    error: '[PocketID] Plain domain must be set in order to use PocketID authentication.',
+                    error: '[PocketID] Plain domain and frontend domain must be set in order to use PocketID authentication.',
                 };
             }
 
@@ -160,7 +162,8 @@ export class RemnawaveSettingsService {
             for (const provider of oauth2Providers) {
                 if (provider.enabled && provider.allowedEmails.length > 0) {
                     for (const email of provider.allowedEmails) {
-                        if (!isEmail(email)) {
+                        const emailSchema = z.email().safeParse(email);
+                        if (!emailSchema.success) {
                             return {
                                 valid: false,
                                 error: `[OAuth2] Email ${email} is not a valid email address.`,
@@ -181,7 +184,8 @@ export class RemnawaveSettingsService {
             for (const provider of genericOAuth2Providers) {
                 if (provider.enabled && provider.allowedEmails.length > 0) {
                     for (const email of provider.allowedEmails) {
-                        if (!isEmail(email)) {
+                        const emailSchema = z.email().safeParse(email);
+                        if (!emailSchema.success) {
                             return {
                                 valid: false,
                                 error: `[OAuth2] Email ${email} is not a valid email address.`,

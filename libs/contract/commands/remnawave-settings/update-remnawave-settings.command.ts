@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { REMNAAWAVE_SETTINGS_ROUTES, REST_API } from '../../api';
+import { REMNAWAVE_SETTINGS_ROUTES, REST_API } from '../../api';
 import { getEndpointDetails } from '../../constants';
 import {
     BrandingSettingsSchema,
@@ -16,13 +16,13 @@ export namespace UpdateRemnawaveSettingsCommand {
     export const TSQ_url = url;
 
     export const endpointDetails = getEndpointDetails(
-        REMNAAWAVE_SETTINGS_ROUTES.UPDATE,
+        REMNAWAVE_SETTINGS_ROUTES.UPDATE,
         'patch',
         'Update Remnawave settings',
         { scope: 'update', kind: 'write' },
     );
 
-    export const RequestSchema = z.object({
+    export const RequestBodySchema = z.object({
         passkeySettings: PasskeySettingsSchema.optional(),
         oauth2Settings: Oauth2SettingsSchema.optional(),
         passwordSettings: PasswordAuthSettingsSchema.optional(),
@@ -30,11 +30,10 @@ export namespace UpdateRemnawaveSettingsCommand {
         brandingSettings: BrandingSettingsSchema.optional(),
     });
 
-    export type Request = z.infer<typeof RequestSchema>;
-
     export const ResponseSchema = z.object({
         response: RemnawaveSettingsSchema,
     });
 
+    export type RequestBody = z.infer<typeof RequestBodySchema>;
     export type Response = z.infer<typeof ResponseSchema>;
 }

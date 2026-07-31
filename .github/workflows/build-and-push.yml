@@ -173,11 +173,13 @@ jobs:
             IMAGES="${IMAGES},${DOCKERHUB_BACKEND_IMAGE}"
           fi
 
+          MAJOR_VERSION="${GITHUB_REF_NAME%%.*}"
+
           IFS=',' read -ra IMAGE_ARR <<< "$IMAGES"
           for IMAGE in "${IMAGE_ARR[@]}"; do
             TAGS=(-t "${IMAGE}:latest" -t "${IMAGE}:${{ github.ref_name }}")
-            if [[ "${{ github.ref_name }}" == 2.* ]]; then
-              TAGS+=(-t "${IMAGE}:2")
+            if [[ "$MAJOR_VERSION" =~ ^[0-9]+$ ]]; then
+              TAGS+=(-t "${IMAGE}:${MAJOR_VERSION}")
             fi
             docker buildx imagetools create \
               "${TAGS[@]}" \
