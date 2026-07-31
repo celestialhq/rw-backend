@@ -1,6 +1,6 @@
 {
   "name": "@celestialhq/backend-contract",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "AGPL-3.0-only",
   "description": "A contract library for Remnawave Backend. It can be used in backend and frontend.",
   "author": "CelestialHQ",
