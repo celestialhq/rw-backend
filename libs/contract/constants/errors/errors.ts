@@ -1269,4 +1269,140 @@ export const ERRORS = {
             httpCode: 400,
         }),
     },
+    ACME_SECRET_KEY_MISSING: {
+        code: 'A253',
+        message:
+            'ACME_SECRET_KEY is not set. Generate one with "cli generate-acme-key" and restart the panel.',
+        httpCode: 400,
+    },
+    ACME_CREDENTIAL_NOT_FOUND: {
+        code: 'A254',
+        message: 'ACME credential not found',
+        httpCode: 404,
+    },
+    ACME_CREDENTIAL_NAME_ALREADY_EXISTS: {
+        code: 'A255',
+        message: 'ACME credential name already exists',
+        httpCode: 400,
+    },
+    ACME_CREDENTIAL_IN_USE: {
+        code: 'A256',
+        message: 'ACME credential is used by certificates',
+        httpCode: 400,
+    },
+    GET_ACME_CREDENTIALS_ERROR: {
+        code: 'A257',
+        message: 'Get ACME credentials error',
+        httpCode: 500,
+    },
+    CREATE_ACME_CREDENTIAL_ERROR: {
+        code: 'A258',
+        message: 'Create ACME credential error',
+        httpCode: 500,
+    },
+    UPDATE_ACME_CREDENTIAL_ERROR: {
+        code: 'A259',
+        message: 'Update ACME credential error',
+        httpCode: 500,
+    },
+    DELETE_ACME_CREDENTIAL_ERROR: {
+        code: 'A260',
+        message: 'Delete ACME credential error',
+        httpCode: 500,
+    },
+    ACME_CREDENTIAL_TEST_FAILED: {
+        code: 'A261',
+        message: 'ACME credential test failed',
+        httpCode: 400,
+        withMessage: (message: string) => ({
+            code: 'A261',
+            message,
+            httpCode: 400,
+        }),
+    },
+    ACME_CERTIFICATE_NOT_FOUND: {
+        code: 'A262',
+        message: 'ACME certificate not found',
+        httpCode: 404,
+    },
+    ACME_CERTIFICATE_NAME_ALREADY_EXISTS: {
+        code: 'A263',
+        message: 'ACME certificate name already exists',
+        httpCode: 400,
+    },
+    GET_ACME_CERTIFICATES_ERROR: {
+        code: 'A264',
+        message: 'Get ACME certificates error',
+        httpCode: 500,
+    },
+    CREATE_ACME_CERTIFICATE_ERROR: {
+        code: 'A265',
+        message: 'Create ACME certificate error',
+        httpCode: 500,
+    },
+    UPDATE_ACME_CERTIFICATE_ERROR: {
+        code: 'A266',
+        message: 'Update ACME certificate error',
+        httpCode: 500,
+    },
+    DELETE_ACME_CERTIFICATE_ERROR: {
+        code: 'A267',
+        message: 'Delete ACME certificate error',
+        httpCode: 500,
+    },
+    ACME_CERTIFICATE_ISSUE_ERROR: {
+        code: 'A268',
+        message: 'ACME certificate issuance failed',
+        httpCode: 500,
+        withMessage: (message: string) => ({
+            code: 'A268',
+            message,
+            httpCode: 500,
+        }),
+    },
+    ACME_INVALID_CERTIFICATE_REQUEST: {
+        code: 'A269',
+        message: 'Invalid ACME certificate request',
+        httpCode: 400,
+        withMessage: (message: string) => ({
+            code: 'A269',
+            message,
+            httpCode: 400,
+        }),
+    },
+    ACME_PERSIST_RECORD_NOT_APPLICABLE: {
+        code: 'A270',
+        message: 'Persistent authorization records apply to dns-persist-01 certificates only',
+        httpCode: 400,
+    },
+    ACME_SOLVER_ERROR: {
+        code: 'A271',
+        message: 'DNS solver error',
+        httpCode: 502,
+        withMessage: (message: string) => ({
+            code: 'A271',
+            message,
+            httpCode: 502,
+        }),
+    },
+    ACME_INVALID_PEM: {
+        code: 'A272',
+        message: 'The certificate or the private key could not be read',
+        httpCode: 400,
+        withMessage: (message: string) => ({
+            code: 'A272',
+            message,
+            httpCode: 400,
+        }),
+    },
+    ACME_CERTIFICATE_NOT_IMPORTED: {
+        code: 'A273',
+        message: 'Only imported certificates can have their material replaced',
+        httpCode: 400,
+    },
+    ACME_CERTIFICATE_IS_IMPORTED: {
+        code: 'A274',
+        message: 'Imported certificates are not issued by the panel; upload a new one instead',
+        httpCode: 400,
+    },
 } as const;

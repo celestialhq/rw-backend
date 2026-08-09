@@ -7,12 +7,17 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { AxiosService } from '@common/axios/axios.service';
+import {
+    getCertificatesFingerprint,
+    injectNodeCertificates,
+} from '@common/helpers/xray-config/inject-node-certificates';
 import { RawCacheService } from '@common/raw-cache';
 import { formatExecutionTime, getTime } from '@common/utils/get-elapsed-time';
 import { CACHE_KEYS, CACHE_KEYS_TTL, EVENTS } from '@libs/contracts/constants';
 
 import { NodeEvent } from '@integration-modules/notifications/interfaces';
 
+import { GetCertificatesForNodeQuery } from '@modules/acme/queries/get-certificates-for-node';
 import { GetResolvedIntegrationsQuery } from '@modules/node-integrations/queries/get-resolved-integrations';
 import { mergeNodeIntegrations } from '@modules/node-integrations/utils';
 import { GetPluginByUuidQuery } from '@modules/node-plugins/queries/get-plugin-by-uuid';
@@ -218,13 +223,30 @@ export class StartNodeProcessor extends WorkerHost {
                     .filter((integration) => integration !== undefined),
             );
 
+            // Certificates managed by the panel are added to this node's copy of
+            // the config, and their fingerprint goes into the hash: the profile
+            // itself does not change when a certificate is renewed, so without it
+            // the node would keep serving the expiring one.
+            const certificates = await this.queryBus.execute(
+                new GetCertificatesForNodeQuery(node.uuid),
+            );
+
+            const hashes = { ...config.response.hashesPayload };
+
+            if (certificates.isOk && certificates.response.length > 0) {
+                injectNodeCertificates(config.response.config, certificates.response);
+
+                hashes.emptyConfig = `${hashes.emptyConfig}:${getCertificatesFingerprint(certificates.response)}`;
+            }
+
+
             const reqStartTime = getTime();
 
             const startNodeResult = await this.axios.startXray(
                 {
                     xrayConfig: config.response.config as unknown as Record<string, unknown>,
                     internals: {
-                        hashes: config.response.hashesPayload,
+                        hashes,
                         forceRestart: force ?? false,
                         metadata: {
                             uuid: node.uuid,

@@ -3,6 +3,7 @@ import { ConditionalModule } from '@nestjs/config';
 
 import { isRestApi, isScheduler } from '@common/utils/startup-app';
 
+import { AcmeModule } from './acme/acme.module';
 import { AdminModule } from './admin/admin.module';
 import { ApiTokensModule } from './api-tokens/api-tokens.module';
 import { AuthModule } from './auth/auth.module';
@@ -48,6 +49,9 @@ import { UsersModule } from './users/users.module';
         NodesModule,
         NodePluginModule,
         NodeIntegrationModule,
+        // Certificates are read by the workers that build node configs and written
+        // by the REST API, so the module lives in both instance types.
+        AcmeModule,
         HostsModule,
         NodesUserUsageHistoryModule,
         HwidUserDevicesModule,
