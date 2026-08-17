@@ -107,7 +107,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           build-args: |
             FRONTEND_URL=${{ steps.meta.outputs.frontend_url }}
-            __RW_METADATA_GIT_BRANCH=${{ github.ref_name }}
+            __RW_METADATA_GIT_BRANCH=main
             __RW_METADATA_BUILD_TIME=${{ steps.meta.outputs.build_time }}
             __RW_METADATA_BUILD_NUMBER=${{ github.run_number }}
             __RW_METADATA_VERSION=${{ steps.meta.outputs.version }}
