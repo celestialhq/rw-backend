@@ -2,10 +2,19 @@ import { z } from 'zod';
 
 const DOCS_LINK = `\n\n[📖 Documentation](https://docs.rw/docs/learn/node-plugins)`;
 
+// https://github.com/colinhacks/zod/issues/5944
+const IPV6 = z.regexes.ipv6.source.slice(1, -1);
+
+const ipv6 = () => z.string().regex(new RegExp(`^(${IPV6})$`), { error: 'Invalid IPv6 address' });
+const cidrv6 = () =>
+    z.string().regex(new RegExp(`^(${IPV6})\\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$`), {
+        error: 'Invalid IPv6 CIDR range',
+    });
+
 const IpCidrOrExtSchema = z
     .union([
-        z.union([z.cidrv4(), z.cidrv6()]),
-        z.union([z.ipv4(), z.ipv6()]),
+        z.union([z.cidrv4(), cidrv6()]),
+        z.union([z.ipv4(), ipv6()]),
         z.string().startsWith('ext:'),
     ])
     .meta({
@@ -13,17 +22,68 @@ const IpCidrOrExtSchema = z
         markdownDescription: `IP address or CIDR range. \n\n You can use lists from **sharedLists** in the format: **ext:list_name**.${DOCS_LINK}`,
     });
 
+const IpListSchema = z
+    .object({
+        type: z.literal('ipList').meta({
+            title: 'IP List',
+            markdownDescription: `A list of IP addresses and CIDR ranges.${DOCS_LINK}`,
+        }),
+        items: z.array(z.union([z.cidrv4(), cidrv6(), z.union([z.ipv4(), ipv6()])])).meta({
+            title: 'IP addresses and CIDR ranges',
+            markdownDescription: [
+                'IPv4 and IPv6 addresses, plain or as CIDR ranges. Mixing both families in one list is allowed.',
+                '',
+                '```json',
+                '{',
+                '  "type": "ipList",',
+                '  "items": ["1.1.1.1", "10.0.0.0/8", "2001:db8::1", "2001:db8::/32"]',
+                '}',
+                '```',
+                DOCS_LINK,
+            ].join('\n'),
+        }),
+    })
+    .meta({
+        title: 'IP List',
+        markdownDescription: `Shared list of IP addresses and CIDR ranges.${DOCS_LINK}`,
+    });
+
+const AsListSchema = z
+    .object({
+        type: z.literal('asList').meta({
+            title: 'AS List',
+            markdownDescription: `A list of autonomous system numbers.${DOCS_LINK}`,
+        }),
+        items: z.array(z.int().min(1).max(4294967295)).meta({
+            title: 'Autonomous system numbers',
+            markdownDescription: [
+                'ASN numbers without the `AS` prefix, from 1 to 4294967295.',
+                '',
+                '```json',
+                '{',
+                '  "type": "asList",',
+                '  "items": [13335, 15169, 32934]',
+                '}',
+                '```',
+                DOCS_LINK,
+            ].join('\n'),
+        }),
+    })
+    .meta({
+        title: 'AS List',
+        markdownDescription: `Shared list of autonomous system numbers.${DOCS_LINK}`,
+    });
+
+export const SharedListConfigSchema = z
+    .discriminatedUnion('type', [IpListSchema, AsListSchema])
+    .meta({
+        title: 'Shared List',
+        markdownDescription: `Shared list body. Pick **ipList** for IP addresses and CIDR ranges, or **asList** for autonomous system numbers.${DOCS_LINK}`,
+    });
+
 export const SharedListSchema = z.discriminatedUnion('type', [
-    z.object({
-        name: z.string().startsWith('ext:'),
-        type: z.literal('ipList'),
-        items: z.array(z.union([z.cidrv4(), z.cidrv6(), z.union([z.ipv4(), z.ipv6()])])),
-    }),
-    z.object({
-        name: z.string().startsWith('ext:'),
-        type: z.literal('asList'),
-        items: z.array(z.int().min(1).max(4294967295)),
-    }),
+    IpListSchema.extend({ name: z.string().startsWith('ext:') }),
+    AsListSchema.extend({ name: z.string().startsWith('ext:') }),
 ]);
 
 export const TorrentBlockerPluginSchema = z.object({
@@ -38,7 +98,7 @@ export const TorrentBlockerPluginSchema = z.object({
     ignoreLists: z
         .object({
             ip: z
-                .array(z.union([z.union([z.ipv4(), z.ipv6()]), z.string().startsWith('ext:')]))
+                .array(z.union([z.union([z.ipv4(), ipv6()]), z.string().startsWith('ext:')]))
                 .optional()
                 .meta({
                     title: 'IP',
@@ -72,7 +132,7 @@ export const ConnectionDropPluginSchema = z.object({
         markdownDescription: `Controls whether IP addresses from the **whitelistIps** object will be used.${DOCS_LINK}`,
     }),
     whitelistIps: z
-        .array(z.union([z.union([z.ipv4(), z.ipv6()]), z.string().startsWith('ext:')]))
+        .array(z.union([z.union([z.ipv4(), ipv6()]), z.string().startsWith('ext:')]))
         .meta({
             title: 'Whitelist IPs',
             markdownDescription: `List of IP addresses, for which the connection drop will not be applied, which is enabled by default for all IP addresses. \n\n You can use lists from **sharedLists** in the format: **ext:list_name**. Please note that this field only supports IP addresses ranges, not CIDR ranges.${DOCS_LINK}`,
@@ -182,4 +242,8 @@ export const NodePluginSchema = z.object({
     }),
 });
 
+export const NodePluginEditorSchema = NodePluginSchema.omit({ sharedLists: true });
+
+export type TSharedListConfig = z.infer<typeof SharedListConfigSchema>;
 export type TNodePlugin = z.infer<typeof NodePluginSchema>;
+export type TNodePluginEditor = z.infer<typeof NodePluginEditorSchema>;
