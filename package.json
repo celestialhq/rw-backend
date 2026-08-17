@@ -1,6 +1,6 @@
 {
   "name": "@remnawave/backend",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "Remnawave Panel Backend",
   "private": false,
   "description": "Remnawave Panel Backend",
@@ -111,7 +111,7 @@
     "validator": "^13.15.35",
     "winston": "^3.19.0",
     "xbytes": "^1.9.1",
-    "xray-typed": "^1.1.2",
+    "xray-typed": "^1.2.1",
     "zod": "4.4.3"
   },
   "devDependencies": {
