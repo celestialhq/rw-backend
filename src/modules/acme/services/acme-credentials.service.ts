@@ -250,7 +250,7 @@ export class AcmeCredentialsService {
             return null;
         }
 
-        const merged: TAcmeCredentialPayload = { ...(current ?? {}) };
+        const merged: TAcmeCredentialPayload = { ...current };
         let touched = false;
 
         for (const field of info.fields) {
