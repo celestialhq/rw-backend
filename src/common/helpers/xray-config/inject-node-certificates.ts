@@ -57,7 +57,7 @@ export function injectNodeCertificates(
             // Keep whatever else the entry carried (usage, ocspStapling), but drop
             // the file paths: an inline certificate wins over a file that would
             // otherwise be re-read on the node.
-            const { certificateFile, keyFile, ...rest } = existing[index];
+            const { certificateFile: _certificateFile, keyFile: _keyFile, ...rest } = existing[index];
 
             existing[index] = { ...rest, ...entry };
         }
